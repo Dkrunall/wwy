@@ -203,7 +203,7 @@ function ProductCard({ product }: { product: typeof products[0] }) {
           />
         </div>
 
-        <div className="absolute inset-x-0 bottom-6 sm:bottom-8 z-20 flex justify-center translate-y-0 opacity-100 lg:opacity-0 lg:translate-y-8 lg:group-hover:opacity-100 lg:group-hover:translate-y-0 transition-all duration-500 delay-100">
+        <div className="absolute inset-x-0 bottom-6 sm:bottom-8 z-20 flex justify-center transition-all duration-500">
           <button
             onClick={() => addItem({ id: product.id, name: product.name, price: product.price, priceNum: product.priceNum, image: product.image, bgColor: product.bgColor })}
             className="bg-brand-charcoal text-brand-oat active:bg-brand-terracotta hover:bg-brand-terracotta hover:text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] shadow-xl flex items-center gap-2 active:scale-95 transition-all">
