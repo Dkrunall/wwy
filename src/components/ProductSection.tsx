@@ -91,7 +91,6 @@ export default function ProductSection() {
           start: "center center",
           end: () => `+=${slider.scrollWidth}`,
           pin: true,
-          animation: gsap.to(slider, { x: getScrollAmount, ease: "none" }),
           scrub: 1,
           invalidateOnRefresh: true,
         }
