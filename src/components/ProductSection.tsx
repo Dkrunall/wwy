@@ -120,7 +120,7 @@ export default function ProductSection() {
   return (
     <section
       ref={sectionRef}
-      className="bg-brand-oat w-full relative z-20 flex flex-col justify-center overflow-hidden py-16 sm:py-20 lg:py-12 lg:min-h-screen"
+      className="bg-brand-oat w-full relative z-20 flex flex-col justify-center lg:overflow-hidden py-16 sm:py-20 lg:py-12 lg:min-h-screen"
     >
       {/* Section Header */}
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl mb-8 sm:mb-12 flex-shrink-0">
@@ -203,10 +203,10 @@ function ProductCard({ product }: { product: typeof products[0] }) {
           />
         </div>
 
-        <div className="absolute inset-x-0 bottom-6 sm:bottom-8 z-20 flex justify-center opacity-0 transform translate-y-8 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 delay-100">
+        <div className="absolute inset-x-0 bottom-6 sm:bottom-8 z-20 flex justify-center translate-y-0 opacity-100 lg:opacity-0 lg:translate-y-8 lg:group-hover:opacity-100 lg:group-hover:translate-y-0 transition-all duration-500 delay-100">
           <button
             onClick={() => addItem({ id: product.id, name: product.name, price: product.price, priceNum: product.priceNum, image: product.image, bgColor: product.bgColor })}
-            className="bg-brand-charcoal text-brand-oat hover:bg-brand-terracotta hover:text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] shadow-xl flex items-center gap-2 active:scale-95 transition-all">
+            className="bg-brand-charcoal text-brand-oat active:bg-brand-terracotta hover:bg-brand-terracotta hover:text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] shadow-xl flex items-center gap-2 active:scale-95 transition-all">
             Add to Cart
           </button>
         </div>
