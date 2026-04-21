@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { X, Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import { useCart } from "./CartContext";
 
@@ -138,9 +139,13 @@ export default function CartDrawer() {
             <p className="text-[10px] text-brand-charcoal/40 font-medium -mt-2">
               Shipping calculated at checkout
             </p>
-            <button className="w-full bg-brand-charcoal text-white hover:bg-brand-terracotta py-4 rounded-full font-black text-xs tracking-[0.2em] uppercase shadow-lg active:scale-[0.98] transition-all duration-300">
-              Checkout
-            </button>
+            <Link
+              href="/cart"
+              onClick={closeCart}
+              className="block w-full bg-brand-charcoal text-white hover:bg-brand-terracotta py-4 rounded-full font-black text-xs tracking-[0.2em] uppercase shadow-lg active:scale-[0.98] transition-all duration-300 text-center"
+            >
+              Review Order
+            </Link>
             <button
               onClick={closeCart}
               className="w-full text-brand-charcoal/50 hover:text-brand-terracotta text-[10px] font-black tracking-[0.15em] uppercase transition-colors"
