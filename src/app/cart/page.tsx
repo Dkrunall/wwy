@@ -22,7 +22,7 @@ export default function CartPage() {
       <Navbar />
       <CartDrawer />
 
-      <div className="container mx-auto px-4 sm:px-6 max-w-6xl pt-36 sm:pt-40 pb-24">
+      <div className="w-full px-4 sm:px-8 xl:px-16 pt-36 sm:pt-40 pb-24">
 
         {/* Page Header */}
         <div className="mb-10 sm:mb-14">
