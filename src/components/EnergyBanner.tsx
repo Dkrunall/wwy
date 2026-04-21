@@ -58,7 +58,7 @@ export default function EnergyBanner() {
         className="font-serif font-black italic text-brand-oat absolute z-0 opacity-[0.07] select-none pointer-events-none whitespace-nowrap text-center drop-shadow-2xl"
         style={{ fontSize: "clamp(5rem, 18vw, 20rem)", lineHeight: 0.7 }}
       >
-        VITALITY VITALITY VITALITY
+        CHARACTER CHARACTER CHARACTER
       </h2>
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10 flex flex-col items-center w-full max-w-[1400px]">
@@ -68,7 +68,7 @@ export default function EnergyBanner() {
           className="font-serif font-black text-brand-oat text-center leading-[0.8] mb-12 sm:mb-20 tracking-tighter drop-shadow-2xl relative z-30"
           style={{ fontSize: "clamp(4rem, 12vw, 8rem)" }}
         >
-          Unwrap <span className="italic font-light text-brand-gold relative">Energy.
+          Alive in <span className="italic font-light text-brand-gold relative">every sip.
             <svg className="absolute -bottom-4 left-0 w-full h-8 text-brand-terracotta opacity-80" viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0 10 Q 50 20 100 10" fill="transparent" stroke="currentColor" strokeWidth="4" strokeLinecap="round"/></svg>
           </span>
         </h3>

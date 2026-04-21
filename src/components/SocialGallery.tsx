@@ -145,8 +145,8 @@ export default function SocialGallery() {
         <div className="absolute top-1/2 left-0 w-full -translate-y-1/2 z-0 whitespace-nowrap">
           <div className="flex font-black uppercase tracking-widest text-[#FEC84D] marquee-content"
             style={{ fontSize: "clamp(1.2rem, 4vw, 2.5rem)" }}>
-            <span>JOIN THE CULT • FERMENT WILDLY • JOIN THE CULT • FERMENT WILDLY • JOIN THE CULT • FERMENT WILDLY •&nbsp;</span>
-            <span>JOIN THE CULT • FERMENT WILDLY • JOIN THE CULT • FERMENT WILDLY • JOIN THE CULT • FERMENT WILDLY •&nbsp;</span>
+            <span>SLOW FERMENTED • ROOTED IN PROCESS • HONEST INGREDIENTS • LIVING FOOD • NATURALLY LEAVENED • SLOW FERMENTED • ROOTED IN PROCESS •&nbsp;</span>
+            <span>SLOW FERMENTED • ROOTED IN PROCESS • HONEST INGREDIENTS • LIVING FOOD • NATURALLY LEAVENED • SLOW FERMENTED • ROOTED IN PROCESS •&nbsp;</span>
           </div>
         </div>
       </div>

@@ -70,7 +70,7 @@ export default function Hero() {
 
           <div className="hero-text inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-2 rounded-full bg-white text-brand-charcoal text-[9px] sm:text-[10px] md:text-xs font-black uppercase tracking-[0.2em] mb-6 sm:mb-8 shadow-sm border border-brand-charcoal/5">
             <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-brand-terracotta animate-pulse shrink-0"></span>
-            Now Available Worldwide
+            Slow-Fermented. Small Batch.
           </div>
 
           <h1 className="hero-text font-black tracking-tighter text-brand-charcoal mb-6 sm:mb-8 leading-[0.85]"
@@ -79,7 +79,7 @@ export default function Hero() {
           </h1>
 
           <p className="hero-text text-base sm:text-lg md:text-xl font-bold text-brand-charcoal/70 max-w-sm sm:max-w-md mb-8 sm:mb-12">
-            Unapologetically natural sodas and sourdough cultures, fermented with pure wild energy.
+            Natural sodas and sourdough cultures. Slow-fermented. Nothing added.
           </p>
 
           <div className="hero-text flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">

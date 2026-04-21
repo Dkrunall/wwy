@@ -21,7 +21,7 @@ export default function Footer() {
               FERMENT YOUR <br /> <span className="text-brand-terracotta">ROUTINE.</span>
             </h3>
             <p className="text-brand-oat/60 font-bold text-xs sm:text-sm max-w-xs">
-              Authentic natural sodas and wild sourdough starters delivered raw to your door.
+              Living food, made slowly. Delivered to your door.
             </p>
           </div>
 

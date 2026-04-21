@@ -83,11 +83,11 @@ export default function StorySection() {
             </h2>
 
             <p className="story-text text-sm sm:text-base md:text-xl text-brand-oat/80 font-bold leading-relaxed max-w-xl mb-6 sm:mb-8">
-              We believe in the slow, chaotic magic of wild fermentation. There are no shortcuts, no lab-made cultures, and zero artificial sweeteners.
+              Wild fermentation moves at its own pace. No shortcuts. No lab-made cultures. No artificial sweeteners.
             </p>
 
             <p className="story-text text-sm sm:text-base md:text-xl text-brand-oat/80 font-bold leading-relaxed max-w-xl mb-10 sm:mb-16">
-              From our botanical soda to our artisan sourdough, everything is cultivated using 100-year-old starters and locally sourced ingredients.
+              From botanical sodas to naturally leavened bread — everything is built on century-old starters and honest, locally sourced ingredients.
             </p>
 
             <div className="story-text flex">

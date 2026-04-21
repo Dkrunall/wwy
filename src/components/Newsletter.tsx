@@ -59,7 +59,7 @@ export default function Newsletter() {
             The <span className="italic font-light text-brand-terracotta">Fermentation</span> Club.
           </h2>
           <p className="max-w-xs sm:max-w-xl mx-auto text-brand-charcoal/70 text-sm sm:text-base font-medium leading-relaxed">
-            Secrets of the starter, the fizz of the wild. Be the first to taste our limited small-batch releases.
+            Notes on fermentation, small-batch arrivals, and what's slow-fermenting right now.
           </p>
         </div>
 
