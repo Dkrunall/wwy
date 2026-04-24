@@ -41,9 +41,9 @@ export default function Navbar() {
         {/* ── Pill 1: Nav Links ── */}
         <div className={`${pillBase} rounded-full px-8 h-14 flex items-center gap-7`}>
           {[
-            { label: "Shop", href: "#" },
-            { label: "Story", href: "#" },
-            { label: "Journal", href: "#" },
+            { label: "Shop", href: "/shop" },
+            { label: "Story", href: "/story" },
+            { label: "Journal", href: "/journal" },
           ].map(({ label, href }) => (
             <Link
               key={label}
@@ -144,9 +144,9 @@ export default function Navbar() {
           }}
         >
           {[
-            { label: "Shop", href: "#" },
-            { label: "Our Story", href: "#" },
-            { label: "Journal", href: "#" },
+            { label: "Shop", href: "/shop" },
+            { label: "Our Story", href: "/story" },
+            { label: "Journal", href: "/journal" },
           ].map(({ label, href }) => (
             <Link
               key={label}
