@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ShoppingBag, Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import CartDrawer from "@/components/CartDrawer";
+import Footer from "@/components/Footer";
 import { useCart } from "@/components/CartContext";
 
 const categories = ["All", "Sodas", "Starters", "Storage", "Bundles"];
@@ -125,6 +126,8 @@ export default function ShopPage() {
           View Cart
         </Link>
       </section>
+
+      <Footer />
     </main>
   );
 }

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Minus, Plus, Trash2, ArrowLeft, ShoppingBag } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import CartDrawer from "@/components/CartDrawer";
+import Footer from "@/components/Footer";
 import { useCart } from "@/components/CartContext";
 
 const SHIPPING_THRESHOLD = 500;
@@ -226,6 +227,7 @@ export default function CartPage() {
           </div>
         )}
       </div>
+      <Footer />
     </main>
   );
 }

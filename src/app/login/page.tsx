@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import CartDrawer from "@/components/CartDrawer";
+import Footer from "@/components/Footer";
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -151,6 +152,7 @@ export default function LoginPage() {
         </div>
 
       </div>
+      <Footer />
     </main>
   );
 }

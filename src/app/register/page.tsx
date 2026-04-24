@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Eye, EyeOff, ArrowRight, Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import CartDrawer from "@/components/CartDrawer";
+import Footer from "@/components/Footer";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -226,6 +227,7 @@ export default function RegisterPage() {
         </div>
 
       </div>
+      <Footer />
     </main>
   );
 }

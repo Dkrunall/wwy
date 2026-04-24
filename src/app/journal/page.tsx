@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import CartDrawer from "@/components/CartDrawer";
+import Footer from "@/components/Footer";
 
 const categories = ["All", "Process", "Ingredients", "Culture", "Recipes"];
 
@@ -256,6 +257,7 @@ export default function JournalPage() {
         </Link>
       </section>
 
+      <Footer />
     </main>
   );
 }

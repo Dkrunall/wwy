@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import CartDrawer from "@/components/CartDrawer";
+import Footer from "@/components/Footer";
 
 /* ── Static demo data ── */
 const demoOrders = [
@@ -430,6 +431,7 @@ export default function AccountPage() {
           </div>
         </div>
       </div>
+      <Footer />
     </main>
   );
 }
