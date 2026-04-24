@@ -73,7 +73,7 @@ export default function Navbar() {
         {/* ── Pill 3: Account + Cart ── */}
         <div className={`${pillBase} rounded-full pl-6 pr-2 h-14 flex items-center gap-4`}>
           <Link
-            href="#"
+            href="/login"
             className="font-black text-[10px] tracking-[0.18em] uppercase text-brand-charcoal/60 hover:text-brand-terracotta transition-colors duration-300"
           >
             Account
@@ -162,7 +162,7 @@ export default function Navbar() {
 
           <div className="flex flex-col gap-4">
             <Link
-              href="#"
+              href="/login"
               className="text-sm font-bold tracking-[0.2em] text-brand-charcoal/50 hover:text-brand-terracotta"
               onClick={() => setMobileMenuOpen(false)}
             >
