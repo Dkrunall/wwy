@@ -12,6 +12,7 @@ import SocialGallery from "@/components/SocialGallery";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 import CartDrawer from "@/components/CartDrawer";
+import HowItWorks from "@/components/HowItWorks";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -31,6 +32,7 @@ export default function Home() {
       <Hero />
       <ProductSection />
       <StorySection />
+      <HowItWorks />
       <EnergyBanner />
       <SocialGallery />
       <Newsletter />

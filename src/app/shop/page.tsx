@@ -19,7 +19,7 @@ const products = [
     desc: "Hibiscus and wild ginger. Slow-fermented over 72 hours. Each bottle carries its own character.",
   },
   {
-    id: 2, name: "Artisan Starter", category: "Starters",
+    id: 2, name: "Wild Starter", category: "Starters",
     price: "₹450", priceNum: 450,
     image: "/p2.png", bgColor: "bg-[#D1E8E2]",
     desc: "A living, naturally leavened sourdough culture. Built on a century-old strain. Ready to bake.",

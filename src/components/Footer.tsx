@@ -15,13 +15,14 @@ export default function Footer() {
           {/* CTA & Description */}
           <div className="flex flex-col gap-4 sm:gap-6 md:w-1/3">
             <h3
-              className="font-black text-brand-oat tracking-tighter leading-none"
-              style={{ fontSize: "clamp(2rem, 6vw, 3rem)" }}
+              className="font-black text-brand-oat tracking-tighter leading-[1.05]"
+              style={{ fontSize: "clamp(1.4rem, 3.5vw, 2.2rem)" }}
             >
-              FERMENT YOUR <br /> <span className="text-brand-terracotta">ROUTINE.</span>
+              YOU DON'T BUY OUR FOOD<br />OFF A SHELF.<br />
+              <span className="text-brand-terracotta">YOU SET IT IN MOTION.</span>
             </h3>
-            <p className="text-brand-oat/60 font-bold text-xs sm:text-sm max-w-xs">
-              Living food, made slowly. Delivered to your door.
+            <p className="text-brand-oat/40 font-bold text-xs sm:text-sm max-w-xs">
+              Wild by nature. Crafted by time.
             </p>
           </div>
 
@@ -29,14 +30,14 @@ export default function Footer() {
           <div className="flex gap-10 sm:gap-16 text-xs sm:text-sm font-black tracking-[0.2em] uppercase text-brand-oat/60">
             <div className="flex flex-col gap-4 sm:gap-6">
               <span className="text-brand-terracotta mb-1">Shop</span>
-              <Link href="#" className="hover:text-white transition-colors">All Products</Link>
-              <Link href="#" className="hover:text-white transition-colors">Botanical Sodas</Link>
-              <Link href="#" className="hover:text-white transition-colors">Wild Starter</Link>
+              <Link href="/shop" className="hover:text-white transition-colors">All Products</Link>
+              <Link href="/shop" className="hover:text-white transition-colors">Botanical Sodas</Link>
+              <Link href="/shop" className="hover:text-white transition-colors">Wild Starter</Link>
             </div>
             <div className="flex flex-col gap-4 sm:gap-6">
               <span className="text-brand-terracotta mb-1">Company</span>
-              <Link href="#" className="hover:text-white transition-colors">Our Story</Link>
-              <Link href="#" className="hover:text-white transition-colors">Journal</Link>
+              <Link href="/story" className="hover:text-white transition-colors">Our Story</Link>
+              <Link href="/journal" className="hover:text-white transition-colors">Journal</Link>
               <Link href="#" className="hover:text-white transition-colors">Contact</Link>
             </div>
           </div>

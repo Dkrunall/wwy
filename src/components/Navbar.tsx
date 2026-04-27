@@ -30,7 +30,7 @@ export default function Navbar() {
           }`}
       >
         <p className="text-[8px] sm:text-[9px] font-black tracking-[0.15em] sm:tracking-[0.2em] uppercase leading-snug">
-          Complimentary shipping on provisions over ₹500
+          Made to order. Nothing baked in advance. Fixed delivery days only.
         </p>
       </div>
 

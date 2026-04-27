@@ -78,21 +78,21 @@ export default function StorySection() {
               className="story-text font-black leading-[0.9] tracking-tighter mb-6 sm:mb-10 text-white"
               style={{ fontSize: "clamp(2.5rem, 7vw, 5.5rem)" }}
             >
-              TIME IS OUR <br />
-              <span className="text-[#FEC84D]">ONLY ADDITIVE.</span>
+              NOTHING MADE <br />
+              <span className="text-[#FEC84D]">BEFORE YOU ORDER.</span>
             </h2>
 
             <p className="story-text text-sm sm:text-base md:text-xl text-brand-oat/80 font-bold leading-relaxed max-w-xl mb-6 sm:mb-8">
-              Wild fermentation moves at its own pace. No shortcuts. No lab-made cultures. No artificial sweeteners.
+              Every loaf and every bottle begins with an order. There is no shelf, no display counter, no excess waiting to be cleared.
             </p>
 
             <p className="story-text text-sm sm:text-base md:text-xl text-brand-oat/80 font-bold leading-relaxed max-w-xl mb-10 sm:mb-16">
-              From botanical sodas to naturally leavened bread — everything is built on century-old starters and honest, locally sourced ingredients.
+              Fermentation resists urgency. We work with that resistance — not against it. Time does the work. Honest ingredients do the rest.
             </p>
 
             <div className="story-text flex">
               <button className="w-full sm:w-auto bg-[#FEC84D] text-brand-charcoal hover:bg-brand-terracotta hover:text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-xl active:scale-95">
-                Read our Journal
+                Our Story
               </button>
             </div>
           </div>

@@ -70,16 +70,21 @@ export default function Hero() {
 
           <div className="hero-text inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-2 rounded-full bg-white text-brand-charcoal text-[9px] sm:text-[10px] md:text-xs font-black uppercase tracking-[0.2em] mb-6 sm:mb-8 shadow-sm border border-brand-charcoal/5">
             <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-brand-terracotta animate-pulse shrink-0"></span>
-            Slow-Fermented. Small Batch.
+            Made to order. Never in advance.
           </div>
 
-          <h1 className="hero-text font-black tracking-tighter text-brand-charcoal mb-6 sm:mb-8 leading-[0.85]"
+          <h1 className="hero-text font-black tracking-tighter text-brand-charcoal mb-3 leading-[0.85]"
             style={{ fontSize: "clamp(3rem, 14vw, 7.5rem)" }}>
             WILD <br /> <span className="text-brand-terracotta">YEAST.</span>
           </h1>
 
+          <p className="hero-text font-black text-brand-charcoal/30 tracking-[0.18em] uppercase mb-6 sm:mb-8"
+            style={{ fontSize: "clamp(0.65rem, 1.5vw, 0.85rem)" }}>
+            Wild by nature. Crafted by time.
+          </p>
+
           <p className="hero-text text-base sm:text-lg md:text-xl font-bold text-brand-charcoal/70 max-w-sm sm:max-w-md mb-8 sm:mb-12">
-            Natural sodas and sourdough cultures. Slow-fermented. Nothing added.
+            Fermented bread and living beverages. Nothing made until you order it. Nothing added that doesn't belong.
           </p>
 
           <div className="hero-text flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
@@ -87,7 +92,7 @@ export default function Hero() {
               Shop The Range
             </button>
             <button className="w-full sm:w-auto bg-white text-brand-charcoal hover:bg-brand-oat px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-sm border border-brand-charcoal/5 active:scale-95">
-              Our Story
+              How It Works
             </button>
           </div>
         </div>

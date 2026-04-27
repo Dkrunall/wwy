@@ -22,7 +22,7 @@ const products = [
   },
   {
     id: 2,
-    name: "Artisan Starter",
+    name: "Wild Starter",
     category: "Baking Core",
     price: "₹450",
     priceNum: 450,

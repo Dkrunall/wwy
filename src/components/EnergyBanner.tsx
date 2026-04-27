@@ -68,7 +68,7 @@ export default function EnergyBanner() {
           className="font-serif font-black text-brand-oat text-center leading-[0.8] mb-12 sm:mb-20 tracking-tighter drop-shadow-2xl relative z-30"
           style={{ fontSize: "clamp(4rem, 12vw, 8rem)" }}
         >
-          Alive in <span className="italic font-light text-brand-gold relative">every sip.
+          Alive in <span className="italic font-light text-brand-gold relative">every batch.
             <svg className="absolute -bottom-4 left-0 w-full h-8 text-brand-terracotta opacity-80" viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0 10 Q 50 20 100 10" fill="transparent" stroke="currentColor" strokeWidth="4" strokeLinecap="round"/></svg>
           </span>
         </h3>

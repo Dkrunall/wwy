@@ -56,7 +56,7 @@ export default function Newsletter() {
             className="font-serif font-black text-brand-charcoal leading-[0.9] mb-4 sm:mb-6 tracking-tighter"
             style={{ fontSize: "clamp(2.5rem, 8vw, 5.5rem)" }}
           >
-            The <span className="italic font-light text-brand-terracotta">Fermentation</span> Club.
+            Stay in the <span className="italic font-light text-brand-terracotta">Culture.</span>
           </h2>
           <p className="max-w-xs sm:max-w-xl mx-auto text-brand-charcoal/70 text-sm sm:text-base font-medium leading-relaxed">
             Notes on fermentation, small-batch arrivals, and what's slow-fermenting right now.
