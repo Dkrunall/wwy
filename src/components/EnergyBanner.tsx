@@ -65,11 +65,13 @@ export default function EnergyBanner() {
 
         {/* Main Heading */}
         <h3
-          className="font-serif font-black text-brand-oat text-center leading-[0.8] mb-12 sm:mb-20 tracking-tighter drop-shadow-2xl relative z-30"
-          style={{ fontSize: "clamp(4rem, 12vw, 8rem)" }}
+          className="font-serif font-black text-brand-oat text-center leading-[0.85] mb-10 sm:mb-20 tracking-tighter drop-shadow-2xl relative z-30 px-4"
+          style={{ fontSize: "clamp(3rem, 10vw, 8rem)" }}
         >
-          Alive in <span className="italic font-light text-brand-gold relative">every batch.
-            <svg className="absolute -bottom-4 left-0 w-full h-8 text-brand-terracotta opacity-80" viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0 10 Q 50 20 100 10" fill="transparent" stroke="currentColor" strokeWidth="4" strokeLinecap="round"/></svg>
+          Alive in{" "}
+          <span className="italic font-light text-brand-gold relative inline-block">
+            every batch.
+            <svg className="absolute -bottom-3 sm:-bottom-4 left-0 w-full h-6 sm:h-8 text-brand-terracotta opacity-80" viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0 10 Q 50 20 100 10" fill="transparent" stroke="currentColor" strokeWidth="4" strokeLinecap="round"/></svg>
           </span>
         </h3>
 
@@ -77,7 +79,7 @@ export default function EnergyBanner() {
         <div className="relative w-full h-[350px] sm:h-[450px] md:h-[600px] flex items-center justify-center mt-8">
           
           {/* Center item - Hero Product */}
-          <div className="floating-item relative w-[60%] sm:w-[40%] md:w-[30%] aspect-[3/4] z-20 rounded-[2rem] sm:rounded-[3rem] overflow-hidden border-[6px] sm:border-[8px] border-brand-oat shadow-[0_30px_60px_rgba(0,0,0,0.4)] rotate-2 group cursor-pointer">
+          <div className="floating-item relative w-[52%] sm:w-[40%] md:w-[30%] aspect-[3/4] z-20 rounded-[2rem] sm:rounded-[3rem] overflow-hidden border-[4px] sm:border-[6px] md:border-[8px] border-brand-oat shadow-[0_30px_60px_rgba(0,0,0,0.4)] rotate-2 group cursor-pointer">
             <Image src="/p5.png" alt="Bundle" fill className="object-cover group-hover:scale-110 transition-transform duration-700 hover:rotate-0" />
             <div className="absolute inset-0 bg-gradient-to-t from-brand-charcoal/60 to-transparent flex items-end p-6 sm:p-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <span className="text-white font-black uppercase tracking-widest text-sm sm:text-lg">Sampler Kit</span>
@@ -85,29 +87,29 @@ export default function EnergyBanner() {
           </div>
 
           {/* Far Left item */}
-          <div className="floating-item absolute left-0 sm:left-[5%] md:left-[10%] top-[10%] sm:top-0 w-[45%] sm:w-[30%] md:w-[22%] aspect-[3/4] z-10 rotate-[-12deg] rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden border-4 sm:border-8 border-white/90 shadow-[0_20px_40px_rgba(0,0,0,0.3)] hover:z-30 hover:rotate-0 transition-all duration-500 group cursor-pointer">
+          <div className="floating-item absolute left-0 sm:left-[5%] md:left-[10%] top-[5%] sm:top-0 w-[38%] sm:w-[30%] md:w-[22%] aspect-[3/4] z-10 rotate-[-10deg] sm:rotate-[-12deg] rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden border-4 sm:border-8 border-white/90 shadow-[0_20px_40px_rgba(0,0,0,0.3)] hover:z-30 hover:rotate-0 transition-all duration-500 group cursor-pointer">
             <Image src="/p3.png" alt="Can" fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
           </div>
 
           {/* Far Right item */}
-          <div className="floating-item absolute right-0 sm:right-[5%] md:right-[10%] bottom-[10%] sm:-bottom-[10%] w-[40%] sm:w-[28%] md:w-[25%] aspect-[3/4] z-30 rotate-[8deg] rounded-[1.5rem] sm:rounded-[2.5rem] overflow-hidden border-4 sm:border-8 border-[#FEC84D] shadow-[0_25px_50px_rgba(0,0,0,0.35)] hover:z-40 hover:rotate-0 transition-all duration-500 group cursor-pointer">
+          <div className="floating-item absolute right-0 sm:right-[5%] md:right-[10%] bottom-[8%] sm:-bottom-[10%] w-[35%] sm:w-[28%] md:w-[25%] aspect-[3/4] z-30 rotate-[8deg] rounded-[1.5rem] sm:rounded-[2.5rem] overflow-hidden border-4 sm:border-8 border-[#FEC84D] shadow-[0_25px_50px_rgba(0,0,0,0.35)] hover:z-40 hover:rotate-0 transition-all duration-500 group cursor-pointer">
             <Image src="/p1.png" alt="Sourdough" fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
           </div>
-          
+
           {/* Small decorative accent 1 */}
-          <div className="floating-item absolute left-[20%] bottom-[5%] md:bottom-[20%] w-16 sm:w-24 h-16 sm:h-24 bg-brand-terracotta rounded-full flex items-center justify-center text-white font-black text-xs sm:text-sm -rotate-12 shadow-xl z-20 border-4 border-brand-olive cursor-default">
+          <div className="floating-item absolute left-[18%] bottom-[3%] md:bottom-[20%] w-12 sm:w-20 md:w-24 h-12 sm:h-20 md:h-24 bg-brand-terracotta rounded-full flex items-center justify-center text-white font-black text-[10px] sm:text-sm -rotate-12 shadow-xl z-20 border-2 sm:border-4 border-brand-olive cursor-default">
             NEW
           </div>
 
           {/* Small decorative accent 2 */}
-          <div className="floating-item absolute right-[25%] top-[5%] md:top-[15%] w-12 sm:w-20 h-12 sm:h-20 bg-white rounded-full flex items-center justify-center text-brand-charcoal font-black text-xl sm:text-2xl rotate-12 shadow-xl z-10 border-4 border-brand-olive cursor-default">
+          <div className="floating-item absolute right-[22%] top-[3%] md:top-[15%] w-10 sm:w-16 md:w-20 h-10 sm:h-16 md:h-20 bg-white rounded-full flex items-center justify-center text-brand-charcoal font-black text-lg sm:text-xl md:text-2xl rotate-12 shadow-xl z-10 border-2 sm:border-4 border-brand-olive cursor-default">
             ✦
           </div>
 
         </div>
 
         {/* CTA Button */}
-        <button className="mt-16 sm:mt-24 bg-brand-oat text-brand-olive rounded-full px-12 sm:px-16 py-4 sm:py-5 text-sm font-black uppercase tracking-[0.2em] hover:bg-brand-terracotta hover:text-white hover:scale-105 transition-all duration-500 shadow-[0_15px_30px_rgba(0,0,0,0.2)] whitespace-nowrap z-30">
+        <button className="mt-12 sm:mt-24 bg-brand-oat text-brand-olive rounded-full px-8 sm:px-16 py-4 sm:py-5 text-sm font-black uppercase tracking-[0.2em] hover:bg-brand-terracotta hover:text-white hover:scale-105 transition-all duration-500 shadow-[0_15px_30px_rgba(0,0,0,0.2)] whitespace-nowrap z-30">
           Shop the Set
         </button>
 

@@ -57,10 +57,10 @@ export default function ShopPage() {
 
       {/* ── Hero ── */}
       <section className="w-full bg-brand-oat px-4 sm:px-8 xl:px-16 pt-36 sm:pt-44 pb-12 sm:pb-16 border-b border-brand-charcoal/5">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 max-w-full">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 max-w-full">
           <div>
             <span className="text-[10px] font-black tracking-[0.3em] uppercase text-brand-terracotta mb-4 block">
-              Shop the Range
+              This Week's Fermentation
             </span>
             <h1
               className="font-black text-brand-charcoal tracking-tighter leading-none"
@@ -68,14 +68,35 @@ export default function ShopPage() {
             >
               PROVISIONS.
             </h1>
+            <p className="text-xs font-black tracking-[0.15em] uppercase text-brand-charcoal/25 mt-3">
+              Made when ordered, not before.
+            </p>
           </div>
-          <p className="text-sm font-bold text-brand-charcoal/40 max-w-xs leading-relaxed pb-2">
-            Small batch. Slow-fermented. Each product made with time and honest ingredients.
-          </p>
+          <div className="flex flex-col gap-2 pb-2">
+            <p className="text-sm font-bold text-brand-charcoal/40 max-w-xs leading-relaxed">
+              WWY food is made with time, not shortcuts. Small batch. Slow-fermented. Honest ingredients.
+            </p>
+            <p className="text-[10px] font-black tracking-[0.15em] uppercase text-brand-charcoal/30">
+              Orders taken via WhatsApp · Delivery Wed & Sat only
+            </p>
+            <a
+              href="https://wa.me/919999999999"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-flex items-center gap-2 bg-brand-charcoal text-white hover:bg-brand-terracotta px-6 py-3 rounded-full text-[10px] font-black tracking-[0.18em] uppercase transition-all duration-300 active:scale-95 w-fit shadow-md"
+            >
+              Order via WhatsApp
+            </a>
+          </div>
         </div>
 
+        {/* Seasonal drop note */}
+        <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-charcoal/25 mt-6">
+          Seasonal drops announced weekly — follow the journal to stay ahead.
+        </p>
+
         {/* Category Filter */}
-        <div className="flex gap-2 sm:gap-3 mt-10 flex-wrap">
+        <div className="flex gap-2 sm:gap-3 mt-6 flex-wrap">
           {categories.map(cat => (
             <button
               key={cat}
@@ -118,6 +139,7 @@ export default function ShopPage() {
             FREE SHIPPING <span className="text-brand-terracotta">OVER ₹500.</span>
           </h3>
           <p className="text-brand-oat/40 font-bold text-sm">On all provisions. Delivered slowly, carefully.</p>
+          <p className="text-brand-oat/20 font-bold text-xs mt-1 italic">Time is our main ingredient.</p>
         </div>
         <Link
           href="/cart"

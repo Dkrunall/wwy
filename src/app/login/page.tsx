@@ -62,7 +62,7 @@ export default function LoginPage() {
         </div>
 
         {/* Right — Form Panel */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center px-6 sm:px-12 lg:px-16 pt-32 lg:pt-0 pb-16">
+        <div className="w-full lg:w-1/2 flex items-center justify-center px-5 sm:px-12 lg:px-16 pt-32 lg:pt-0 pb-16">
           <div className="w-full max-w-md">
 
             {/* Header */}

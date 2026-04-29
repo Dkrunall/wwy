@@ -159,12 +159,12 @@ export default function ProductSection() {
               <div
                 key={product.id}
                 className="shrink-0"
-                style={{ width: "clamp(240px, 75vw, 320px)" }}
+                style={{ width: "clamp(260px, 78vw, 320px)" }}
               >
                 <ProductCard product={product} />
               </div>
             ))}
-            <div className="shrink-0 flex items-center justify-center px-6" style={{ width: "clamp(140px, 40vw, 200px)" }}>
+            <div className="shrink-0 flex items-center justify-center px-4 sm:px-6" style={{ width: "clamp(160px, 45vw, 200px)" }}>
               <button className="flex flex-col justify-center items-center gap-4 font-black text-brand-charcoal text-xs uppercase tracking-widest hover:text-brand-terracotta transition-colors group">
                 <div className="w-16 h-16 rounded-[1.5rem] bg-brand-charcoal/5 flex items-center justify-center group-hover:bg-brand-terracotta/10 group-hover:scale-110 transition-all duration-500 rotate-12 group-hover:rotate-0">
                   <ArrowUpRight size={28} className="opacity-50 group-hover:opacity-100 transition-opacity" />

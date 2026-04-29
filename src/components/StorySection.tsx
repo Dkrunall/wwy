@@ -53,7 +53,7 @@ export default function StorySection() {
         <div className="flex flex-col lg:flex-row gap-10 sm:gap-16 md:gap-24 items-center">
 
           {/* Left: Images */}
-          <div className="w-full lg:w-1/2 flex gap-3 sm:gap-4 md:gap-8 story-images h-[50vw] sm:h-[60vh] md:h-[80vh] max-h-[520px] relative overflow-hidden rounded-[2rem] sm:rounded-[3rem]">
+          <div className="w-full lg:w-1/2 flex gap-3 sm:gap-4 md:gap-8 story-images h-[70vw] sm:h-[60vh] md:h-[80vh] min-h-[260px] max-h-[520px] relative overflow-hidden rounded-[2rem] sm:rounded-[3rem]">
             <div className="w-1/2 h-[120%] -top-[10%] relative overflow-hidden rounded-[2rem] sm:rounded-[3rem] shadow-2xl border-4 border-brand-charcoal">
               <Image src="/f1.png" alt="Wheat field" fill className="parallax-bg object-cover transition-transform duration-700 hover:scale-105" />
             </div>
@@ -90,10 +90,18 @@ export default function StorySection() {
               Fermentation resists urgency. We work with that resistance — not against it. Time does the work. Honest ingredients do the rest.
             </p>
 
-            <div className="story-text flex">
-              <button className="w-full sm:w-auto bg-[#FEC84D] text-brand-charcoal hover:bg-brand-terracotta hover:text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-xl active:scale-95">
-                Our Story
-              </button>
+            <div className="story-text flex flex-col sm:flex-row gap-3">
+              <a
+                href="https://wa.me/919999999999"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto text-center bg-[#FEC84D] text-brand-charcoal hover:bg-brand-terracotta hover:text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-xl active:scale-95"
+              >
+                Order on WhatsApp
+              </a>
+              <p className="text-[10px] font-black tracking-[0.12em] uppercase text-brand-oat/30 self-center">
+                Wed & Sat delivery
+              </p>
             </div>
           </div>
 

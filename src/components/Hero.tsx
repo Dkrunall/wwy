@@ -63,7 +63,7 @@ export default function Hero() {
         <h1 className="font-serif font-black tracking-tighter whitespace-nowrap" style={{ fontSize: "clamp(10rem, 25vw, 30rem)", lineHeight: 0.8 }}>WILD<br/>FERMENT</h1>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-12 relative z-10 flex flex-col lg:flex-row items-center gap-10 sm:gap-16 lg:gap-8 w-full">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-12 relative z-10 flex flex-col lg:flex-row items-center gap-8 sm:gap-12 lg:gap-8 w-full">
 
         {/* Left: Typography & Actions */}
         <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left">
@@ -83,14 +83,19 @@ export default function Hero() {
             Wild by nature. Crafted by time.
           </p>
 
-          <p className="hero-text text-base sm:text-lg md:text-xl font-bold text-brand-charcoal/70 max-w-sm sm:max-w-md mb-8 sm:mb-12">
+          <p className="hero-text text-sm sm:text-base md:text-xl font-bold text-brand-charcoal/70 max-w-sm sm:max-w-md mb-6 sm:mb-10">
             Fermented bread and living beverages. Nothing made until you order it. Nothing added that doesn't belong.
           </p>
 
           <div className="hero-text flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
-            <button className="w-full sm:w-auto bg-brand-charcoal text-brand-oat hover:bg-brand-terracotta hover:text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-xl active:scale-95">
-              Shop The Range
-            </button>
+            <a
+              href="https://wa.me/919999999999"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto bg-brand-charcoal text-brand-oat hover:bg-brand-terracotta hover:text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-xl active:scale-95 text-center"
+            >
+              Order on WhatsApp
+            </a>
             <button className="w-full sm:w-auto bg-white text-brand-charcoal hover:bg-brand-oat px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-sm border border-brand-charcoal/5 active:scale-95">
               How It Works
             </button>
@@ -100,7 +105,7 @@ export default function Hero() {
         {/* Right: Playful Product Frame */}
         <div className="w-full lg:w-1/2 flex justify-center lg:justify-end relative mt-4 sm:mt-0">
           <div className="hero-card hero-float relative rounded-[2.5rem] sm:rounded-[3rem] bg-white p-3 sm:p-4 shadow-[0_30px_60px_rgba(0,0,0,0.15)] border-4 border-white rotate-3 group z-20"
-            style={{ width: "min(320px, 88vw)", height: "min(400px, 110vw)", maxWidth: "450px", maxHeight: "550px" }}>
+            style={{ width: "min(300px, 86vw)", height: "min(360px, 100vw)", maxWidth: "440px", maxHeight: "520px" }}>
             <div className="relative w-full h-full rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden bg-brand-oat/50 shadow-[inset_0_10px_30px_rgba(0,0,0,0.08)] mask-image-rounded">
               <Image src="/p1.png" alt="Sourdough Soda" fill className="object-cover group-hover:scale-105 transition-transform duration-700" priority />
             </div>

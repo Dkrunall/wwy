@@ -24,6 +24,9 @@ export default function Footer() {
             <p className="text-brand-oat/40 font-bold text-xs sm:text-sm max-w-xs">
               Wild by nature. Crafted by time.
             </p>
+            <p className="text-brand-oat/25 font-bold text-[10px] sm:text-xs max-w-xs italic">
+              WWY food is made with time, not shortcuts.
+            </p>
           </div>
 
           {/* Links */}
@@ -65,7 +68,7 @@ export default function Footer() {
       <div className="w-full overflow-hidden relative z-10 px-4 mt-4 sm:mt-8 mb-2">
         <h1
           className="font-black text-brand-oat/5 tracking-tighter whitespace-nowrap select-none drop-shadow-xl text-center"
-          style={{ fontSize: "clamp(3rem, 14vw, 12rem)", lineHeight: 0.75 }}
+          style={{ fontSize: "clamp(2.5rem, 10vw, 12rem)", lineHeight: 0.75 }}
         >
           WILD WILD YEAST
         </h1>

@@ -127,7 +127,7 @@ export default function JournalPage() {
       {featured && (
         <section className="w-full px-4 sm:px-8 xl:px-16 py-12 sm:py-16 border-b border-brand-charcoal/5">
           <div className="flex flex-col lg:flex-row gap-8 xl:gap-12 items-center group cursor-pointer">
-            <div className="w-full lg:w-1/2 rounded-[2rem] sm:rounded-[3rem] overflow-hidden aspect-[4/3] relative shadow-xl">
+            <div className="w-full lg:w-1/2 rounded-[2rem] sm:rounded-[3rem] overflow-hidden aspect-[3/2] sm:aspect-[4/3] relative shadow-xl">
               <Image
                 src={featured.image}
                 alt={featured.title}

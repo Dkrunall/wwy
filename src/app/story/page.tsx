@@ -70,6 +70,18 @@ const objections = [
     q: "Is variation a quality issue?",
     a: "No. In fermented food, controlled variation is a sign of life, not inconsistency. The goal is recognisability, not sameness.",
   },
+  {
+    q: "Why is it priced higher than store bread?",
+    a: "Because it isn't store bread. There is no preservative masking age, no volume discount built on overproduction. You are paying for time — specifically, the time taken to ferment properly, using ingredients that don't need correction.",
+  },
+  {
+    q: "The shelf life is only 2–3 days. Is that normal?",
+    a: "Yes. And it's deliberate. A shelf life of 2–3 days means the food is real — not stabilised, not preserved, not treated to last longer than it should. Natural fermentation gives it more stability than unfermented bread, but it is still living food. Treat it accordingly.",
+  },
+  {
+    q: "Is fermented food safe to eat?",
+    a: "Yes. Natural fermentation is one of the oldest food preservation techniques in the world. The acidic environment created during fermentation is inhospitable to harmful bacteria. Our process is controlled, consistent, and free from additives or shortcuts.",
+  },
 ];
 
 export default function StoryPage() {
@@ -146,46 +158,134 @@ export default function StoryPage() {
             <p>Our ingredients are simple and recognisable. Their quality matters because there is nothing in the process designed to correct, mask, or artificially extend shelf life.</p>
             <p className="text-brand-charcoal font-black">The food we make is alive, fresh, and imperfect by nature. Variation is expected. Waiting is part of the experience.</p>
           </div>
+
+          {/* Brand personality */}
+          <div className="flex flex-wrap gap-3 mt-10 pt-8 border-t border-brand-charcoal/5">
+            {["Wild, but credible", "Craft, but approachable", "Premium, but not stiff", "Fermentation-led, but flavour-first"].map(tag => (
+              <span key={tag} className="px-4 py-2 rounded-full border border-brand-charcoal/10 text-[10px] font-black tracking-[0.12em] uppercase text-brand-charcoal/40">
+                {tag}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ── Manifesto ── */}
-      <section className="w-full bg-brand-charcoal px-4 sm:px-8 xl:px-16 py-20 sm:py-32 relative overflow-hidden">
+      <section className="w-full bg-brand-charcoal px-4 sm:px-8 xl:px-16 py-24 sm:py-44 relative overflow-hidden">
+        {/* Noise */}
         <div className="absolute inset-0 opacity-[0.08] mix-blend-overlay pointer-events-none"
           style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22n%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23n)%22/%3E%3C/svg%3E")' }} />
-        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-brand-gold/10 blur-[120px] rounded-full pointer-events-none" />
 
-        <div className="max-w-3xl mx-auto relative z-10">
-          <span className="text-[10px] font-black tracking-[0.3em] uppercase text-brand-terracotta mb-8 block">
-            The Manifesto
+        {/* Ambient orbs */}
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand-gold/8 blur-[180px] rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-terracotta/8 blur-[160px] rounded-full pointer-events-none" />
+
+        {/* Background watermark */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
+          <span className="font-serif italic font-black text-white/[0.025] whitespace-nowrap leading-none"
+            style={{ fontSize: "clamp(8rem, 25vw, 28rem)" }}>
+            BELIEVE
           </span>
-          <div className="flex flex-col gap-5 font-bold text-brand-oat/70 leading-relaxed"
-            style={{ fontSize: "clamp(1rem, 2vw, 1.25rem)" }}>
-            <p className="text-brand-oat font-black" style={{ fontSize: "clamp(1.2rem, 2.5vw, 1.6rem)" }}>
-              We believe food should take time.
-            </p>
-            <p>Not because it is fashionable,<br />but because it always has.</p>
-            <p>We work with processes that cannot be rushed —<br />
-              dough that needs resting,<br />
-              flavours that change quietly,<br />
-              drinks that continue to live after they leave us.</p>
-            <p className="text-brand-oat font-black">We don't aim for perfection.<br />We aim for honesty.</p>
-            <p>Some days the loaf is different.<br />
-              Some days the bubbles are louder.<br />
-              That's not inconsistency — that's life.</p>
-            <p className="text-brand-oat font-black">We don't explain fermentation.<br />We let you experience it.</p>
-            <p className="text-brand-oat/40">WWY exists for people who are comfortable with waiting,<br />
-              curious about change,<br />
-              and willing to trust the process.</p>
+        </div>
+
+        <div className="max-w-5xl mx-auto relative z-10">
+
+          {/* Badge */}
+          <div className="flex items-center gap-4 mb-20 sm:mb-28">
+            <div className="w-8 h-px bg-brand-terracotta" />
+            <span className="text-[10px] font-black tracking-[0.35em] uppercase text-brand-terracotta">
+              The Manifesto
+            </span>
           </div>
+
+          {/* Block 1 */}
+          <div className="mb-16 sm:mb-24">
+            <h2
+              className="font-serif italic font-black text-brand-oat tracking-tighter leading-[0.85] mb-8 sm:mb-10"
+              style={{ fontSize: "clamp(2.8rem, 8vw, 6.5rem)" }}
+            >
+              We believe food<br />should take time.
+            </h2>
+            <div className="pl-5 sm:pl-7 border-l-2 border-brand-terracotta/40 max-w-md">
+              <p className="text-brand-oat/50 font-bold text-sm sm:text-base leading-relaxed">
+                Not because it is fashionable —<br />but because it always has.
+              </p>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-6 mb-16 sm:mb-24">
+            <div className="flex-1 h-px bg-white/[0.06]" />
+            <span className="text-brand-terracotta/30 text-lg select-none">✦</span>
+            <div className="flex-1 h-px bg-white/[0.06]" />
+          </div>
+
+          {/* Block 2 */}
+          <div className="mb-16 sm:mb-24">
+            <div className="pl-5 sm:pl-7 border-l-2 border-white/[0.08] max-w-xl mb-10 sm:mb-12">
+              <p className="text-brand-oat/40 font-bold text-sm sm:text-base leading-loose">
+                We work with processes that cannot be rushed —<br />
+                dough that needs resting,<br />
+                flavours that change quietly,<br />
+                drinks that continue to live after they leave us.
+              </p>
+            </div>
+            <h2
+              className="font-serif italic font-black text-brand-oat tracking-tighter leading-[0.85]"
+              style={{ fontSize: "clamp(2.2rem, 6vw, 5rem)" }}
+            >
+              We don't aim for perfection.<br />
+              <span className="text-brand-gold">We aim for honesty.</span>
+            </h2>
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-6 mb-16 sm:mb-24">
+            <div className="flex-1 h-px bg-white/[0.06]" />
+            <span className="text-brand-terracotta/30 text-lg select-none">✦</span>
+            <div className="flex-1 h-px bg-white/[0.06]" />
+          </div>
+
+          {/* Block 3 */}
+          <div className="mb-16 sm:mb-24">
+            <div className="pl-5 sm:pl-7 border-l-2 border-white/[0.08] max-w-lg mb-10 sm:mb-12">
+              <p className="text-brand-oat/40 font-bold text-sm sm:text-base leading-loose">
+                Some days the loaf is different.<br />
+                Some days the bubbles are louder.<br />
+                That's not inconsistency — that's life.
+              </p>
+            </div>
+            <h2
+              className="font-serif italic font-black text-brand-oat tracking-tighter leading-[0.85]"
+              style={{ fontSize: "clamp(2.2rem, 6vw, 5rem)" }}
+            >
+              We don't explain fermentation.<br />
+              <span className="text-brand-terracotta">We let you experience it.</span>
+            </h2>
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-6 mb-14 sm:mb-20">
+            <div className="flex-1 h-px bg-white/[0.06]" />
+            <span className="text-brand-terracotta/30 text-lg select-none">✦</span>
+            <div className="flex-1 h-px bg-white/[0.06]" />
+          </div>
+
+          {/* Closing */}
+          <p className="text-brand-oat/30 font-bold text-sm sm:text-base leading-loose max-w-lg">
+            WWY exists for people who are comfortable with waiting,<br />
+            curious about change,<br />
+            and willing to trust the process.
+          </p>
+
         </div>
       </section>
 
       {/* ── Split Image ── */}
       <section className="w-full bg-white px-4 sm:px-8 xl:px-16 py-20 sm:py-32">
         <div className="flex flex-col lg:flex-row gap-12 xl:gap-24 items-center max-w-7xl mx-auto">
-          <div className="w-full lg:w-1/2 flex gap-4 h-[60vw] sm:h-[500px] max-h-[600px]">
-            <div className="w-1/2 rounded-[2rem] sm:rounded-[3rem] overflow-hidden shadow-2xl mt-8">
+          <div className="w-full lg:w-1/2 flex gap-4 h-[75vw] sm:h-[500px] min-h-[240px] max-h-[600px]">
+            <div className="w-1/2 rounded-[2rem] sm:rounded-[3rem] overflow-hidden shadow-2xl mt-6 sm:mt-8">
               <div className="relative w-full h-full">
                 <Image src="/f1.png" alt="Process" fill className="object-cover" />
               </div>

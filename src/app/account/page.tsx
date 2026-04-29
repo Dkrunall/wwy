@@ -126,7 +126,33 @@ export default function AccountPage() {
 
           {/* ── Sidebar ── */}
           <aside className="w-full lg:w-60 shrink-0">
-            <div className="bg-white rounded-[2rem] p-3 shadow-sm border border-brand-charcoal/5 sticky top-32">
+            {/* Mobile: horizontal tab strip */}
+            <div className="lg:hidden flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
+              {tabs.map(({ id, label, icon: Icon }) => (
+                <button
+                  key={id}
+                  onClick={() => setActiveTab(id)}
+                  className={`flex items-center gap-2 px-5 py-3 rounded-full text-[10px] font-black tracking-[0.15em] uppercase whitespace-nowrap transition-all duration-200 shrink-0 ${
+                    activeTab === id
+                      ? "bg-brand-charcoal text-white shadow-md"
+                      : "bg-white border border-brand-charcoal/10 text-brand-charcoal/50"
+                  }`}
+                >
+                  <Icon size={13} />
+                  {label}
+                </button>
+              ))}
+              <Link
+                href="/login"
+                className="flex items-center gap-2 px-5 py-3 rounded-full text-[10px] font-black tracking-[0.15em] uppercase whitespace-nowrap bg-white border border-brand-charcoal/10 text-brand-terracotta shrink-0"
+              >
+                <LogOut size={13} />
+                Sign Out
+              </Link>
+            </div>
+
+            {/* Desktop: vertical sidebar */}
+            <div className="hidden lg:block bg-white rounded-[2rem] p-3 shadow-sm border border-brand-charcoal/5 lg:sticky lg:top-28">
 
               {/* Avatar + name */}
               <div className="flex items-center gap-3 px-4 py-4 mb-1">

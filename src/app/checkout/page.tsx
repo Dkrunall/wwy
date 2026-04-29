@@ -29,7 +29,7 @@ export default function CheckoutPage() {
     setForm(prev => ({ ...prev, [field]: value }));
 
   const inputClass =
-    "w-full bg-brand-oat border border-brand-charcoal/10 rounded-full px-5 py-3.5 text-sm font-bold text-brand-charcoal placeholder:text-brand-charcoal/25 focus:outline-none focus:border-brand-terracotta transition-colors duration-300";
+    "w-full bg-brand-oat border border-brand-charcoal/10 rounded-full px-5 py-3.5 text-[16px] font-bold text-brand-charcoal placeholder:text-brand-charcoal/25 focus:outline-none focus:border-brand-terracotta transition-colors duration-300";
 
   const labelClass =
     "text-[10px] font-black tracking-[0.2em] uppercase text-brand-charcoal/40";
@@ -135,7 +135,7 @@ export default function CheckoutPage() {
                       <input type="text" placeholder="Maharashtra" value={form.state}
                         onChange={e => update("state", e.target.value)} className={inputClass} />
                     </div>
-                    <div className="flex flex-col gap-2 w-full sm:w-36">
+                    <div className="flex flex-col gap-2 w-full sm:w-32 sm:shrink-0">
                       <label className={labelClass}>Pincode</label>
                       <input type="text" placeholder="400050" value={form.pincode}
                         onChange={e => update("pincode", e.target.value)} className={inputClass} />
@@ -277,7 +277,7 @@ export default function CheckoutPage() {
 
           {/* ── Right: Order Summary ── */}
           <div className="w-full lg:w-[400px] shrink-0">
-            <div className="bg-white rounded-[2rem] p-6 sm:p-8 shadow-sm border border-brand-charcoal/5 sticky top-32">
+            <div className="bg-white rounded-[2rem] p-6 sm:p-8 shadow-sm border border-brand-charcoal/5 lg:sticky lg:top-28">
               <h2 className="font-black text-sm tracking-[0.18em] uppercase text-brand-charcoal mb-6">
                 Order Summary
               </h2>

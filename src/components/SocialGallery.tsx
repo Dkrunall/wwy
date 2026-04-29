@@ -117,7 +117,7 @@ export default function SocialGallery() {
             <div
               key={i}
               className="relative shrink-0 aspect-[3/4] rounded-[1.5rem] sm:rounded-[2rem] bg-white border-4 border-brand-charcoal overflow-hidden group cursor-pointer shadow-lg hover:shadow-2xl transition-shadow duration-300"
-              style={{ width: "clamp(140px, 40vw, 280px)" }}
+              style={{ width: "clamp(160px, 42vw, 280px)" }}
             >
               <Image src={item.img} alt="Social Post" fill className="object-cover group-hover:scale-110 transition-all duration-700" />
 

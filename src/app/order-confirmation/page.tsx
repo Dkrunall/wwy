@@ -24,17 +24,20 @@ export default function OrderConfirmationPage() {
 
         {/* Heading */}
         <span className="text-[10px] font-black tracking-[0.3em] uppercase text-brand-terracotta mb-4 block">
-          Order Placed
+          Order Confirmed
         </span>
         <h1
           className="font-black text-brand-charcoal tracking-tighter leading-[0.88] mb-4"
           style={{ fontSize: "clamp(2.5rem, 8vw, 5.5rem)" }}
         >
-          IT'S ON ITS <br />
-          <span className="text-brand-terracotta">WAY.</span>
+          YOUR ORDER HAS <br />
+          <span className="text-brand-terracotta">ENTERED FERMENTATION.</span>
         </h1>
-        <p className="text-sm font-bold text-brand-charcoal/50 max-w-sm leading-relaxed mb-3">
-          Your slow-fermented provisions are being prepared. We'll send a confirmation to your email shortly.
+        <p className="text-sm font-bold text-brand-charcoal/50 max-w-sm leading-relaxed mb-2">
+          We'll update you as it progresses. Your bread is baking today.
+        </p>
+        <p className="text-xs font-bold text-brand-charcoal/30 max-w-xs leading-relaxed mb-3 italic">
+          "Food that is still becoming."
         </p>
         <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-charcoal/30 mb-12">
           Order ID: {orderId}
@@ -53,10 +56,10 @@ export default function OrderConfirmationPage() {
           </div>
 
           {[
-            { label: "Order confirmed", done: true },
-            { label: "Being prepared", done: false },
-            { label: "Dispatched", done: false },
-            { label: "Delivered", done: false },
+            { label: "Order confirmed — fermentation begins", done: true },
+            { label: "Developing flavour and structure", done: false },
+            { label: "Baked, brewed, and dispatched", done: false },
+            { label: "Delivered fresh", done: false },
           ].map((s, i) => (
             <div key={i} className="flex items-center gap-3 py-2">
               <div className={`w-5 h-5 rounded-full flex items-center justify-center shrink-0 ${s.done ? "bg-brand-olive" : "bg-brand-charcoal/10"}`}>

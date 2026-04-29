@@ -172,7 +172,7 @@ export default function CartPage() {
 
             {/* ── Order Summary ── */}
             <div className="w-full lg:w-[480px] shrink-0">
-              <div className="bg-white rounded-[2rem] p-6 sm:p-8 shadow-sm border border-brand-charcoal/5 sticky top-32">
+              <div className="bg-white rounded-[2rem] p-6 sm:p-8 shadow-sm border border-brand-charcoal/5 lg:sticky lg:top-28">
                 <h2 className="font-black text-sm tracking-[0.18em] uppercase text-brand-charcoal mb-6">
                   Order Summary
                 </h2>
