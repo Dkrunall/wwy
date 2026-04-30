@@ -52,18 +52,25 @@ export default function ProductPage() {
     const storedFlat = localStorage.getItem("wwy_flat");
     if (!storedFlat) { router.replace("/order/login"); return; }
 
-    supabase
-      .from("products")
-      .select("*")
-      .eq("id", id)
-      .single()
-      .then(({ data }) => {
-        setProduct(data);
-        const cart = getCart();
-        const existing = cart.find((i) => i.product_id === id);
-        setQty(existing?.quantity ?? 0);
+    (async () => {
+      try {
+        const { data, error } = await supabase
+          .from("products")
+          .select("*")
+          .eq("id", id)
+          .single();
+        if (!error && data) {
+          setProduct(data);
+          const cart = getCart();
+          const existing = cart.find((i) => i.product_id === id);
+          setQty(existing?.quantity ?? 0);
+        }
+      } catch {
+        // product stays null → shows "not found"
+      } finally {
         setLoading(false);
-      });
+      }
+    })();
   }, [id, router]);
 
   const updateQty = (delta: number) => {

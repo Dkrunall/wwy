@@ -55,15 +55,20 @@ export default function OrderPage() {
     setCustomerName(storedName || "");
     setCart(getCart());
 
-    supabase
-      .from("products")
-      .select("*")
-      .eq("available", true)
-      .order("category")
-      .then(({ data }) => {
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from("products")
+          .select("*")
+          .eq("available", true)
+          .order("category");
         setProducts(data || []);
+      } catch {
+        setProducts([]);
+      } finally {
         setLoading(false);
-      });
+      }
+    })();
   }, [router]);
 
   const getQty = useCallback(

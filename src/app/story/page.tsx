@@ -129,7 +129,7 @@ export default function StoryPage() {
         </div>
 
         <div className="relative z-10 max-w-4xl">
-          <span className="story-hero-text text-[10px] font-black tracking-[0.3em] uppercase text-brand-terracotta mb-6 block">
+          <span className="story-hero-text text-brand-terracotta text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
             Our Story
           </span>
           <h1 className="story-hero-text font-black text-brand-oat tracking-tighter leading-[0.85] mb-4"
@@ -146,7 +146,7 @@ export default function StoryPage() {
       {/* ── About ── */}
       <section className="w-full bg-brand-oat px-4 sm:px-8 xl:px-16 py-20 sm:py-32">
         <div className="max-w-3xl mx-auto">
-          <span className="text-[10px] font-black tracking-[0.3em] uppercase text-brand-terracotta mb-6 block">
+          <span className="text-brand-terracotta text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
             What WWY Is
           </span>
           <p className="font-black text-brand-charcoal leading-[1.05] tracking-tight mb-10"
@@ -182,101 +182,86 @@ export default function StoryPage() {
 
         {/* Background watermark */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
-          <span className="font-serif italic font-black text-white/[0.025] whitespace-nowrap leading-none"
+          <span className="font-serif italic font-medium text-white/[0.025] whitespace-nowrap leading-none"
             style={{ fontSize: "clamp(8rem, 25vw, 28rem)" }}>
             BELIEVE
           </span>
         </div>
 
-        <div className="max-w-5xl mx-auto relative z-10">
+        <div className="max-w-6xl mx-auto relative z-10">
 
           {/* Badge */}
-          <div className="flex items-center gap-4 mb-20 sm:mb-28">
+          <div className="flex items-center gap-4 mb-24 sm:mb-32 justify-center">
             <div className="w-8 h-px bg-brand-terracotta" />
-            <span className="text-[10px] font-black tracking-[0.35em] uppercase text-brand-terracotta">
+            <span className="text-brand-terracotta text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase">
               The Manifesto
             </span>
+            <div className="w-8 h-px bg-brand-terracotta" />
           </div>
 
-          {/* Block 1 */}
-          <div className="mb-16 sm:mb-24">
-            <h2
-              className="font-serif italic font-black text-brand-oat tracking-tighter leading-[0.85] mb-8 sm:mb-10"
-              style={{ fontSize: "clamp(2.8rem, 8vw, 6.5rem)" }}
-            >
-              We believe food<br />should take time.
-            </h2>
-            <div className="pl-5 sm:pl-7 border-l-2 border-brand-terracotta/40 max-w-md">
-              <p className="text-brand-oat/50 font-bold text-sm sm:text-base leading-relaxed">
-                Not because it is fashionable —<br />but because it always has.
-              </p>
+          <div className="grid grid-cols-1 gap-24 sm:gap-40">
+            {/* Block 1 */}
+            <div className="flex flex-col md:flex-row gap-10 md:gap-20 items-start md:items-center">
+              <div className="md:w-3/5">
+                <h2
+                  className="font-serif italic font-medium text-brand-oat leading-[0.85] mb-6"
+                  style={{ fontSize: "clamp(1.5rem, 5vw, 3rem)" }}
+                >
+                  We believe food<br />should take time.
+                </h2>
+              </div>
+              <div className="md:w-2/5 border-l-2 border-brand-terracotta/40 pl-6 sm:pl-8">
+                <p className="text-brand-oat/50 font-bold text-sm sm:text-base md:text-lg leading-relaxed">
+                  Not because it is fashionable —<br />but because it always has.
+                </p>
+              </div>
             </div>
-          </div>
 
-          {/* Divider */}
-          <div className="flex items-center gap-6 mb-16 sm:mb-24">
-            <div className="flex-1 h-px bg-white/[0.06]" />
-            <span className="text-brand-terracotta/30 text-lg select-none">✦</span>
-            <div className="flex-1 h-px bg-white/[0.06]" />
-          </div>
-
-          {/* Block 2 */}
-          <div className="mb-16 sm:mb-24">
-            <div className="pl-5 sm:pl-7 border-l-2 border-white/[0.08] max-w-xl mb-10 sm:mb-12">
-              <p className="text-brand-oat/40 font-bold text-sm sm:text-base leading-loose">
-                We work with processes that cannot be rushed —<br />
-                dough that needs resting,<br />
-                flavours that change quietly,<br />
-                drinks that continue to live after they leave us.
-              </p>
+            {/* Block 2 */}
+            <div className="flex flex-col md:flex-row-reverse gap-10 md:gap-20 items-start md:items-center">
+              <div className="md:w-3/5 md:text-right">
+                <h2
+                  className="font-serif italic font-medium text-brand-oat leading-[0.85] mb-6"
+                  style={{ fontSize: "clamp(1.5rem, 5vw, 3rem)" }}
+                >
+                  We don't aim for perfection.<br />
+                  <span className="text-brand-gold">We aim for honesty.</span>
+                </h2>
+              </div>
+              <div className="md:w-2/5 border-r-2 border-white/[0.08] pr-6 sm:pr-8 md:text-right">
+                <p className="text-brand-oat/40 font-bold text-sm sm:text-base md:text-lg leading-relaxed">
+                  We work with processes that cannot be rushed — dough that needs resting, flavours that change quietly, drinks that continue to live after they leave us.
+                </p>
+              </div>
             </div>
-            <h2
-              className="font-serif italic font-black text-brand-oat tracking-tighter leading-[0.85]"
-              style={{ fontSize: "clamp(2.2rem, 6vw, 5rem)" }}
-            >
-              We don't aim for perfection.<br />
-              <span className="text-brand-gold">We aim for honesty.</span>
-            </h2>
-          </div>
 
-          {/* Divider */}
-          <div className="flex items-center gap-6 mb-16 sm:mb-24">
-            <div className="flex-1 h-px bg-white/[0.06]" />
-            <span className="text-brand-terracotta/30 text-lg select-none">✦</span>
-            <div className="flex-1 h-px bg-white/[0.06]" />
-          </div>
-
-          {/* Block 3 */}
-          <div className="mb-16 sm:mb-24">
-            <div className="pl-5 sm:pl-7 border-l-2 border-white/[0.08] max-w-lg mb-10 sm:mb-12">
-              <p className="text-brand-oat/40 font-bold text-sm sm:text-base leading-loose">
-                Some days the loaf is different.<br />
-                Some days the bubbles are louder.<br />
-                That's not inconsistency — that's life.
-              </p>
+            {/* Block 3 */}
+            <div className="flex flex-col md:flex-row gap-10 md:gap-20 items-start md:items-center">
+              <div className="md:w-3/5">
+                <h2
+                  className="font-serif italic font-medium text-brand-oat leading-[0.85] mb-6"
+                  style={{ fontSize: "clamp(1.5rem, 5vw, 3rem)" }}
+                >
+                  We don't explain fermentation.<br />
+                  <span className="text-brand-terracotta">We let you experience it.</span>
+                </h2>
+              </div>
+              <div className="md:w-2/5 border-l-2 border-white/[0.08] pl-6 sm:pl-8">
+                <p className="text-brand-oat/40 font-bold text-sm sm:text-base md:text-lg leading-relaxed">
+                  Some days the loaf is different. Some days the bubbles are louder. That's not inconsistency — that's life.
+                </p>
+              </div>
             </div>
-            <h2
-              className="font-serif italic font-black text-brand-oat tracking-tighter leading-[0.85]"
-              style={{ fontSize: "clamp(2.2rem, 6vw, 5rem)" }}
-            >
-              We don't explain fermentation.<br />
-              <span className="text-brand-terracotta">We let you experience it.</span>
-            </h2>
-          </div>
-
-          {/* Divider */}
-          <div className="flex items-center gap-6 mb-14 sm:mb-20">
-            <div className="flex-1 h-px bg-white/[0.06]" />
-            <span className="text-brand-terracotta/30 text-lg select-none">✦</span>
-            <div className="flex-1 h-px bg-white/[0.06]" />
           </div>
 
           {/* Closing */}
-          <p className="text-brand-oat/30 font-bold text-sm sm:text-base leading-loose max-w-lg">
-            WWY exists for people who are comfortable with waiting,<br />
-            curious about change,<br />
-            and willing to trust the process.
-          </p>
+          <div className="mt-32 sm:mt-48 pt-16 border-t border-white/[0.05] text-center">
+            <p className="text-brand-oat/30 font-bold text-sm sm:text-base md:text-lg leading-relaxed max-w-2xl mx-auto">
+              WWY exists for people who are comfortable with waiting,<br className="hidden sm:block" />
+              curious about change,<br className="hidden sm:block" />
+              and willing to trust the process.
+            </p>
+          </div>
 
         </div>
       </section>
@@ -297,15 +282,15 @@ export default function StoryPage() {
             </div>
           </div>
           <div className="w-full lg:w-1/2">
-            <span className="text-[10px] font-black tracking-[0.25em] uppercase text-brand-terracotta mb-5 block">
+            <span className="text-brand-terracotta text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
               The Operating System
             </span>
-            <h2 className="font-black text-brand-charcoal tracking-tighter leading-[0.88] mb-8"
-              style={{ fontSize: "clamp(2rem, 5vw, 3.8rem)" }}>
-              FERMENTATION ISN'T A FEATURE.<br />
+            <h2 className="font-black text-brand-charcoal tracking-tight leading-none mb-8"
+              style={{ fontSize: "clamp(2.5rem, 8vw, 5.5rem)" }}>
+              FERMENTATION ISN'T A FEATURE.<br className="hidden sm:block" />
               <span className="text-brand-terracotta">IT'S THE FOUNDATION.</span>
             </h2>
-            <div className="flex flex-col gap-5 text-brand-charcoal/60 font-bold text-sm sm:text-base leading-relaxed">
+            <div className="flex flex-col gap-5 text-brand-charcoal/60 font-bold text-sm sm:text-base md:text-lg leading-relaxed">
               <p>WWY is not a bakery that happens to ferment. Not a beverage label using the word craft casually. Fermentation is the organising principle — bread, beverages, and flavour development all rely on time, microbes, and natural transformation.</p>
               <p>Because fermented food is alive, it cannot be treated like inventory. We produce only against orders, using whole ingredients that don't need correction or concealment.</p>
               <p>Veg only. No onion. No garlic. No compromise on flavour.</p>
@@ -317,12 +302,12 @@ export default function StoryPage() {
       {/* ── Timeline ── */}
       <section className="w-full bg-brand-charcoal px-4 sm:px-8 xl:px-16 py-20 sm:py-32">
         <div className="max-w-5xl mx-auto">
-          <span className="text-[10px] font-black tracking-[0.25em] uppercase text-brand-terracotta mb-5 block">
+          <span className="text-brand-terracotta text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
             How We Got Here
           </span>
-          <h2 className="font-black text-brand-oat tracking-tighter leading-[0.88] mb-16 sm:mb-20"
-            style={{ fontSize: "clamp(2.5rem, 6vw, 4.5rem)" }}>
-            THE CULTURE <br /><span className="text-brand-gold">EVOLVES.</span>
+          <h2 className="font-black text-brand-oat tracking-tight leading-none mb-16 sm:mb-20"
+            style={{ fontSize: "clamp(2.5rem, 8vw, 5.5rem)" }}>
+            THE CULTURE <br className="hidden sm:block" /><span className="text-brand-gold">EVOLVES.</span>
           </h2>
 
           <div className="timeline-container flex flex-col gap-0">
@@ -337,8 +322,8 @@ export default function StoryPage() {
                   )}
                 </div>
                 <div className="pb-12 flex-1">
-                  <h3 className="font-black text-base sm:text-lg tracking-[0.05em] uppercase text-brand-oat mb-2">{item.title}</h3>
-                  <p className="text-brand-oat/50 font-bold text-sm leading-relaxed max-w-lg">{item.body}</p>
+                  <h3 className="font-black text-lg sm:text-xl tracking-[0.05em] uppercase text-brand-oat mb-2">{item.title}</h3>
+                  <p className="text-brand-oat/50 font-bold text-sm sm:text-base md:text-lg leading-relaxed max-w-lg">{item.body}</p>
                 </div>
               </div>
             ))}
@@ -349,19 +334,19 @@ export default function StoryPage() {
       {/* ── Principles ── */}
       <section className="w-full bg-brand-oat px-4 sm:px-8 xl:px-16 py-20 sm:py-32">
         <div className="max-w-6xl mx-auto">
-          <span className="text-[10px] font-black tracking-[0.25em] uppercase text-brand-terracotta mb-5 block text-center">
+          <span className="text-brand-terracotta text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block text-center">
             What We Stand For
           </span>
-          <h2 className="font-black text-brand-charcoal tracking-tighter leading-[0.88] mb-16 text-center"
-            style={{ fontSize: "clamp(2.5rem, 6vw, 4.5rem)" }}>
+          <h2 className="font-black text-brand-charcoal tracking-tight leading-none mb-16 text-center"
+            style={{ fontSize: "clamp(2.5rem, 8vw, 5.5rem)" }}>
             FOUR <span className="text-brand-terracotta">PRINCIPLES.</span>
           </h2>
           <div className="principles-container grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             {principles.map((v, i) => (
               <div key={i} className="principle-card bg-white rounded-[2rem] p-8 sm:p-10 border border-brand-charcoal/5 shadow-sm hover:shadow-xl transition-shadow duration-500 group">
-                <span className="text-[10px] font-black tracking-[0.3em] uppercase text-brand-terracotta mb-4 block">{String(i + 1).padStart(2, "0")}</span>
+                <span className="font-black text-3xl sm:text-4xl tracking-[0.2em] text-brand-terracotta mb-4 block">{String(i + 1).padStart(2, "0")}</span>
                 <h3 className="font-black text-2xl sm:text-3xl tracking-tight text-brand-charcoal mb-4 group-hover:text-brand-terracotta transition-colors duration-300">{v.label}</h3>
-                <p className="text-brand-charcoal/50 font-bold text-sm leading-relaxed">{v.body}</p>
+                <p className="text-sm sm:text-base md:text-lg font-bold text-brand-charcoal/50 leading-relaxed">{v.body}</p>
               </div>
             ))}
           </div>
@@ -371,12 +356,12 @@ export default function StoryPage() {
       {/* ── Constraints as Credibility ── */}
       <section className="w-full bg-white px-4 sm:px-8 xl:px-16 py-20 sm:py-32">
         <div className="max-w-6xl mx-auto">
-          <span className="text-[10px] font-black tracking-[0.25em] uppercase text-brand-terracotta mb-5 block">
+          <span className="text-brand-terracotta text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
             Common Questions
           </span>
-          <h2 className="font-black text-brand-charcoal tracking-tighter leading-[0.88] mb-4"
-            style={{ fontSize: "clamp(2rem, 5vw, 3.8rem)" }}>
-            OUR CONSTRAINTS ARE<br />
+          <h2 className="font-black text-brand-charcoal tracking-tight leading-none mb-4"
+            style={{ fontSize: "clamp(2.5rem, 8vw, 5.5rem)" }}>
+            OUR CONSTRAINTS ARE<br className="hidden sm:block" />
             <span className="text-brand-terracotta">OUR CREDIBILITY.</span>
           </h2>
           <p className="text-sm font-bold text-brand-charcoal/40 max-w-xl leading-relaxed mb-14 sm:mb-16">
@@ -386,10 +371,10 @@ export default function StoryPage() {
           <div className="objections-container grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             {objections.map((item, i) => (
               <div key={i} className="objection-item bg-brand-oat rounded-[2rem] p-7 sm:p-8 border border-brand-charcoal/5 group hover:bg-brand-charcoal transition-all duration-500">
-                <p className="font-black text-sm sm:text-base tracking-tight text-brand-charcoal group-hover:text-brand-gold mb-4 transition-colors duration-300">
+                <p className="font-black text-base sm:text-lg md:text-xl tracking-tight text-brand-charcoal group-hover:text-brand-gold mb-4 transition-colors duration-300">
                   "{item.q}"
                 </p>
-                <p className="text-xs sm:text-sm font-bold text-brand-charcoal/50 group-hover:text-brand-oat/60 leading-relaxed transition-colors duration-300">
+                <p className="text-sm sm:text-base md:text-lg font-bold text-brand-charcoal/50 group-hover:text-brand-oat/60 leading-relaxed transition-colors duration-300">
                   {item.a}
                 </p>
               </div>

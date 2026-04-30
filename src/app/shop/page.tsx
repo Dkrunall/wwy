@@ -8,41 +8,9 @@ import Navbar from "@/components/Navbar";
 import CartDrawer from "@/components/CartDrawer";
 import Footer from "@/components/Footer";
 import { useCart } from "@/components/CartContext";
+import { products } from "@/lib/products";
 
 const categories = ["All", "Sodas", "Starters", "Storage", "Bundles"];
-
-const products = [
-  {
-    id: 1, name: "Wild Botanicals", category: "Sodas",
-    badge: "BEST SELLER", price: "₹180", priceNum: 180,
-    image: "/p1.png", bgColor: "bg-[#FFDDC1]",
-    desc: "Hibiscus and wild ginger. Slow-fermented over 72 hours. Each bottle carries its own character.",
-  },
-  {
-    id: 2, name: "Wild Starter", category: "Starters",
-    price: "₹450", priceNum: 450,
-    image: "/p2.png", bgColor: "bg-[#D1E8E2]",
-    desc: "A living, naturally leavened sourdough culture. Built on a century-old strain. Ready to bake.",
-  },
-  {
-    id: 3, name: "Golden Fizz", category: "Sodas",
-    price: "₹180", priceNum: 180,
-    image: "/p3.png", bgColor: "bg-[#FCEEA7]",
-    desc: "Turmeric, green cardamom, raw cane. Probiotic. Fermented. Alive in every sip.",
-  },
-  {
-    id: 4, name: "The Iron Tin", category: "Storage",
-    badge: "NEW", price: "₹850", priceNum: 850,
-    image: "/p4.png", bgColor: "bg-[#E2D4E0]",
-    desc: "Designed to keep your starter alive. Airtight. Measured. Built for the long ferment.",
-  },
-  {
-    id: 5, name: "Sampler Kit", category: "Bundles",
-    badge: "LIMITED", price: "₹1,200", priceNum: 1200,
-    image: "/p5.png", bgColor: "bg-[#FFDDC1]",
-    desc: "Everything to begin. Two sodas, one starter, one tin. A complete introduction to living food.",
-  },
-];
 
 export default function ShopPage() {
   const [activeCategory, setActiveCategory] = useState("All");
@@ -59,7 +27,7 @@ export default function ShopPage() {
       <section className="w-full bg-brand-oat px-4 sm:px-8 xl:px-16 pt-36 sm:pt-44 pb-12 sm:pb-16 border-b border-brand-charcoal/5">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 max-w-full">
           <div>
-            <span className="text-[10px] font-black tracking-[0.3em] uppercase text-brand-terracotta mb-4 block">
+            <span className="text-brand-terracotta text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
               This Week's Fermentation
             </span>
             <h1
@@ -167,29 +135,33 @@ function ProductCard({ product }: { product: typeof products[0] }) {
 
   return (
     <div className="group flex flex-col bg-white rounded-[2rem] overflow-hidden border border-brand-charcoal/5 shadow-sm hover:shadow-xl transition-all duration-500">
-      {/* Image */}
-      <div className={`relative w-full aspect-square ${product.bgColor} p-8 flex items-center justify-center`}>
-        {product.badge && (
-          <span className="absolute top-4 left-4 z-10 text-[9px] font-black bg-brand-charcoal text-white px-3 py-1.5 rounded-full uppercase tracking-widest">
-            {product.badge}
-          </span>
-        )}
-        <div className="relative w-full h-full transition-transform duration-700 group-hover:scale-110">
-          <Image src={product.image} alt={product.name} fill className="object-contain mix-blend-multiply drop-shadow-xl" />
+      {/* Image — clickable */}
+      <Link href={`/shop/${product.id}`} className="block">
+        <div className={`relative w-full aspect-square ${product.bgColor} p-5 sm:p-8 flex items-center justify-center`}>
+          {product.badge && (
+            <span className="absolute top-4 left-4 z-10 text-[9px] font-black bg-brand-charcoal text-white px-3 py-1.5 rounded-full uppercase tracking-widest">
+              {product.badge}
+            </span>
+          )}
+          <div className="relative w-full h-full transition-transform duration-700 group-hover:scale-110">
+            <Image src={product.image} alt={product.name} fill className="object-contain mix-blend-multiply drop-shadow-xl" />
+          </div>
         </div>
-      </div>
+      </Link>
 
       {/* Info */}
       <div className="flex flex-col flex-1 p-5 sm:p-6 gap-3">
-        <div>
+        <Link href={`/shop/${product.id}`} className="block">
           <span className="text-[9px] font-black tracking-[0.2em] uppercase text-brand-charcoal/40 mb-1 block">
             {product.category}
           </span>
-          <h3 className="font-black text-lg tracking-tight text-brand-charcoal">{product.name}</h3>
+          <h3 className="font-black text-lg tracking-tight text-brand-charcoal group-hover:text-brand-terracotta transition-colors duration-200">
+            {product.name}
+          </h3>
           <p className="text-xs font-bold text-brand-charcoal/40 mt-2 leading-relaxed line-clamp-2">
             {product.desc}
           </p>
-        </div>
+        </Link>
 
         <div className="flex items-center justify-between mt-auto pt-3 border-t border-brand-charcoal/5">
           <span className="font-black text-brand-terracotta text-lg">{product.price}</span>

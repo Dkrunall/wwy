@@ -90,7 +90,7 @@ function Faq({ item }: { item: typeof faqs[0] }) {
         onClick={() => setOpen(!open)}
         className="w-full flex items-start justify-between gap-4 py-5 text-left group"
       >
-        <span className="font-black text-sm tracking-tight text-brand-charcoal group-hover:text-brand-terracotta transition-colors duration-300 leading-snug">
+        <span className="font-black text-base sm:text-lg md:text-xl tracking-tight text-brand-charcoal group-hover:text-brand-terracotta transition-colors duration-300 leading-snug">
           {item.q}
         </span>
         <ChevronDown
@@ -99,7 +99,7 @@ function Faq({ item }: { item: typeof faqs[0] }) {
         />
       </button>
       <div className={`overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.87,0,0.13,1)] ${open ? "max-h-48 pb-5" : "max-h-0"}`}>
-        <p className="text-xs sm:text-sm font-bold text-brand-charcoal/50 leading-relaxed">{item.a}</p>
+        <p className="text-sm sm:text-base md:text-lg font-bold text-brand-charcoal/60 leading-relaxed">{item.a}</p>
       </div>
     </div>
   );
@@ -146,22 +146,22 @@ export default function HowItWorks() {
         {/* ── Header ── */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-14 sm:mb-20">
           <div>
-            <span className="text-[10px] font-black tracking-[0.3em] uppercase text-brand-terracotta mb-4 block">
+            <span className="text-brand-terracotta text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
               How Ordering Works
             </span>
             <h2
-              className="font-black text-brand-charcoal tracking-tighter leading-[0.88]"
-              style={{ fontSize: "clamp(2.5rem, 7vw, 5rem)" }}
+              className="font-black text-brand-charcoal tracking-tight leading-none"
+              style={{ fontSize: "clamp(2.5rem, 8vw, 5.5rem)" }}
             >
-              MADE TO ORDER.<br />
+              MADE TO ORDER.<br className="hidden sm:block" />
               <span className="text-brand-terracotta">VIA WHATSAPP.</span>
             </h2>
           </div>
           <div className="max-w-sm lg:pb-2 flex flex-col gap-2">
-            <p className="text-sm font-bold text-brand-charcoal/50 leading-relaxed">
+            <p className="text-sm sm:text-base md:text-xl font-bold text-brand-charcoal/60 leading-relaxed">
               We don't have a traditional cart. Every order starts with a WhatsApp message. We plan batches from confirmed orders, bake and brew to order, and deliver on fixed days.
             </p>
-            <p className="text-[10px] font-black tracking-[0.15em] uppercase text-brand-charcoal/25 italic">
+            <p className="text-xs sm:text-sm md:text-base font-black tracking-[0.15em] uppercase text-brand-charcoal/40 italic">
               We don't rush food. We plan for it.
             </p>
           </div>
@@ -175,7 +175,7 @@ export default function HowItWorks() {
             { label: "UPI payment · 2hr window" },
             { label: "Bake to order — no advance stock" },
           ].map(({ label }) => (
-            <span key={label} className="px-4 py-2 rounded-full bg-white border border-brand-charcoal/8 text-[10px] font-black tracking-[0.12em] uppercase text-brand-charcoal/50 shadow-sm">
+            <span key={label} className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white border border-brand-charcoal/8 text-[10px] sm:text-xs md:text-sm font-black tracking-[0.12em] uppercase text-brand-charcoal/60 shadow-sm">
               {label}
             </span>
           ))}
@@ -189,19 +189,19 @@ export default function HowItWorks() {
               className="hiw-step group bg-white rounded-[2rem] p-6 sm:p-7 border border-brand-charcoal/5 shadow-sm hover:shadow-xl hover:border-brand-terracotta/20 transition-all duration-500 flex flex-col gap-4"
             >
               <div className="flex items-center justify-between">
-                <span className="font-black text-[10px] tracking-[0.3em] text-brand-terracotta">{step.number}</span>
-                <span className="text-[9px] font-black tracking-[0.12em] uppercase text-brand-charcoal/25 bg-brand-charcoal/5 px-3 py-1 rounded-full">
+                <span className="font-black text-2xl sm:text-3xl md:text-4xl tracking-[0.2em] text-brand-terracotta">{step.number}</span>
+                <span className="text-[9px] sm:text-xs font-black tracking-[0.12em] uppercase text-brand-charcoal/40 bg-brand-charcoal/5 px-3 sm:px-4 py-1.5 rounded-full">
                   {step.tag}
                 </span>
               </div>
-              <div className="w-8 h-px bg-brand-charcoal/10 group-hover:bg-brand-terracotta group-hover:w-14 transition-all duration-500" />
+              <div className="w-12 h-1 bg-brand-charcoal/10 group-hover:bg-brand-terracotta group-hover:w-20 transition-all duration-500 rounded-full" />
               <div>
-                <p className="text-[10px] font-black tracking-[0.15em] uppercase text-brand-charcoal/30 mb-1">{step.day}</p>
-                <h3 className="font-black text-base sm:text-lg tracking-tight text-brand-charcoal leading-tight group-hover:text-brand-terracotta transition-colors duration-300">
+                <p className="text-xs sm:text-sm font-black tracking-[0.15em] uppercase text-brand-charcoal/40 mb-2">{step.day}</p>
+                <h3 className="font-black text-xl sm:text-2xl md:text-3xl tracking-tight text-brand-charcoal leading-tight group-hover:text-brand-terracotta transition-colors duration-300">
                   {step.title}
                 </h3>
               </div>
-              <p className="text-xs font-bold text-brand-charcoal/40 leading-relaxed flex-1">
+              <p className="text-sm sm:text-base font-bold text-brand-charcoal/50 leading-relaxed flex-1">
                 {step.body}
               </p>
             </div>
@@ -211,17 +211,17 @@ export default function HowItWorks() {
         {/* ── Product lead times ── */}
         <div className="mb-16 sm:mb-24">
           <div className="flex items-center gap-4 mb-8">
-            <div className="w-6 h-px bg-brand-terracotta" />
-            <span className="text-[10px] font-black tracking-[0.3em] uppercase text-brand-terracotta">
+            <div className="w-8 h-px bg-brand-terracotta" />
+            <span className="text-sm sm:text-base md:text-lg font-bold tracking-[0.2em] uppercase text-brand-terracotta">
               Lead Times by Product
             </span>
           </div>
           <div className="hiw-leads bg-white rounded-[2rem] border border-brand-charcoal/5 shadow-sm overflow-hidden">
             {deliveryRules.map((row, i) => (
               <div key={i} className="hiw-lead-row flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0 px-6 sm:px-8 py-4 sm:py-5 border-b border-brand-charcoal/5 last:border-0 hover:bg-brand-oat/40 transition-colors duration-200">
-                <span className="font-black text-sm text-brand-charcoal sm:w-1/3">{row.product}</span>
-                <span className="font-black text-brand-terracotta text-sm sm:w-1/6">{row.lead}</span>
-                <span className="text-xs font-bold text-brand-charcoal/40 sm:flex-1">{row.notes}</span>
+                <span className="font-black text-sm sm:text-base md:text-lg text-brand-charcoal sm:w-1/3">{row.product}</span>
+                <span className="font-black text-brand-terracotta text-sm sm:text-base md:text-lg sm:w-1/6">{row.lead}</span>
+                <span className="text-xs sm:text-sm md:text-base font-bold text-brand-charcoal/50 sm:flex-1">{row.notes}</span>
               </div>
             ))}
           </div>
@@ -235,8 +235,8 @@ export default function HowItWorks() {
           <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
             <div className="lg:w-72 shrink-0">
               <div className="flex items-center gap-4 mb-5">
-                <div className="w-6 h-px bg-brand-terracotta" />
-                <span className="text-[10px] font-black tracking-[0.3em] uppercase text-brand-terracotta">Common Questions</span>
+                <div className="w-8 h-px bg-brand-terracotta" />
+                <span className="text-sm sm:text-base md:text-lg font-bold tracking-[0.2em] uppercase text-brand-terracotta">Common Questions</span>
               </div>
               <h3
                 className="font-black text-brand-charcoal tracking-tighter leading-[0.9]"
@@ -245,7 +245,7 @@ export default function HowItWorks() {
                 WHY WWY<br />
                 <span className="text-brand-terracotta">WORKS THIS WAY.</span>
               </h3>
-              <p className="text-xs font-bold text-brand-charcoal/40 leading-relaxed mt-4 max-w-xs">
+              <p className="text-sm sm:text-base font-bold text-brand-charcoal/50 leading-relaxed mt-4 max-w-xs">
                 Our constraints are our credibility. Order windows, fixed delivery days, and a 2-hour payment window are not inconveniences — they are how fresh food without preservatives works.
               </p>
             </div>

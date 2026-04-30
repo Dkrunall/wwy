@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { ArrowUpRight } from "lucide-react";
@@ -120,7 +121,7 @@ export default function ProductSection() {
   return (
     <section
       ref={sectionRef}
-      className="bg-brand-oat w-full relative z-20 flex flex-col justify-center lg:overflow-hidden py-16 sm:py-20 lg:py-12 lg:min-h-screen"
+      className="bg-brand-oat w-full relative z-20 flex flex-col justify-center lg:overflow-hidden py-12 sm:py-20 lg:py-12 lg:min-h-screen"
     >
       {/* Section Header */}
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl mb-8 sm:mb-12 flex-shrink-0">
@@ -183,47 +184,52 @@ function ProductCard({ product }: { product: typeof products[0] }) {
   const { addItem } = useCart();
 
   return (
-    <div className="product-card group flex flex-col h-full shrink-0 w-full lg:w-[28vw]">
-      {/* Image Container */}
-      <div className={`relative w-full aspect-[4/5] rounded-[2rem] sm:rounded-[3rem] ${product.bgColor} overflow-hidden mb-4 sm:mb-6 p-6 sm:p-8 flex items-center justify-center border-4 border-transparent hover:border-brand-charcoal/5 transition-all duration-300 shadow-[inset_0_10px_30px_rgba(0,0,0,0.08)] group-hover:shadow-[inset_0_10px_30px_rgba(0,0,0,0.08),0_25px_50px_-12px_rgba(0,0,0,0.25)]`}>
-        {product.badge && (
-          <div className="absolute top-4 sm:top-6 left-4 sm:left-6 z-20">
-            <span className="text-[9px] sm:text-[10px] font-black bg-brand-charcoal text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full uppercase tracking-widest shadow-lg rotate-[-5deg] inline-block group-hover:rotate-0 transition-transform">
-              {product.badge}
-            </span>
+    <div className="product-card group flex flex-col h-full shrink-0 w-full lg:w-[22vw]">
+      {/* Image Container — clickable */}
+      <Link href={`/shop/${product.id}`} className="block">
+        <div className={`relative w-full aspect-[4/5] rounded-[2rem] sm:rounded-[3rem] ${product.bgColor} overflow-hidden mb-4 sm:mb-6 p-6 sm:p-8 flex items-center justify-center border-4 border-transparent hover:border-brand-charcoal/5 transition-all duration-300 shadow-[inset_0_10px_30px_rgba(0,0,0,0.08)] group-hover:shadow-[inset_0_10px_30px_rgba(0,0,0,0.08),0_25px_50px_-12px_rgba(0,0,0,0.25)]`}>
+          {product.badge && (
+            <div className="absolute top-4 sm:top-6 left-4 sm:left-6 z-20">
+              <span className="text-[9px] sm:text-[10px] font-black bg-brand-charcoal text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full uppercase tracking-widest shadow-lg rotate-[-5deg] inline-block group-hover:rotate-0 transition-transform">
+                {product.badge}
+              </span>
+            </div>
+          )}
+
+          <div className="relative w-full h-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden transition-transform duration-700 ease-out group-hover:scale-105 group-hover:-translate-y-2 shadow-xl border-4 border-white/20">
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              className="object-cover object-center"
+            />
           </div>
-        )}
 
-        <div className="relative w-full h-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden transition-transform duration-700 ease-out group-hover:scale-105 group-hover:-translate-y-2 shadow-xl border-4 border-white/20">
-          <Image
-            src={product.image}
-            alt={product.name}
-            fill
-            className="object-cover object-center"
-          />
+          <div className="absolute inset-x-0 bottom-6 sm:bottom-8 z-20 flex justify-center transition-all duration-500">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                addItem({ id: product.id, name: product.name, price: product.price, priceNum: product.priceNum, image: product.image, bgColor: product.bgColor });
+              }}
+              className="bg-brand-charcoal text-brand-oat active:bg-brand-terracotta hover:bg-brand-terracotta hover:text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] shadow-xl flex items-center gap-2 active:scale-95 transition-all">
+              Add to Cart
+            </button>
+          </div>
         </div>
+      </Link>
 
-        <div className="absolute inset-x-0 bottom-6 sm:bottom-8 z-20 flex justify-center transition-all duration-500">
-          <button
-            onClick={() => addItem({ id: product.id, name: product.name, price: product.price, priceNum: product.priceNum, image: product.image, bgColor: product.bgColor })}
-            className="bg-brand-charcoal text-brand-oat active:bg-brand-terracotta hover:bg-brand-terracotta hover:text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] shadow-xl flex items-center gap-2 active:scale-95 transition-all">
-            Add to Cart
-          </button>
-        </div>
-      </div>
-
-      {/* Text Info */}
-      <div className="flex flex-col items-center text-center px-2 sm:px-4">
+      {/* Text Info — clickable */}
+      <Link href={`/shop/${product.id}`} className="flex flex-col items-center text-center px-2 sm:px-4 group/text">
         <span className="text-[10px] font-bold tracking-[0.2em] text-brand-charcoal/60 uppercase mb-1 sm:mb-2">
           {product.category}
         </span>
-        <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-brand-charcoal tracking-tight mb-1 sm:mb-2">
+        <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-brand-charcoal tracking-tight mb-1 sm:mb-2 group-hover/text:text-brand-terracotta transition-colors duration-200">
           {product.name}
         </h3>
         <span className="font-black text-brand-terracotta text-base sm:text-lg">
           {product.price}
         </span>
-      </div>
+      </Link>
     </div>
   );
 }

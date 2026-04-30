@@ -107,7 +107,7 @@ export default function JournalPage() {
         </div>
 
         <div className="relative z-10 max-w-2xl">
-          <span className="text-[10px] font-black tracking-[0.3em] uppercase text-brand-terracotta mb-6 block">
+          <span className="text-brand-terracotta text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
             The Journal
           </span>
           <h1
@@ -153,7 +153,7 @@ export default function JournalPage() {
               >
                 {featured.title}
               </h2>
-              <p className="text-sm font-bold text-brand-charcoal/50 leading-relaxed mb-8 max-w-lg">
+              <p className="text-sm sm:text-base md:text-lg font-bold text-brand-charcoal/50 leading-relaxed mb-8 max-w-lg">
                 {featured.excerpt}
               </p>
               <button className="inline-flex items-center gap-3 bg-brand-charcoal text-white hover:bg-brand-terracotta px-8 py-3.5 rounded-full text-[10px] font-black tracking-[0.2em] uppercase transition-all duration-300 active:scale-95 shadow-md">
@@ -214,7 +214,7 @@ export default function JournalPage() {
                 <h3 className="font-black text-base sm:text-lg tracking-tight text-brand-charcoal leading-[1.1] group-hover:text-brand-terracotta transition-colors duration-300">
                   {post.title}
                 </h3>
-                <p className="text-xs font-bold text-brand-charcoal/40 leading-relaxed line-clamp-2 flex-1">
+                <p className="text-sm sm:text-base font-bold text-brand-charcoal/40 leading-relaxed line-clamp-2 flex-1">
                   {post.excerpt}
                 </p>
                 <div className="flex items-center justify-between pt-3 border-t border-brand-charcoal/5 mt-auto">
@@ -239,14 +239,14 @@ export default function JournalPage() {
 
       {/* ── Newsletter CTA ── */}
       <section className="w-full bg-brand-oat border-t border-brand-charcoal/5 px-4 sm:px-8 xl:px-16 py-16 sm:py-20 text-center">
-        <span className="text-[10px] font-black tracking-[0.25em] uppercase text-brand-terracotta mb-4 block">
+        <span className="text-brand-terracotta text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
           Stay in the Culture
         </span>
         <h3 className="font-black text-brand-charcoal tracking-tighter leading-[0.9] mb-4"
           style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}>
           NEW NOTES, <span className="text-brand-terracotta">WHEN READY.</span>
         </h3>
-        <p className="text-sm font-bold text-brand-charcoal/40 max-w-md mx-auto mb-8 leading-relaxed">
+        <p className="text-sm sm:text-base md:text-lg font-bold text-brand-charcoal/40 max-w-md mx-auto mb-8 leading-relaxed">
           Notes on fermentation, small-batch arrivals, and what's slow-fermenting right now.
         </p>
         <Link

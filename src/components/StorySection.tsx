@@ -46,14 +46,14 @@ export default function StorySection() {
   return (
     <section
       ref={containerRef}
-      className="w-full relative bg-brand-charcoal text-brand-oat py-20 sm:py-32 md:py-48 z-10 rounded-t-[2rem] sm:rounded-t-[3rem] md:rounded-t-[5rem] -mt-8 sm:-mt-12 shadow-[0_-20px_50px_rgba(0,0,0,0.1)]"
+      className="w-full relative bg-brand-charcoal text-brand-oat py-16 sm:py-32 md:py-40 z-10 rounded-t-[2rem] sm:rounded-t-[3rem] md:rounded-t-[5rem] -mt-8 sm:-mt-12 shadow-[0_-20px_50px_rgba(0,0,0,0.1)]"
     >
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
 
         <div className="flex flex-col lg:flex-row gap-10 sm:gap-16 md:gap-24 items-center">
 
           {/* Left: Images */}
-          <div className="w-full lg:w-1/2 flex gap-3 sm:gap-4 md:gap-8 story-images h-[70vw] sm:h-[60vh] md:h-[80vh] min-h-[260px] max-h-[520px] relative overflow-hidden rounded-[2rem] sm:rounded-[3rem]">
+          <div className="w-full lg:w-1/2 flex gap-3 sm:gap-4 md:gap-8 story-images h-[65vw] sm:h-[55vh] md:h-[75vh] min-h-[240px] max-h-[500px] relative overflow-hidden rounded-[2rem] sm:rounded-[3rem]">
             <div className="w-1/2 h-[120%] -top-[10%] relative overflow-hidden rounded-[2rem] sm:rounded-[3rem] shadow-2xl border-4 border-brand-charcoal">
               <Image src="/f1.png" alt="Wheat field" fill className="parallax-bg object-cover transition-transform duration-700 hover:scale-105" />
             </div>
@@ -70,15 +70,15 @@ export default function StorySection() {
 
           {/* Right: Text */}
           <div className="w-full lg:w-1/2 story-text-container flex flex-col justify-center lg:pl-10">
-            <span className="story-text inline-block px-4 sm:px-5 py-2 rounded-full bg-brand-terracotta text-white text-[9px] sm:text-[10px] md:text-xs font-black tracking-[0.2em] uppercase mb-6 sm:mb-8 shadow-sm w-fit">
+            <span className="story-text text-[#FEC84D] text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
               The Philosophy
             </span>
 
             <h2
-              className="story-text font-black leading-[0.9] tracking-tighter mb-6 sm:mb-10 text-white"
-              style={{ fontSize: "clamp(2.5rem, 7vw, 5.5rem)" }}
+              className="story-text font-black tracking-tight leading-none mb-6 sm:mb-10 text-white"
+              style={{ fontSize: "clamp(2.5rem, 8vw, 5.5rem)" }}
             >
-              NOTHING MADE <br />
+              NOTHING MADE <br className="hidden sm:block" />
               <span className="text-[#FEC84D]">BEFORE YOU ORDER.</span>
             </h2>
 

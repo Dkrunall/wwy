@@ -78,19 +78,20 @@ export default function SocialGallery() {
   return (
     <section
       ref={containerRef}
-      className="w-full relative flex flex-col bg-[#FFF6EC] pt-20 sm:pt-32 overflow-hidden border-t-4 border-brand-charcoal/10 -mt-8 z-20 rounded-t-[2rem] sm:rounded-t-[3rem] md:rounded-t-[5rem]"
+      className="w-full relative flex flex-col bg-[#FFF6EC] pt-16 sm:pt-32 overflow-hidden border-t-4 border-brand-charcoal/10 -mt-8 z-20 rounded-t-[2rem] sm:rounded-t-[3rem] md:rounded-t-[5rem]"
     >
       {/* Header Row */}
-      <div className="container mx-auto px-4 sm:px-6 mb-12 sm:mb-20 md:mb-32 flex flex-col md:flex-row justify-between items-center gap-8 sm:gap-12 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 mb-10 sm:mb-20 md:mb-28 flex flex-col md:flex-row justify-between items-center gap-6 sm:gap-12 relative z-10">
         <div className="social-text-container text-center md:text-left">
-          <span className="social-text inline-block px-4 sm:px-5 py-2 rounded-full bg-[#FEC84D] text-brand-charcoal text-[9px] sm:text-[10px] md:text-xs font-black tracking-[0.2em] uppercase mb-4 sm:mb-6 shadow-sm">
+          <span className="social-text text-brand-terracotta text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
             The Community
           </span>
           <h2
-            className="social-text font-black text-brand-charcoal leading-[0.9] tracking-tighter"
-            style={{ fontSize: "clamp(2.8rem, 9vw, 7rem)" }}
+            className="social-text font-black text-brand-charcoal tracking-tight leading-none"
+            style={{ fontSize: "clamp(2.5rem, 8vw, 5.5rem)" }}
           >
-            WILD <span className="text-brand-terracotta">SIGHTINGS.</span>
+            WILD <br className="hidden sm:block" />
+            <span className="text-brand-terracotta">SIGHTINGS.</span>
           </h2>
         </div>
 
