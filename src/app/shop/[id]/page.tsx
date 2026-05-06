@@ -4,18 +4,17 @@ import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { Check, ArrowLeft, ShoppingBag } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import CartDrawer from "@/components/CartDrawer";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import Footer from "@/components/Footer";
-import { useCart } from "@/components/CartContext";
 import { getProduct, products } from "@/lib/products";
+
+const WA_LINK = "https://wa.me/919999999999";
 
 export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { addItem, items } = useCart();
-  const [added, setAdded] = useState(false);
   const [stickyVisible, setStickyVisible] = useState(false);
   const heroRef = useRef<HTMLDivElement>(null);
 
@@ -30,20 +29,6 @@ export default function ProductDetailPage() {
     if (heroRef.current) observer.observe(heroRef.current);
     return () => observer.disconnect();
   }, []);
-
-  const handleAdd = () => {
-    if (!product) return;
-    addItem({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      priceNum: product.priceNum,
-      image: product.image,
-      bgColor: product.bgColor,
-    });
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1800);
-  };
 
   if (!product) {
     return (
@@ -61,8 +46,6 @@ export default function ProductDetailPage() {
     );
   }
 
-  const inCart = items.some((i) => i.id === product.id);
-  const cartQty = items.find((i) => i.id === product.id)?.quantity ?? 0;
   const related = products.filter((p) => p.id !== product.id);
 
   /* split the long description at the first sentence for pull-quote treatment */
@@ -73,7 +56,6 @@ export default function ProductDetailPage() {
   return (
     <main className="min-h-screen bg-brand-oat overflow-x-hidden">
       <Navbar />
-      <CartDrawer />
 
       {/* ── HERO — full-bleed split ───────────────────────────── */}
       <section className="w-full min-h-screen flex flex-col lg:flex-row">
@@ -145,23 +127,14 @@ export default function ProductDetailPage() {
             </p>
 
             {/* Price */}
-            <div className="flex items-center gap-5">
-              <div>
-                <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-charcoal/30 mb-1">Price</p>
-                <p
-                  className="font-black text-brand-charcoal leading-none"
-                  style={{ fontSize: "clamp(2.5rem, 5vw, 3.5rem)" }}
-                >
-                  {product.price}
-                </p>
-              </div>
-              {cartQty > 0 && (
-                <div className="bg-brand-terracotta/10 border border-brand-terracotta/20 rounded-full px-3 py-1.5">
-                  <p className="text-xs font-black text-brand-terracotta tracking-wide">
-                    {cartQty} in cart
-                  </p>
-                </div>
-              )}
+            <div>
+              <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-charcoal/30 mb-1">Price</p>
+              <p
+                className="font-black text-brand-charcoal leading-none"
+                style={{ fontSize: "clamp(2.5rem, 5vw, 3.5rem)" }}
+              >
+                {product.price}
+              </p>
             </div>
 
             {/* Lead time */}
@@ -173,38 +146,19 @@ export default function ProductDetailPage() {
               </div>
             </div>
 
-            {/* CTAs */}
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                onClick={handleAdd}
-                className={`flex-1 flex items-center justify-center gap-2.5 py-4 sm:py-5 rounded-full
-                  font-black text-xs tracking-[0.2em] uppercase
-                  transition-all duration-300 active:scale-[0.97] shadow-lg min-h-[56px] ${
-                  added
-                    ? "bg-brand-olive text-white shadow-brand-olive/20"
-                    : "bg-brand-charcoal text-white hover:bg-brand-terracotta"
-                }`}
-              >
-                {added
-                  ? <><Check size={13} strokeWidth={3} /> Added to Cart</>
-                  : inCart
-                  ? <><ShoppingBag size={13} /> Add One More</>
-                  : "Add to Cart"
-                }
-              </button>
-              <a
-                href="https://wa.me/919999999999"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex-1 flex items-center justify-center py-4 sm:py-5 rounded-full
-                  font-black text-xs tracking-[0.2em] uppercase
-                  border-2 border-brand-charcoal/15 text-brand-charcoal
-                  hover:bg-brand-charcoal hover:text-white hover:border-brand-charcoal
-                  transition-all duration-300 active:scale-[0.97] min-h-[56px]"
-              >
-                Order via WhatsApp
-              </a>
-            </div>
+            {/* CTA */}
+            <a
+              href={WA_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2.5 py-4 sm:py-5 rounded-full
+                font-black text-xs tracking-[0.2em] uppercase
+                bg-brand-charcoal text-white hover:bg-brand-terracotta
+                transition-all duration-300 active:scale-[0.97] shadow-lg min-h-[56px]"
+            >
+              <WhatsAppIcon size={14} />
+              Order Now
+            </a>
 
             {/* Trust tags */}
             <div className="flex flex-wrap gap-2">
@@ -337,18 +291,18 @@ export default function ProductDetailPage() {
               </p>
               <p className="font-black text-brand-terracotta text-xs mt-0.5">{product.price}</p>
             </div>
-            <button
-              onClick={handleAdd}
-              className={`shrink-0 flex items-center gap-2 px-5 py-3 rounded-full
+            <a
+              href={WA_LINK}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 flex items-center gap-2 px-5 py-3 rounded-full
                 font-black text-[10px] tracking-[0.15em] uppercase
-                transition-all duration-300 active:scale-[0.96] ${
-                added
-                  ? "bg-brand-olive text-white"
-                  : "bg-brand-charcoal text-white hover:bg-brand-terracotta"
-              }`}
+                bg-brand-charcoal text-white hover:bg-brand-terracotta
+                transition-all duration-300 active:scale-[0.96]"
             >
-              {added ? <><Check size={11} strokeWidth={3} />Added</> : "Add to Cart"}
-            </button>
+              <WhatsAppIcon size={12} />
+              Order Now
+            </a>
           </div>
         </div>
       </div>

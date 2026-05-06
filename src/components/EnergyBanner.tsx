@@ -43,14 +43,14 @@ export default function EnergyBanner() {
   return (
     <section
       ref={sectionRef}
-      className="w-full bg-brand-olive py-28 sm:py-48 md:py-64 relative overflow-hidden flex items-center justify-center -mt-px shadow-inner"
+      className="w-full bg-brand-brown py-28 sm:py-48 md:py-64 relative overflow-hidden flex items-center justify-center -mt-px shadow-inner"
     >
       {/* Noise Texture */}
       <div className="absolute inset-0 opacity-[0.25] mix-blend-overlay pointer-events-none z-0" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}></div>
 
       {/* Background Orbs */}
       <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-brand-gold/15 blur-[120px] rounded-full pointer-events-none z-0"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-brand-terracotta/15 blur-[150px] rounded-full pointer-events-none z-0"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-brand-orange/15 blur-[150px] rounded-full pointer-events-none z-0"></div>
 
       {/* Massive Parallax Text */}
       <h2
@@ -71,7 +71,7 @@ export default function EnergyBanner() {
           Alive in{" "}
           <span className="italic font-light text-brand-gold relative inline-block">
             every batch.
-            <svg className="absolute -bottom-3 sm:-bottom-4 left-0 w-full h-6 sm:h-8 text-brand-terracotta opacity-80" viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0 10 Q 50 20 100 10" fill="transparent" stroke="currentColor" strokeWidth="4" strokeLinecap="round"/></svg>
+            <svg className="absolute -bottom-3 sm:-bottom-4 left-0 w-full h-6 sm:h-8 text-brand-orange opacity-80" viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0 10 Q 50 20 100 10" fill="transparent" stroke="currentColor" strokeWidth="4" strokeLinecap="round"/></svg>
           </span>
         </h3>
 
@@ -81,7 +81,7 @@ export default function EnergyBanner() {
           {/* Center item - Hero Product */}
           <div className="floating-item relative w-[52%] sm:w-[40%] md:w-[30%] aspect-[3/4] z-20 rounded-[2rem] sm:rounded-[3rem] overflow-hidden border-[4px] sm:border-[6px] md:border-[8px] border-brand-oat shadow-[0_30px_60px_rgba(0,0,0,0.4)] rotate-2 group cursor-pointer">
             <Image src="/p5.png" alt="Bundle" fill className="object-cover group-hover:scale-110 transition-transform duration-700 hover:rotate-0" />
-            <div className="absolute inset-0 bg-gradient-to-t from-brand-charcoal/60 to-transparent flex items-end p-6 sm:p-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="absolute inset-0 bg-gradient-to-t from-brand-brown/60 to-transparent flex items-end p-6 sm:p-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <span className="text-white font-black uppercase tracking-widest text-sm sm:text-lg">Sampler Kit</span>
             </div>
           </div>
@@ -92,24 +92,24 @@ export default function EnergyBanner() {
           </div>
 
           {/* Far Right item */}
-          <div className="floating-item absolute right-0 sm:right-[5%] md:right-[10%] bottom-[8%] sm:-bottom-[10%] w-[35%] sm:w-[28%] md:w-[25%] aspect-[3/4] z-30 rotate-[8deg] rounded-[1.5rem] sm:rounded-[2.5rem] overflow-hidden border-4 sm:border-8 border-[#FEC84D] shadow-[0_25px_50px_rgba(0,0,0,0.35)] hover:z-40 hover:rotate-0 transition-all duration-500 group cursor-pointer">
+          <div className="floating-item absolute right-0 sm:right-[5%] md:right-[10%] bottom-[8%] sm:-bottom-[10%] w-[35%] sm:w-[28%] md:w-[25%] aspect-[3/4] z-30 rotate-[8deg] rounded-[1.5rem] sm:rounded-[2.5rem] overflow-hidden border-4 sm:border-8 border-brand-gold shadow-[0_25px_50px_rgba(0,0,0,0.35)] hover:z-40 hover:rotate-0 transition-all duration-500 group cursor-pointer">
             <Image src="/p1.png" alt="Sourdough" fill className="object-cover group-hover:scale-110 transition-transform duration-700" />
           </div>
 
           {/* Small decorative accent 1 */}
-          <div className="floating-item absolute left-[18%] bottom-[3%] md:bottom-[20%] w-12 sm:w-20 md:w-24 h-12 sm:h-20 md:h-24 bg-brand-terracotta rounded-full flex items-center justify-center text-white font-black text-[10px] sm:text-sm -rotate-12 shadow-xl z-20 border-2 sm:border-4 border-brand-olive cursor-default">
+          <div className="floating-item absolute left-[18%] bottom-[3%] md:bottom-[20%] w-12 sm:w-20 md:w-24 h-12 sm:h-20 md:h-24 bg-brand-orange rounded-full flex items-center justify-center text-white font-black text-[10px] sm:text-sm -rotate-12 shadow-xl z-20 border-2 sm:border-4 border-brand-brown cursor-default">
             NEW
           </div>
 
           {/* Small decorative accent 2 */}
-          <div className="floating-item absolute right-[22%] top-[3%] md:top-[15%] w-10 sm:w-16 md:w-20 h-10 sm:h-16 md:h-20 bg-white rounded-full flex items-center justify-center text-brand-charcoal font-black text-lg sm:text-xl md:text-2xl rotate-12 shadow-xl z-10 border-2 sm:border-4 border-brand-olive cursor-default">
+          <div className="floating-item absolute right-[22%] top-[3%] md:top-[15%] w-10 sm:w-16 md:w-20 h-10 sm:h-16 md:h-20 bg-white rounded-full flex items-center justify-center text-brand-brown font-black text-lg sm:text-xl md:text-2xl rotate-12 shadow-xl z-10 border-2 sm:border-4 border-brand-brown cursor-default">
             ✦
           </div>
 
         </div>
 
         {/* CTA Button */}
-        <button className="mt-12 sm:mt-24 bg-brand-oat text-brand-olive rounded-full px-8 sm:px-16 py-4 sm:py-5 text-sm font-black uppercase tracking-[0.2em] hover:bg-brand-terracotta hover:text-white hover:scale-105 transition-all duration-500 shadow-[0_15px_30px_rgba(0,0,0,0.2)] whitespace-nowrap z-30">
+        <button className="mt-12 sm:mt-24 bg-brand-oat text-brand-brown rounded-full px-8 sm:px-16 py-4 sm:py-5 text-sm font-black uppercase tracking-[0.2em] hover:bg-brand-orange hover:text-white hover:scale-105 transition-all duration-500 shadow-[0_15px_30px_rgba(0,0,0,0.2)] whitespace-nowrap z-30">
           Shop the Set
         </button>
 

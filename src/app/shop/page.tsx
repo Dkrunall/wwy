@@ -3,13 +3,12 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ShoppingBag, Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import CartDrawer from "@/components/CartDrawer";
 import Footer from "@/components/Footer";
-import { useCart } from "@/components/CartContext";
+import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { products } from "@/lib/products";
 
+const WA_LINK = "https://wa.me/919999999999";
 const categories = ["All", "Sodas", "Starters", "Storage", "Bundles"];
 
 export default function ShopPage() {
@@ -21,7 +20,6 @@ export default function ShopPage() {
   return (
     <main className="min-h-screen bg-brand-oat">
       <Navbar />
-      <CartDrawer />
 
       {/* ── Hero ── */}
       <section className="w-full bg-brand-oat px-4 sm:px-8 xl:px-16 pt-36 sm:pt-44 pb-12 sm:pb-16 border-b border-brand-charcoal/5">
@@ -53,6 +51,7 @@ export default function ShopPage() {
               rel="noopener noreferrer"
               className="mt-2 inline-flex items-center gap-2 bg-brand-charcoal text-white hover:bg-brand-terracotta px-6 py-3 rounded-full text-[10px] font-black tracking-[0.18em] uppercase transition-all duration-300 active:scale-95 w-fit shadow-md"
             >
+              <WhatsAppIcon size={13} />
               Order via WhatsApp
             </a>
           </div>
@@ -104,17 +103,20 @@ export default function ShopPage() {
         <div>
           <h3 className="font-black text-brand-oat tracking-tighter leading-none mb-3"
             style={{ fontSize: "clamp(1.8rem, 4vw, 3rem)" }}>
-            FREE SHIPPING <span className="text-brand-terracotta">OVER ₹500.</span>
+            ORDER VIA <span className="text-brand-terracotta">WHATSAPP.</span>
           </h3>
-          <p className="text-brand-oat/40 font-bold text-sm">On all provisions. Delivered slowly, carefully.</p>
-          <p className="text-brand-oat/20 font-bold text-xs mt-1 italic">Time is our main ingredient.</p>
+          <p className="text-brand-oat/40 font-bold text-sm">Tell us what you want. We'll confirm and deliver.</p>
+          <p className="text-brand-oat/20 font-bold text-xs mt-1 italic">Delivery Wed &amp; Sat only.</p>
         </div>
-        <Link
-          href="/cart"
-          className="shrink-0 bg-brand-terracotta text-white hover:bg-brand-oat hover:text-brand-charcoal px-10 py-4 rounded-full font-black text-xs tracking-[0.2em] uppercase shadow-xl active:scale-95 transition-all duration-300"
+        <a
+          href={WA_LINK}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="shrink-0 inline-flex items-center gap-2 bg-brand-terracotta text-white hover:bg-brand-oat hover:text-brand-charcoal px-10 py-4 rounded-full font-black text-xs tracking-[0.2em] uppercase shadow-xl active:scale-95 transition-all duration-300"
         >
-          View Cart
-        </Link>
+          <WhatsAppIcon size={13} />
+          Order Now
+        </a>
       </section>
 
       <Footer />
@@ -123,16 +125,6 @@ export default function ShopPage() {
 }
 
 function ProductCard({ product }: { product: typeof products[0] }) {
-  const { addItem, items } = useCart();
-  const [added, setAdded] = useState(false);
-  const inCart = items.some(i => i.id === product.id);
-
-  const handleAdd = () => {
-    addItem({ id: product.id, name: product.name, price: product.price, priceNum: product.priceNum, image: product.image, bgColor: product.bgColor });
-    setAdded(true);
-    setTimeout(() => setAdded(false), 1500);
-  };
-
   return (
     <div className="group flex flex-col bg-white rounded-[2rem] overflow-hidden border border-brand-charcoal/5 shadow-sm hover:shadow-xl transition-all duration-500">
       {/* Image — clickable */}
@@ -165,18 +157,15 @@ function ProductCard({ product }: { product: typeof products[0] }) {
 
         <div className="flex items-center justify-between mt-auto pt-3 border-t border-brand-charcoal/5">
           <span className="font-black text-brand-terracotta text-lg">{product.price}</span>
-          <button
-            onClick={handleAdd}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[10px] font-black tracking-[0.15em] uppercase transition-all duration-300 active:scale-95 shadow-sm ${
-              added
-                ? "bg-brand-olive text-white"
-                : inCart
-                ? "bg-brand-charcoal/10 text-brand-charcoal hover:bg-brand-charcoal hover:text-white"
-                : "bg-brand-charcoal text-white hover:bg-brand-terracotta"
-            }`}
+          <a
+            href={WA_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full text-[10px] font-black tracking-[0.15em] uppercase bg-brand-charcoal text-white hover:bg-brand-terracotta transition-all duration-300 active:scale-95 shadow-sm"
           >
-            {added ? <><Check size={11} /> Added</> : inCart ? "Add More" : "Add to Cart"}
-          </button>
+            <WhatsAppIcon size={11} />
+            Order Now
+          </a>
         </div>
       </div>
     </div>

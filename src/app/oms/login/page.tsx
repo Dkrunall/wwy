@@ -37,7 +37,7 @@ export default function OmsLoginPage() {
     <main className="min-h-screen bg-brand-charcoal flex flex-col items-center justify-center px-5">
       <div className="w-full max-w-sm flex flex-col items-center gap-8">
 
-        <Image src="/logo.png" alt="WWY" width={56} height={56} className="object-contain opacity-60 invert" />
+        <Image src="/WWY-LOGO_White.png" alt="WWY" width={56} height={56} className="object-contain opacity-60" />
 
         <div className="text-center">
           <p className="text-[11px] font-black tracking-[0.25em] uppercase text-white/30 mb-2">

@@ -6,7 +6,6 @@ import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { ArrowUpRight } from "lucide-react";
-import { useCart } from "./CartContext";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -125,17 +124,32 @@ export default function ProductSection() {
     >
       {/* Section Header */}
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl mb-8 sm:mb-12 flex-shrink-0">
-        <div className="text-center lg:text-left">
-          <span className="text-brand-terracotta text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
-            Shop The Range
-          </span>
-          <h2 className="font-black text-brand-charcoal tracking-tight leading-none"
-            style={{ fontSize: "clamp(2.5rem, 8vw, 5.5rem)" }}>
-            FERMENTED{" "}
-            <br className="hidden sm:block" />
-            WITH{" "}
-            <span className="text-brand-terracotta">WILD ENERGY.</span>
-          </h2>
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 text-center lg:text-left">
+          <div>
+            <span className="text-brand-orange text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
+              Shop The Range
+            </span>
+            <h2 className="font-black text-brand-brown tracking-tight leading-none"
+              style={{ fontSize: "clamp(2.5rem, 8vw, 5.5rem)" }}>
+              FERMENTED{" "}
+              <br className="hidden sm:block" />
+              WITH{" "}
+              <span className="text-brand-orange">WILD ENERGY.</span>
+            </h2>
+          </div>
+          <div className="flex flex-col items-center lg:items-end gap-4 lg:pb-2 max-w-xs lg:max-w-sm lg:ml-auto">
+            <p className="text-sm font-bold text-brand-brown/40 leading-relaxed text-center lg:text-right">
+              Small-batch ferments made when you order — never before. Slow time, honest ingredients.
+            </p>
+            <Link
+              href="/shop"
+              className="inline-flex items-center gap-2 bg-brand-brown text-white hover:bg-brand-orange
+                px-7 py-3.5 rounded-full text-[10px] font-black tracking-[0.2em] uppercase
+                transition-all duration-300 active:scale-95 shadow-md"
+            >
+              Browse All →
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -166,8 +180,8 @@ export default function ProductSection() {
               </div>
             ))}
             <div className="shrink-0 flex items-center justify-center px-4 sm:px-6" style={{ width: "clamp(160px, 45vw, 200px)" }}>
-              <button className="flex flex-col justify-center items-center gap-4 font-black text-brand-charcoal text-xs uppercase tracking-widest hover:text-brand-terracotta transition-colors group">
-                <div className="w-16 h-16 rounded-[1.5rem] bg-brand-charcoal/5 flex items-center justify-center group-hover:bg-brand-terracotta/10 group-hover:scale-110 transition-all duration-500 rotate-12 group-hover:rotate-0">
+              <button className="flex flex-col justify-center items-center gap-4 font-black text-brand-brown text-xs uppercase tracking-widest hover:text-brand-orange transition-colors group">
+                <div className="w-16 h-16 rounded-[1.5rem] bg-brand-brown/5 flex items-center justify-center group-hover:bg-brand-orange/10 group-hover:scale-110 transition-all duration-500 rotate-12 group-hover:rotate-0">
                   <ArrowUpRight size={28} className="opacity-50 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <span className="text-center">Browse Full<br />Collection</span>
@@ -181,16 +195,14 @@ export default function ProductSection() {
 }
 
 function ProductCard({ product }: { product: typeof products[0] }) {
-  const { addItem } = useCart();
-
   return (
     <div className="product-card group flex flex-col h-full shrink-0 w-full lg:w-[22vw]">
       {/* Image Container — clickable */}
       <Link href={`/shop/${product.id}`} className="block">
-        <div className={`relative w-full aspect-[4/5] rounded-[2rem] sm:rounded-[3rem] ${product.bgColor} overflow-hidden mb-4 sm:mb-6 p-6 sm:p-8 flex items-center justify-center border-4 border-transparent hover:border-brand-charcoal/5 transition-all duration-300 shadow-[inset_0_10px_30px_rgba(0,0,0,0.08)] group-hover:shadow-[inset_0_10px_30px_rgba(0,0,0,0.08),0_25px_50px_-12px_rgba(0,0,0,0.25)]`}>
+        <div className={`relative w-full aspect-[4/5] rounded-[2rem] sm:rounded-[3rem] ${product.bgColor} overflow-hidden mb-4 sm:mb-6 p-6 sm:p-8 flex items-center justify-center border-4 border-transparent hover:border-brand-brown/5 transition-all duration-300 shadow-[inset_0_10px_30px_rgba(0,0,0,0.08)] group-hover:shadow-[inset_0_10px_30px_rgba(0,0,0,0.08),0_25px_50px_-12px_rgba(0,0,0,0.25)]`}>
           {product.badge && (
             <div className="absolute top-4 sm:top-6 left-4 sm:left-6 z-20">
-              <span className="text-[9px] sm:text-[10px] font-black bg-brand-charcoal text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full uppercase tracking-widest shadow-lg rotate-[-5deg] inline-block group-hover:rotate-0 transition-transform">
+              <span className="text-[9px] sm:text-[10px] font-black bg-brand-brown text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full uppercase tracking-widest shadow-lg rotate-[-5deg] inline-block group-hover:rotate-0 transition-transform">
                 {product.badge}
               </span>
             </div>
@@ -204,29 +216,18 @@ function ProductCard({ product }: { product: typeof products[0] }) {
               className="object-cover object-center"
             />
           </div>
-
-          <div className="absolute inset-x-0 bottom-6 sm:bottom-8 z-20 flex justify-center transition-all duration-500">
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                addItem({ id: product.id, name: product.name, price: product.price, priceNum: product.priceNum, image: product.image, bgColor: product.bgColor });
-              }}
-              className="bg-brand-charcoal text-brand-oat active:bg-brand-terracotta hover:bg-brand-terracotta hover:text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] shadow-xl flex items-center gap-2 active:scale-95 transition-all">
-              Add to Cart
-            </button>
-          </div>
         </div>
       </Link>
 
       {/* Text Info — clickable */}
       <Link href={`/shop/${product.id}`} className="flex flex-col items-center text-center px-2 sm:px-4 group/text">
-        <span className="text-[10px] font-bold tracking-[0.2em] text-brand-charcoal/60 uppercase mb-1 sm:mb-2">
+        <span className="text-[10px] font-bold tracking-[0.2em] text-brand-brown/60 uppercase mb-1 sm:mb-2">
           {product.category}
         </span>
-        <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-brand-charcoal tracking-tight mb-1 sm:mb-2 group-hover/text:text-brand-terracotta transition-colors duration-200">
+        <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-brand-brown tracking-tight mb-1 sm:mb-2 group-hover/text:text-brand-orange transition-colors duration-200">
           {product.name}
         </h3>
-        <span className="font-black text-brand-terracotta text-base sm:text-lg">
+        <span className="font-black text-brand-orange text-base sm:text-lg">
           {product.price}
         </span>
       </Link>
@@ -237,8 +238,8 @@ function ProductCard({ product }: { product: typeof products[0] }) {
 function BrowseAllCard() {
   return (
     <div className="shrink-0 w-[30vw] sm:w-[25vw] lg:w-[18vw] flex items-center justify-center p-6 sm:p-8">
-      <button className="flex flex-col justify-center items-center gap-4 sm:gap-6 font-black text-brand-charcoal text-xs sm:text-sm uppercase tracking-widest hover:text-brand-terracotta transition-colors group">
-        <div className="w-16 sm:w-24 h-16 sm:h-24 rounded-[1.5rem] sm:rounded-[2rem] bg-brand-charcoal/5 flex items-center justify-center group-hover:bg-brand-terracotta/10 group-hover:scale-110 transition-all duration-500 rotate-12 group-hover:rotate-0">
+      <button className="flex flex-col justify-center items-center gap-4 sm:gap-6 font-black text-brand-brown text-xs sm:text-sm uppercase tracking-widest hover:text-brand-orange transition-colors group">
+        <div className="w-16 sm:w-24 h-16 sm:h-24 rounded-[1.5rem] sm:rounded-[2rem] bg-brand-brown/5 flex items-center justify-center group-hover:bg-brand-orange/10 group-hover:scale-110 transition-all duration-500 rotate-12 group-hover:rotate-0">
           <ArrowUpRight size={32} className="opacity-50 group-hover:opacity-100 transition-opacity" />
         </div>
         <span className="text-center">Browse Full<br />Collection</span>

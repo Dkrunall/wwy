@@ -75,10 +75,10 @@ export default function OrderConfirmationPage() {
         {/* Actions */}
         <div className="flex flex-col sm:flex-row gap-3">
           <Link
-            href="/account"
+            href="/shop"
             className="bg-brand-charcoal text-white hover:bg-brand-terracotta px-10 py-4 rounded-full font-black text-xs tracking-[0.2em] uppercase shadow-lg active:scale-95 transition-all duration-300"
           >
-            View My Orders
+            Back to Shop
           </Link>
           <Link
             href="/shop"

@@ -54,7 +54,7 @@ function ConfirmContent() {
       <div className="w-full max-w-sm flex flex-col items-center gap-8">
 
         {/* Logo */}
-        <Image src="/logo.png" alt="WWY" width={56} height={56} className="object-contain opacity-80" />
+        <Image src="/WWY-LOGO_White.png" alt="WWY" width={56} height={56} className="object-contain opacity-80" />
 
         {/* Heading */}
         <div className="text-center">

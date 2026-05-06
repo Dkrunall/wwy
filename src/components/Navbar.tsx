@@ -3,12 +3,12 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useCart } from "./CartContext";
+import WhatsAppIcon from "./WhatsAppIcon";
+const WA_LINK = "https://wa.me/919999999999";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { totalItems, openCart } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -60,7 +60,7 @@ export default function Navbar() {
         <div className={`${pillBase} rounded-full w-24 h-24 lg:w-24 lg:h-24 absolute left-1/2 -translate-x-1/2 flex items-center justify-center p-1 lg:p-1`}>
           <Link href="/" className="flex items-center justify-center w-full h-full hover:scale-105 transition-transform duration-500">
             <Image
-              src="/logo.png"
+              src="/WWY-LOGO_White.png"
               alt="Wild Wild Yeast"
               width={300}
               height={300}
@@ -70,23 +70,17 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* ── Pill 3: Account + Cart ── */}
-        <div className={`${pillBase} rounded-full pl-6 pr-2 h-14 flex items-center gap-4`}>
-          <Link
-            href="/login"
-            className="font-black text-[10px] tracking-[0.18em] uppercase text-brand-charcoal/60 hover:text-brand-terracotta transition-colors duration-300"
+        {/* ── Pill 3: Order CTA ── */}
+        <div className={`${pillBase} rounded-full px-2 h-14 flex items-center`}>
+          <a
+            href={WA_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 bg-brand-charcoal text-white hover:bg-brand-terracotta transition-colors duration-300 px-5 py-2.5 rounded-full font-black text-[10px] tracking-[0.15em] uppercase shadow-md active:scale-95"
           >
-            Account
-          </Link>
-
-          <div className="w-px h-3.5 bg-brand-charcoal/15 rounded-full" />
-
-          <button onClick={openCart} className="flex items-center gap-2 bg-brand-charcoal text-white hover:bg-brand-terracotta transition-colors duration-300 px-5 py-2.5 rounded-full font-black text-[10px] tracking-[0.15em] uppercase shadow-md active:scale-95 group">
-            Cart
-            <span className="bg-white/20 px-2 py-0.5 rounded-full text-[9px] group-hover:bg-white text-white group-hover:text-brand-terracotta transition-colors">
-              {totalItems}
-            </span>
-          </button>
+            <WhatsAppIcon size={13} />
+            Order Now
+          </a>
         </div>
       </div>
 
@@ -98,7 +92,7 @@ export default function Navbar() {
         <div className={`${pillBase} rounded-full w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center p-1`}>
           <Link href="/" className="flex items-center justify-center w-full h-full hover:scale-105 transition-transform duration-500">
             <Image
-              src="/logo.png"
+              src="/WWY-LOGO_White.png"
               alt="Wild Wild Yeast"
               width={300}
               height={300}
@@ -119,13 +113,16 @@ export default function Navbar() {
             {mobileMenuOpen ? "Close" : "Menu"}
           </button>
 
-          {/* Cart pill */}
-          <button onClick={openCart} className={`${pillBase} rounded-full px-4 sm:px-5 h-11 sm:h-12 flex items-center justify-center gap-1.5 sm:gap-2 font-black text-[9px] sm:text-[10px] tracking-widest uppercase text-brand-charcoal hover:bg-brand-terracotta hover:text-white hover:border-brand-terracotta/40 transition-all duration-300 active:scale-95 group whitespace-nowrap`}>
-            Cart
-            <span className="bg-brand-charcoal/10 text-brand-charcoal px-2 py-0.5 rounded-full text-[9px] group-hover:bg-white/20 group-hover:text-white transition-colors">
-              {totalItems}
-            </span>
-          </button>
+          {/* Order pill */}
+          <a
+            href={WA_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${pillBase} rounded-full px-4 sm:px-5 h-11 sm:h-12 flex items-center justify-center gap-1.5 font-black text-[9px] sm:text-[10px] tracking-widest uppercase text-brand-charcoal hover:bg-brand-terracotta hover:text-white hover:border-brand-terracotta/40 transition-all duration-300 active:scale-95 whitespace-nowrap`}
+          >
+            <WhatsAppIcon size={12} />
+            Order
+          </a>
         </div>
       </div>
 
@@ -160,15 +157,16 @@ export default function Navbar() {
 
           <div className="h-[2px] w-12 bg-brand-terracotta/30 mx-auto mt-2" />
 
-          <div className="flex flex-col gap-4">
-            <Link
-              href="/login"
-              className="text-sm font-bold tracking-[0.2em] text-brand-charcoal/50 hover:text-brand-terracotta"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Account / Login
-            </Link>
-          </div>
+          <a
+            href={WA_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 text-sm font-bold tracking-[0.2em] text-brand-charcoal/50 hover:text-brand-terracotta"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <WhatsAppIcon size={16} />
+            Order via WhatsApp
+          </a>
         </div>
       </div>
     </>

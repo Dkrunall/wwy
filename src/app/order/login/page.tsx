@@ -60,7 +60,7 @@ export default function OrderLoginPage() {
     <main className="min-h-screen bg-brand-oat flex flex-col items-center justify-center px-5">
       <div className="w-full max-w-sm flex flex-col items-center gap-8">
 
-        <Image src="/logo.png" alt="Wild Wild Yeast" width={80} height={80} className="object-contain" />
+        <Image src="/WWY-LOGO_White.png" alt="Wild Wild Yeast" width={80} height={80} className="object-contain" />
 
         <div className="text-center">
           <h1 className="font-black text-brand-charcoal tracking-tighter leading-none mb-2"

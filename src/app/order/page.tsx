@@ -133,7 +133,7 @@ export default function OrderPage() {
       <header className="sticky top-0 z-40 bg-brand-oat/95 backdrop-blur-sm border-b border-brand-charcoal/5">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <Image src="/logo.png" alt="WWY" width={32} height={32} className="object-contain" />
+            <Image src="/WWY-LOGO_White.png" alt="WWY" width={32} height={32} className="object-contain" />
             <div>
               <p className="font-black text-brand-charcoal text-sm leading-none">
                 {firstName ? `Hey, ${firstName}.` : "Wild Wild Yeast"}

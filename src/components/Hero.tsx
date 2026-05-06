@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
+import WhatsAppIcon from "./WhatsAppIcon";
 
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
@@ -50,13 +51,13 @@ export default function Hero() {
   return (
     <section
       ref={containerRef}
-      className="w-full relative min-h-screen bg-brand-oat overflow-hidden flex items-center pt-32 sm:pt-36 md:pt-28 pb-16 sm:pb-20 border-b border-brand-charcoal/5"
+      className="w-full relative min-h-screen bg-brand-oat overflow-hidden flex items-center pt-32 sm:pt-36 md:pt-28 pb-16 sm:pb-20 border-b border-brand-brown/5"
     >
       {/* Dynamic Background Texture & Orbs */}
       <div className="absolute inset-0 opacity-[0.35] mix-blend-overlay pointer-events-none z-0" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}></div>
 
-      <div className="absolute -top-[10%] -right-[10%] w-[500px] sm:w-[700px] lg:w-[900px] h-[500px] sm:h-[700px] lg:h-[900px] bg-brand-terracotta/20 blur-[100px] sm:blur-[140px] rounded-full pointer-events-none z-0"></div>
-      <div className="absolute bottom-[-10%] left-[-10%] w-[400px] sm:w-[600px] lg:w-[800px] h-[400px] sm:h-[600px] lg:h-[800px] bg-[#FEC84D]/20 blur-[80px] sm:blur-[120px] rounded-full pointer-events-none z-0"></div>
+      <div className="absolute -top-[10%] -right-[10%] w-[500px] sm:w-[700px] lg:w-[900px] h-[500px] sm:h-[700px] lg:h-[900px] bg-brand-orange/20 blur-[100px] sm:blur-[140px] rounded-full pointer-events-none z-0"></div>
+      <div className="absolute bottom-[-10%] left-[-10%] w-[400px] sm:w-[600px] lg:w-[800px] h-[400px] sm:h-[600px] lg:h-[800px] bg-brand-gold/20 blur-[80px] sm:blur-[120px] rounded-full pointer-events-none z-0"></div>
       
       {/* Massive Background Text watermark */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none z-0 opacity-[0.03] select-none">
@@ -68,22 +69,22 @@ export default function Hero() {
         {/* Left: Typography & Actions */}
         <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left">
 
-          <div className="hero-text inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-2 rounded-full bg-white text-brand-charcoal text-[9px] sm:text-[10px] md:text-xs font-black uppercase tracking-[0.2em] mb-6 sm:mb-8 shadow-sm border border-brand-charcoal/5">
-            <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-brand-terracotta animate-pulse shrink-0"></span>
+          <div className="hero-text inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-2 rounded-full bg-white text-brand-brown text-[9px] sm:text-[10px] md:text-xs font-black uppercase tracking-[0.2em] mb-6 sm:mb-8 shadow-sm border border-brand-brown/5">
+            <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-brand-orange animate-pulse shrink-0"></span>
             Made to order. Never in advance.
           </div>
 
-          <h1 className="hero-text font-black tracking-tighter text-brand-charcoal mb-3 leading-[0.85]"
+          <h1 className="hero-text font-black tracking-tighter text-brand-brown mb-3 leading-[0.85]"
             style={{ fontSize: "clamp(3rem, 14vw, 7.5rem)" }}>
-            WILD <br /> <span className="text-brand-terracotta">YEAST.</span>
+            WILD <br /> <span className="text-brand-orange">YEAST.</span>
           </h1>
 
-          <p className="hero-text font-black text-brand-charcoal/30 tracking-[0.18em] uppercase mb-6 sm:mb-8"
+          <p className="hero-text font-black text-brand-brown/30 tracking-[0.18em] uppercase mb-6 sm:mb-8"
             style={{ fontSize: "clamp(0.65rem, 1.5vw, 0.85rem)" }}>
             Wild by nature. Crafted by time.
           </p>
 
-          <p className="hero-text text-sm sm:text-base md:text-xl font-bold text-brand-charcoal/70 max-w-sm sm:max-w-md mb-6 sm:mb-10">
+          <p className="hero-text text-sm sm:text-base md:text-xl font-bold text-brand-brown/70 max-w-sm sm:max-w-md mb-6 sm:mb-10">
             Fermented bread and living beverages. Nothing made until you order it. Nothing added that doesn't belong.
           </p>
 
@@ -92,11 +93,12 @@ export default function Hero() {
               href="https://wa.me/919999999999"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full sm:w-auto bg-brand-charcoal text-brand-oat hover:bg-brand-terracotta hover:text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-xl active:scale-95 text-center"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-brand-brown text-brand-oat hover:bg-brand-orange hover:text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-xl active:scale-95"
             >
+              <WhatsAppIcon size={14} />
               Order on WhatsApp
             </a>
-            <button className="w-full sm:w-auto bg-white text-brand-charcoal hover:bg-brand-oat px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-sm border border-brand-charcoal/5 active:scale-95">
+            <button className="w-full sm:w-auto bg-white text-brand-brown hover:bg-brand-oat px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-sm border border-brand-brown/5 active:scale-95">
               How It Works
             </button>
           </div>
@@ -111,7 +113,7 @@ export default function Hero() {
             </div>
 
             {/* Decorative floating badge */}
-            <div className="absolute -bottom-5 sm:-bottom-6 -left-5 sm:-left-6 bg-[#FEC84D] text-brand-charcoal w-20 sm:w-24 h-20 sm:h-24 rounded-full flex flex-col justify-center items-center -rotate-12 shadow-lg border-2 border-brand-oat z-30">
+            <div className="absolute -bottom-5 sm:-bottom-6 -left-5 sm:-left-6 bg-brand-gold text-brand-brown w-20 sm:w-24 h-20 sm:h-24 rounded-full flex flex-col justify-center items-center -rotate-12 shadow-lg border-2 border-brand-oat z-30">
               <span className="font-black text-xl sm:text-2xl leading-none">100%</span>
               <span className="text-[7px] sm:text-[8px] font-bold uppercase tracking-widest">Natural</span>
             </div>
@@ -132,9 +134,9 @@ export default function Hero() {
         className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 opacity-50 hover:opacity-100 transition-opacity cursor-pointer z-20"
         onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
       >
-        <span className="text-[9px] font-black uppercase tracking-[0.3em] rotate-180 [writing-mode:vertical-lr] text-brand-charcoal hidden sm:block">Scroll</span>
-        <div className="w-[1px] h-10 bg-brand-charcoal/20 relative overflow-hidden">
-          <div className="absolute top-0 left-0 w-full h-1/2 bg-brand-terracotta animate-scroll-line"></div>
+        <span className="text-[9px] font-black uppercase tracking-[0.3em] rotate-180 [writing-mode:vertical-lr] text-brand-brown hidden sm:block">Scroll</span>
+        <div className="w-[1px] h-10 bg-brand-brown/20 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1/2 bg-brand-orange animate-scroll-line"></div>
         </div>
       </div>
 
