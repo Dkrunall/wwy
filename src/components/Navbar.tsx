@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import WhatsAppIcon from "./WhatsAppIcon";
-const WA_LINK = "https://wa.me/919999999999";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -72,15 +71,13 @@ export default function Navbar() {
 
         {/* ── Pill 3: Order CTA ── */}
         <div className={`${pillBase} rounded-full px-2 h-14 flex items-center`}>
-          <a
-            href={WA_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/order"
             className="flex items-center gap-2 bg-brand-charcoal text-white hover:bg-brand-terracotta transition-colors duration-300 px-5 py-2.5 rounded-full font-black text-[10px] tracking-[0.15em] uppercase shadow-md active:scale-95"
           >
             <WhatsAppIcon size={13} />
             Order Now
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -114,15 +111,13 @@ export default function Navbar() {
           </button>
 
           {/* Order pill */}
-          <a
-            href={WA_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/order"
             className={`${pillBase} rounded-full px-4 sm:px-5 h-11 sm:h-12 flex items-center justify-center gap-1.5 font-black text-[9px] sm:text-[10px] tracking-widest uppercase text-brand-charcoal hover:bg-brand-terracotta hover:text-white hover:border-brand-terracotta/40 transition-all duration-300 active:scale-95 whitespace-nowrap`}
           >
             <WhatsAppIcon size={12} />
             Order
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -157,16 +152,14 @@ export default function Navbar() {
 
           <div className="h-[2px] w-12 bg-brand-terracotta/30 mx-auto mt-2" />
 
-          <a
-            href={WA_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/order"
             className="flex items-center justify-center gap-2 text-sm font-bold tracking-[0.2em] text-brand-charcoal/50 hover:text-brand-terracotta"
             onClick={() => setMobileMenuOpen(false)}
           >
             <WhatsAppIcon size={16} />
-            Order via WhatsApp
-          </a>
+            Order Now
+          </Link>
         </div>
       </div>
     </>

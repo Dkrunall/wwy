@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
+import Link from "next/link";
 import WhatsAppIcon from "./WhatsAppIcon";
 
 export default function Hero() {
@@ -89,15 +90,13 @@ export default function Hero() {
           </p>
 
           <div className="hero-text flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
-            <a
-              href="https://wa.me/919999999999"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/order"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-brand-brown text-brand-oat hover:bg-brand-orange hover:text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-xl active:scale-95"
             >
               <WhatsAppIcon size={14} />
-              Order on WhatsApp
-            </a>
+              Order Now
+            </Link>
             <button className="w-full sm:w-auto bg-white text-brand-brown hover:bg-brand-oat px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-sm border border-brand-brown/5 active:scale-95">
               How It Works
             </button>

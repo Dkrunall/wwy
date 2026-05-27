@@ -6,11 +6,9 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import WhatsAppIcon from "@/components/WhatsAppIcon";
 import Footer from "@/components/Footer";
 import { getProduct, products } from "@/lib/products";
 
-const WA_LINK = "https://wa.me/919999999999";
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -147,18 +145,15 @@ export default function ProductDetailPage() {
             </div>
 
             {/* CTA */}
-            <a
-              href={WA_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/order"
               className="flex items-center justify-center gap-2.5 py-4 sm:py-5 rounded-full
                 font-black text-xs tracking-[0.2em] uppercase
                 bg-brand-charcoal text-white hover:bg-brand-terracotta
                 transition-all duration-300 active:scale-[0.97] shadow-lg min-h-[56px]"
             >
-              <WhatsAppIcon size={14} />
               Order Now
-            </a>
+            </Link>
 
             {/* Trust tags */}
             <div className="flex flex-wrap gap-2">
@@ -291,18 +286,15 @@ export default function ProductDetailPage() {
               </p>
               <p className="font-black text-brand-terracotta text-xs mt-0.5">{product.price}</p>
             </div>
-            <a
-              href={WA_LINK}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/order"
               className="shrink-0 flex items-center gap-2 px-5 py-3 rounded-full
                 font-black text-[10px] tracking-[0.15em] uppercase
                 bg-brand-charcoal text-white hover:bg-brand-terracotta
                 transition-all duration-300 active:scale-[0.96]"
             >
-              <WhatsAppIcon size={12} />
               Order Now
-            </a>
+            </Link>
           </div>
         </div>
       </div>

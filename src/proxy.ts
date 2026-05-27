@@ -5,7 +5,7 @@ export function proxy(req: NextRequest) {
 
   if (pathname.startsWith("/oms") && pathname !== "/oms/login") {
     const auth = req.cookies.get("oms_auth");
-    if (!auth?.value) {
+    if (auth?.value !== "1") {
       return NextResponse.redirect(new URL("/oms/login", req.url));
     }
   }

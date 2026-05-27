@@ -18,11 +18,41 @@ function fmtDate(iso: string) {
   });
 }
 
-const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  pending: { label: "Pending payment", color: "text-brand-gold", bg: "bg-brand-gold/20" },
-  confirmed: { label: "Confirmed — fermenting", color: "text-brand-olive", bg: "bg-brand-olive/10" },
-  delivered: { label: "Delivered", color: "text-brand-charcoal/50", bg: "bg-brand-charcoal/5" },
+const DELIVERY_STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
+  placed:            { label: "Confirmed — fermenting", color: "text-brand-olive",       bg: "bg-brand-olive/10" },
+  resting:           { label: "Dough resting 🌙",        color: "text-amber-700",         bg: "bg-amber-50" },
+  baking:            { label: "In the oven 🔥",           color: "text-orange-700",        bg: "bg-orange-100" },
+  out_for_delivery:  { label: "Out for delivery 🚗",      color: "text-blue-700",          bg: "bg-blue-100" },
+  delivered:         { label: "Delivered ✓",              color: "text-brand-charcoal/50", bg: "bg-brand-charcoal/5" },
 };
+
+const PAYMENT_STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
+  pending: { label: "Pending payment", color: "text-brand-gold", bg: "bg-brand-gold/20" },
+};
+
+interface FeedbackState {
+  [orderId: string]: "idle" | "submitting" | "done";
+}
+
+function StarRating({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const [hovered, setHovered] = useState(0);
+  return (
+    <div className="flex gap-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          onMouseEnter={() => setHovered(star)}
+          onMouseLeave={() => setHovered(0)}
+          onClick={() => onChange(star)}
+          className="text-2xl transition-transform active:scale-90"
+        >
+          <span className={(hovered || value) >= star ? "text-brand-gold" : "text-brand-charcoal/20"}>★</span>
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export default function HistoryPage() {
   const router = useRouter();
@@ -30,6 +60,12 @@ export default function HistoryPage() {
   const [loading, setLoading] = useState(true);
   const [flat, setFlat] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  // Feedback state
+  const [feedbackStates, setFeedbackStates] = useState<FeedbackState>({});
+  const [feedbackRating, setFeedbackRating] = useState<Record<string, number>>({});
+  const [feedbackComment, setFeedbackComment] = useState<Record<string, string>>({});
+  const [feedbackOpen, setFeedbackOpen] = useState<string | null>(null);
 
   useEffect(() => {
     const storedFlat = localStorage.getItem("wwy_flat");
@@ -45,7 +81,44 @@ export default function HistoryPage() {
         setOrders(data || []);
         setLoading(false);
       });
+
+    // Load which orders already have feedback
+    supabase
+      .from("feedbacks")
+      .select("order_id")
+      .eq("flat_number", storedFlat)
+      .then(({ data }) => {
+        if (data) {
+          const done: FeedbackState = {};
+          data.forEach((f) => { done[f.order_id] = "done"; });
+          setFeedbackStates(done);
+        }
+      });
   }, [router]);
+
+  const submitFeedback = async (orderId: string) => {
+    const rating = feedbackRating[orderId];
+    if (!rating) return;
+    setFeedbackStates((prev) => ({ ...prev, [orderId]: "submitting" }));
+
+    const res = await fetch("/api/orders/feedback", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        orderId,
+        flatNumber: flat,
+        rating,
+        comment: feedbackComment[orderId] || "",
+      }),
+    });
+
+    if (res.ok || (await res.json()).error === "Feedback already submitted") {
+      setFeedbackStates((prev) => ({ ...prev, [orderId]: "done" }));
+      setFeedbackOpen(null);
+    } else {
+      setFeedbackStates((prev) => ({ ...prev, [orderId]: "idle" }));
+    }
+  };
 
   return (
     <main className="min-h-screen bg-brand-oat pb-20">
@@ -88,8 +161,13 @@ export default function HistoryPage() {
 
         <div className="flex flex-col gap-3">
           {orders.map((order) => {
-            const status = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
+            const isPending = order.payment_status !== "paid";
+            const isDelivered = order.delivery_status === "delivered";
+            const statusCfg = isPending
+              ? PAYMENT_STATUS_CONFIG.pending
+              : DELIVERY_STATUS_CONFIG[order.delivery_status ?? "placed"] ?? DELIVERY_STATUS_CONFIG.placed;
             const isExpanded = expandedId === order.id;
+            const fbState = feedbackStates[order.id] || "idle";
 
             return (
               <div
@@ -103,15 +181,15 @@ export default function HistoryPage() {
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className={`text-[10px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full ${status.bg} ${status.color}`}>
-                        {status.label}
+                      <span className={`text-[10px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full ${statusCfg.bg} ${statusCfg.color}`}>
+                        {statusCfg.label}
                       </span>
                     </div>
                     <p className="font-black text-brand-charcoal text-sm leading-none">
                       {fmt(order.total_paise)}
                     </p>
                     <p className="text-[11px] font-bold text-brand-charcoal/30 mt-0.5">
-                      {fmtDate(order.created_at)} · #{order.id.slice(0, 8).toUpperCase()}
+                      {fmtDate(order.created_at)} · #{(order.order_number || order.id.slice(0, 8)).toUpperCase()}
                     </p>
                   </div>
                   <span className={`text-brand-charcoal/30 font-black transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}>
@@ -136,6 +214,62 @@ export default function HistoryPage() {
                       <p className="text-xs font-medium text-brand-charcoal/40 italic border-t border-brand-charcoal/5 pt-2 mt-1">
                         Note: {order.notes}
                       </p>
+                    )}
+                    {order.invoice_url && (
+                      <a
+                        href={order.invoice_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-black text-brand-charcoal/50 hover:text-brand-terracotta transition-colors mt-1 underline underline-offset-2"
+                      >
+                        ↓ Download Invoice
+                      </a>
+                    )}
+
+                    {/* Feedback for delivered orders */}
+                    {isDelivered && (
+                      <div className="border-t border-brand-charcoal/5 pt-3 mt-1">
+                        {fbState === "done" ? (
+                          <p className="text-xs font-black text-green-700">✓ Thanks for your feedback!</p>
+                        ) : feedbackOpen === order.id ? (
+                          <div className="flex flex-col gap-3">
+                            <p className="text-[11px] font-black tracking-wider uppercase text-brand-charcoal/40">Rate your order</p>
+                            <StarRating
+                              value={feedbackRating[order.id] || 0}
+                              onChange={(v) => setFeedbackRating((prev) => ({ ...prev, [order.id]: v }))}
+                            />
+                            <textarea
+                              rows={2}
+                              placeholder="Tell us what you thought (optional)..."
+                              value={feedbackComment[order.id] || ""}
+                              onChange={(e) => setFeedbackComment((prev) => ({ ...prev, [order.id]: e.target.value }))}
+                              className="w-full bg-brand-oat border border-brand-charcoal/10 rounded-xl px-3 py-2 text-sm font-medium text-brand-charcoal placeholder:text-brand-charcoal/20 outline-none resize-none"
+                            />
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => submitFeedback(order.id)}
+                                disabled={!feedbackRating[order.id] || fbState === "submitting"}
+                                className="flex-1 bg-brand-charcoal disabled:opacity-40 text-white font-black text-xs tracking-wider uppercase px-4 py-2.5 rounded-xl transition-colors hover:bg-brand-terracotta"
+                              >
+                                {fbState === "submitting" ? "Sending..." : "Submit"}
+                              </button>
+                              <button
+                                onClick={() => setFeedbackOpen(null)}
+                                className="px-4 py-2.5 text-xs font-black text-brand-charcoal/40 hover:text-brand-charcoal transition-colors"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setFeedbackOpen(order.id)}
+                            className="text-xs font-black tracking-wider uppercase text-brand-terracotta hover:text-brand-charcoal transition-colors"
+                          >
+                            ★ Leave feedback →
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
                 )}

@@ -5,11 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import WhatsAppIcon from "@/components/WhatsAppIcon";
 import { ShoppingBag } from "lucide-react";
 import { products } from "@/lib/products";
 
-const WA_LINK = "https://wa.me/919999999999";
 const categories = ["All", "Sodas", "Starters", "Storage", "Bundles"];
 
 export default function ShopPage() {
@@ -44,17 +42,14 @@ export default function ShopPage() {
               WWY food is made with time, not shortcuts. Small batch. Slow-fermented. Honest ingredients.
             </p>
             <p className="text-[10px] font-black tracking-[0.15em] uppercase text-brand-brown/30">
-              Orders taken via WhatsApp · Delivery Wed & Sat only
+              Made to order · Delivery Wed &amp; Sat only
             </p>
-            <a
-              href="https://wa.me/919999999999"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/order"
               className="mt-2 inline-flex items-center gap-2 bg-brand-brown text-white hover:bg-brand-orange px-6 py-3 rounded-full text-[10px] font-black tracking-[0.18em] uppercase transition-all duration-300 active:scale-95 w-fit shadow-md"
             >
-              <WhatsAppIcon size={13} />
-              Order via WhatsApp
-            </a>
+              Order Now
+            </Link>
           </div>
         </div>
 
@@ -104,20 +99,17 @@ export default function ShopPage() {
         <div>
           <h3 className="font-black text-brand-oat tracking-tighter leading-none mb-3"
             style={{ fontSize: "clamp(1.8rem, 4vw, 3rem)" }}>
-            ORDER VIA <span className="text-brand-orange">WHATSAPP.</span>
+            ORDER <span className="text-brand-orange">ONLINE.</span>
           </h3>
-          <p className="text-brand-oat/40 font-bold text-sm">Tell us what you want. We'll confirm and deliver.</p>
+          <p className="text-brand-oat/40 font-bold text-sm">Browse, add to cart, pay securely. We bake and deliver.</p>
           <p className="text-brand-oat/20 font-bold text-xs mt-1 italic">Delivery Wed &amp; Sat only.</p>
         </div>
-        <a
-          href={WA_LINK}
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          href="/order"
           className="shrink-0 inline-flex items-center gap-2 bg-brand-orange text-white hover:bg-brand-oat hover:text-brand-brown px-10 py-4 rounded-full font-black text-xs tracking-[0.2em] uppercase shadow-xl active:scale-95 transition-all duration-300"
         >
-          <WhatsAppIcon size={13} />
           Order Now
-        </a>
+        </Link>
       </section>
 
       <Footer />
@@ -158,15 +150,12 @@ function ProductCard({ product }: { product: typeof products[0] }) {
 
         <div className="flex items-center justify-between mt-auto pt-3 border-t border-brand-brown/5">
           <span className="font-black text-brand-orange text-lg">{product.price}</span>
-          <a
-            href={WA_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href="/order"
             className="flex items-center gap-2 px-5 py-2.5 rounded-full text-[10px] font-black tracking-[0.15em] uppercase bg-brand-brown text-white hover:bg-brand-orange transition-all duration-300 active:scale-95 shadow-sm"
           >
-            <WhatsAppIcon size={11} />
             Order Now
-          </a>
+          </Link>
         </div>
       </div>
     </div>

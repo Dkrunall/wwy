@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Claude local settings
+.claude/
+
+# Build prompts and docs
+WWY_Claude_Code_Master_Prompt.docx
+doc_extract.txt
+
+

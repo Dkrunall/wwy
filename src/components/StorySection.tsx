@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
+import Link from "next/link";
 import WhatsAppIcon from "./WhatsAppIcon";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 
@@ -92,15 +93,13 @@ export default function StorySection() {
             </p>
 
             <div className="story-text flex flex-col sm:flex-row gap-3">
-              <a
-                href="https://wa.me/919999999999"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/order"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-brand-gold text-brand-brown hover:bg-brand-orange hover:text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-xl active:scale-95"
               >
                 <WhatsAppIcon size={14} />
-                Order on WhatsApp
-              </a>
+                Order Now
+              </Link>
               <p className="text-[10px] font-black tracking-[0.12em] uppercase text-brand-oat/30 self-center">
                 Wed & Sat delivery
               </p>
