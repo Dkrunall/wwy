@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
   }
 
   const nowUTC = new Date();
-  const istHour = (nowUTC.getUTCHours() + 5) % 24 + (nowUTC.getUTCMinutes() >= 30 ? 1 : 0);
+  const istHour = Math.floor(((nowUTC.getUTCHours() * 60 + nowUTC.getUTCMinutes() + 330) % 1440) / 60);
 
   const transitions: Record<string, { from: string; to: string }> = {
     "6": { from: "placed", to: "resting" },

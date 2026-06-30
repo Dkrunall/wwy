@@ -10,7 +10,7 @@ import {
   ShoppingBag, Coffee, Users, Flame, Clock, CheckCircle, TrendingUp, RefreshCw,
   LogOut, ChevronDown, Phone, FileText, Clipboard, Check, Search, Activity, Menu, X,
   Loader2, BarChart2, Edit2, Trash2, Plus, XCircle, CalendarDays, MessageCircle,
-  Download, Send, StickyNote, ChevronLeft, ChevronRight,
+  Download, Send, StickyNote, ChevronLeft, ChevronRight, Settings, Star, Bell, Zap,
 } from "lucide-react";
 
 interface OrderItem { id: string; product_name: string; quantity: number; unit_price_paise: number; }
@@ -19,14 +19,17 @@ interface Order {
   total_paise: number; status: string; payment_status: string | null;
   delivery_status: string | null; delivery_date: string | null; invoice_url: string | null;
   baker_id: string | null; notes: string | null; admin_notes: string | null;
-  created_at: string; order_items?: OrderItem[];
+  source: string | null; created_at: string; order_items?: OrderItem[];
 }
 interface Product { id: string; name: string; category: string; description?: string | null; price_paise: number; available: boolean; }
 interface Customer { id: string; name: string; flat_number: string; phone: string | null; address?: string | null; pincode?: string | null; created_at: string; }
 interface Baker { id: string; name: string; phone: string; is_active: boolean; share_token: string; pincodes?: string[]; daily_capacity?: number; }
+interface Setting { key: string; value: string; }
+interface Feedback { id: string; order_id: string | null; flat_number: string; rating: number; comment: string | null; created_at: string; }
+interface Session { phone: string; step: string; cart: unknown; temp: unknown; updated_at: string; }
 
-type Tab = "orders" | "products" | "customers" | "bakers" | "analytics";
-type ModalType = "add-product" | "edit-product" | "add-baker" | "edit-baker" | "cancel-order" | "edit-delivery" | "edit-customer" | null;
+type Tab = "orders" | "products" | "customers" | "bakers" | "analytics" | "feedback" | "settings";
+type ModalType = "add-product" | "edit-product" | "add-baker" | "edit-baker" | "cancel-order" | "edit-delivery" | "edit-customer" | "delete-baker" | null;
 
 function fmt(p: number) { return `₹${(p / 100).toFixed(0)}`; }
 function fmtDate(iso: string) {
@@ -110,6 +113,15 @@ export default function OmsDashboard() {
   const [analyticsFrom, setAnalyticsFrom] = useState("");
   const [analyticsTo, setAnalyticsTo] = useState("");
 
+  // Settings / Feedback / Sessions
+  const [settings, setSettings] = useState<Setting[]>([]);
+  const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
+  const [sessions, setSessions] = useState<Session[]>([]);
+  const [settingEdits, setSettingEdits] = useState<Record<string,string>>({});
+  const [savingSettingKey, setSavingSettingKey] = useState<string | null>(null);
+  const [deletingBakerId, setDeletingBakerId] = useState<string | null>(null);
+  const [newOrdersAlert, setNewOrdersAlert] = useState(0);
+
   const [breadTime, setBreadTime] = useState("");
   useEffect(() => {
     const u = () => setBreadTime(new Date().toLocaleTimeString("en-IN",{timeZone:"Asia/Kolkata",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:true}));
@@ -118,21 +130,37 @@ export default function OmsDashboard() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const [oR, pR, cR, bR, vacR] = await Promise.all([
+    const [oR, pR, cR, bR, vacR, sR, fR, sesR] = await Promise.all([
       supabase.from("orders").select("*, order_items(*)").order("created_at",{ascending:false}),
       supabase.from("products").select("*").order("category"),
       supabase.from("customers").select("*").order("created_at",{ascending:false}),
       supabase.from("bakers").select("*").order("name"),
       fetch("/api/oms/vacation").then(r=>r.json()).catch(()=>({vacation_mode:false})),
+      supabase.from("settings").select("*"),
+      supabase.from("feedbacks").select("*").order("created_at",{ascending:false}).limit(100),
+      supabase.from("sessions").select("*").order("updated_at",{ascending:false}).limit(50),
     ]);
     setOrders((oR.data||[]) as Order[]);
     setProducts(pR.data||[]);
     setCustomers(cR.data||[]);
     setBakers(bR.data||[]);
     setVacationMode(vacR.vacation_mode===true);
+    setSettings((sR.data||[]) as Setting[]);
+    setFeedbacks((fR.data||[]) as Feedback[]);
+    setSessions((sesR.data||[]) as Session[]);
+    setNewOrdersAlert(0);
     setLoading(false);
   }, []);
   useEffect(()=>{fetchData();},[fetchData]);
+
+  // Poll for new orders every 30s
+  useEffect(()=>{
+    const iv = setInterval(async ()=>{
+      const {count} = await supabase.from("orders").select("id",{count:"exact",head:true});
+      if(count && count > orders.length) setNewOrdersAlert(count - orders.length);
+    }, 30000);
+    return ()=>clearInterval(iv);
+  },[orders.length]);
 
   const toggleVacation = async () => {
     setVacationLoading(true);
@@ -314,6 +342,26 @@ export default function OmsDashboard() {
     setFormSaving(false); setModal(null); setActionOrder(null);
   };
 
+  // ── Delete Baker ──
+  const deleteBaker = async (id: string) => {
+    await supabase.from("bakers").delete().eq("id",id);
+    setBakers(p=>p.filter(b=>b.id!==id));
+    setDeletingBakerId(null); setModal(null);
+  };
+
+  // ── Save Setting ──
+  const saveSetting = async (key: string) => {
+    const val = settingEdits[key];
+    if(val === undefined) return;
+    setSavingSettingKey(key);
+    await supabase.from("settings").upsert({key,value:val},{onConflict:"key"});
+    setSettings(p=>{
+      const exists = p.find(s=>s.key===key);
+      return exists ? p.map(s=>s.key===key?{...s,value:val}:s) : [...p,{key,value:val}];
+    });
+    setSavingSettingKey(null);
+  };
+
   // ── Analytics ──
   const analytics = useMemo(()=>{
     let baseOrders = orders.filter(o=>o.payment_status==="paid");
@@ -341,6 +389,30 @@ export default function OmsDashboard() {
     const lastWeekRevenue = baseOrders.filter(o=>{const d=new Date(o.created_at);return d>=lastWeekStart&&d<thisWeekStart;}).reduce((s,o)=>s+o.total_paise,0);
     return {totalRevenue,avgOrderValue,revenueByDay,maxDayRevenue,topProducts,newCustomers,thisWeekRevenue,lastWeekRevenue};
   },[orders,customers,analyticsFrom,analyticsTo]);
+
+  const todayDeliveries = useMemo(()=>{
+    const today = new Date().toISOString().slice(0,10);
+    return orders.filter(o=>o.delivery_date===today&&o.payment_status==="paid"&&o.delivery_status!=="delivered"&&o.status!=="cancelled");
+  },[orders]);
+
+  const bakerStats = useMemo(()=>{
+    const map: Record<string,{active:number;delivered:number;revenue:number}> = {};
+    for(const b of bakers) {
+      const bOrds = orders.filter(o=>o.baker_id===b.id);
+      map[b.id] = {
+        active:bOrds.filter(o=>o.payment_status==="paid"&&o.delivery_status!=="delivered"&&o.status!=="cancelled").length,
+        delivered:bOrds.filter(o=>o.delivery_status==="delivered").length,
+        revenue:bOrds.filter(o=>o.payment_status==="paid").reduce((s,o)=>s+o.total_paise,0),
+      };
+    }
+    return map;
+  },[bakers,orders]);
+
+  const settingValues = useMemo(()=>{
+    const m: Record<string,string> = {};
+    for(const s of settings) m[s.key] = s.value;
+    return m;
+  },[settings]);
 
   // ── Filters & Sorts ──
   const existingCategories = [...new Set(products.map(p=>p.category))];
@@ -395,7 +467,7 @@ export default function OmsDashboard() {
     return new Date(b.created_at).getTime()-new Date(a.created_at).getTime();
   }),[customers,orders,searchQuery,customerSort]);
 
-  const closeModal = () => { setModal(null); setEditingProduct(null); setEditingBaker(null); setEditingCustomer(null); setActionOrder(null); setFormError(""); };
+  const closeModal = () => { setModal(null); setEditingProduct(null); setEditingBaker(null); setEditingCustomer(null); setActionOrder(null); setDeletingBakerId(null); setFormError(""); };
 
   const NAV: {key:Tab;icon:React.ElementType;label:string}[] = [
     {key:"orders",icon:ShoppingBag,label:"Orders"},
@@ -403,6 +475,8 @@ export default function OmsDashboard() {
     {key:"customers",icon:Users,label:"Customers"},
     {key:"bakers",icon:Flame,label:"Bakers"},
     {key:"analytics",icon:BarChart2,label:"Analytics"},
+    {key:"feedback",icon:Star,label:"Feedback"},
+    {key:"settings",icon:Settings,label:"Settings"},
   ];
 
   const inputCls = "w-full bg-brand-oat/40 border border-brand-brown/15 rounded-2xl px-4 py-3 font-bold text-brand-brown text-sm outline-none focus:border-brand-orange transition-colors";
@@ -411,7 +485,7 @@ export default function OmsDashboard() {
     <div className="min-h-screen bg-brand-oat text-brand-brown font-sans flex flex-col md:flex-row antialiased">
 
       {/* ── MODALS ── */}
-      {(modal || deleteConfirmId) && (
+      {(modal || deleteConfirmId || deletingBakerId) && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center px-4" onClick={closeModal}>
           <div className="absolute inset-0 bg-brand-brown/50 backdrop-blur-sm" />
 
@@ -509,6 +583,15 @@ export default function OmsDashboard() {
               <div className="flex gap-3"><button onClick={()=>setDeleteConfirmId(null)} className="flex-1 py-3 rounded-2xl border border-brand-brown/15 text-xs font-black uppercase tracking-wider text-brand-brown/60 hover:bg-brand-brown/5">Keep</button><button onClick={()=>deleteProduct(deleteConfirmId)} className="flex-1 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black uppercase tracking-wider">Delete</button></div>
             </div>
           )}
+
+          {/* Delete Baker Confirm */}
+          {modal==="delete-baker" && deletingBakerId && (
+            <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 flex flex-col gap-4" onClick={e=>e.stopPropagation()}>
+              <h2 className="font-serif text-xl font-black text-rose-700">Delete Baker?</h2>
+              <p className="text-sm font-bold text-brand-brown/60">This will permanently remove <span className="text-brand-brown">{bakers.find(b=>b.id===deletingBakerId)?.name}</span>. Existing orders with this baker will become unassigned.</p>
+              <div className="flex gap-3"><button onClick={closeModal} className="flex-1 py-3 rounded-2xl border border-brand-brown/15 text-xs font-black uppercase tracking-wider text-brand-brown/60 hover:bg-brand-brown/5">Cancel</button><button onClick={()=>deleteBaker(deletingBakerId)} className="flex-1 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black uppercase tracking-wider">Delete Baker</button></div>
+            </div>
+          )}
         </div>
       )}
 
@@ -585,6 +668,14 @@ export default function OmsDashboard() {
         </div>
 
         {vacationMode && <div className="mb-6 bg-brand-orange/10 border-2 border-brand-orange/20 rounded-3xl px-5 py-4 text-xs font-black text-brand-brown flex items-center gap-3 animate-pulse"><span className="text-xl">🌾</span><div><p className="font-serif font-black uppercase tracking-wider">Vacation mode is active</p><p className="text-brand-brown/70 font-bold mt-0.5">Storefront orders are paused.</p></div></div>}
+
+        {/* New orders alert */}
+        {newOrdersAlert > 0 && (
+          <div className="mb-4 bg-emerald-50 border-2 border-emerald-200 rounded-3xl px-5 py-3 flex items-center justify-between gap-3 animate-pulse">
+            <div className="flex items-center gap-2.5"><Bell className="w-4 h-4 text-emerald-600"/><p className="text-sm font-black text-emerald-800">{newOrdersAlert} new order{newOrdersAlert>1?"s":""} arrived</p></div>
+            <button onClick={()=>fetchData()} className="bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase px-4 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer"><RefreshCw className="w-3 h-3"/>Refresh</button>
+          </div>
+        )}
 
         {/* KPI Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8 relative z-10">
@@ -705,6 +796,26 @@ export default function OmsDashboard() {
         {/* ── ORDERS ── */}
         {!loading && tab==="orders" && (
           <div className="flex flex-col gap-4 relative z-10">
+
+            {/* Today's deliveries banner */}
+            {todayDeliveries.length > 0 && (
+              <div className="bg-sky-50 border border-sky-200 rounded-[2rem] p-5 flex flex-col gap-3">
+                <div className="flex items-center gap-2"><Zap className="w-4 h-4 text-sky-600"/><span className="text-[10px] font-black uppercase tracking-widest text-sky-700">Today&apos;s Deliveries — {todayDeliveries.length} order{todayDeliveries.length!==1?"s":""}</span></div>
+                <div className="flex flex-col gap-2">
+                  {todayDeliveries.map(o=>{
+                    const baker = bakers.find(b=>b.id===o.baker_id);
+                    const del = D_THEME[o.delivery_status||"placed"];
+                    return (
+                      <div key={o.id} className="flex items-center justify-between bg-white border border-sky-100 rounded-2xl px-4 py-2.5 gap-3">
+                        <div className="min-w-0"><p className="text-xs font-black text-brand-brown truncate">{o.customer_name} — Flat {o.flat_number}</p><p className="text-[10px] font-bold text-brand-brown/50">{baker?baker.name:"Unassigned baker"} · {fmt(o.total_paise)}</p></div>
+                        <span className={`text-[9px] font-black uppercase px-2.5 py-1 rounded-xl border ${del.bg} ${del.text} ${del.border} shrink-0`}>{D_LABELS[o.delivery_status||"placed"]}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             {pagedOrders.length===0 && <div className="text-center py-16 bg-white border border-brand-brown/10 rounded-[2rem] shadow-sm"><span className="text-3xl block mb-2">🍞</span><p className="text-sm font-bold text-brand-brown/40">No orders match.</p></div>}
             {pagedOrders.map(order=>{
               const isExpanded = expandedOrderId===order.id;
@@ -744,6 +855,7 @@ export default function OmsDashboard() {
                         <span>{fmtDate(order.created_at)}</span><span>·</span>
                         <span className="font-mono bg-brand-brown/5 px-2 py-0.5 rounded text-[10px] text-brand-brown/65">{order.order_number||`#${order.id.slice(0,8).toUpperCase()}`}</span>
                         <span>·</span><span className="font-serif font-black text-brand-brown/75 text-xs">{fmt(order.total_paise)}</span>
+                        {order.source==="whatsapp"&&<span className="inline-flex items-center gap-1 bg-emerald-50 border border-emerald-200/60 text-emerald-700 text-[9px] font-black uppercase px-2 py-0.5 rounded-lg"><MessageCircle className="w-2.5 h-2.5"/>WA</span>}
                         {order.delivery_date&&<><span>·</span><span className="text-brand-orange">Delivery: {order.delivery_date}</span></>}
                       </div>
                       {!isCancelled&&order.payment_status==="paid"&&(
@@ -919,7 +1031,7 @@ export default function OmsDashboard() {
             {bakers.map(b=>{
               const dashUrl=`${typeof window!=="undefined"?window.location.origin:""}/baker/${b.share_token}`;
               const isCopied=copiedBakerId===b.id;
-              const active=orders.filter(o=>o.baker_id===b.id&&o.payment_status==="paid"&&o.delivery_status!=="delivered").length;
+              const stats = bakerStats[b.id]||{active:0,delivered:0,revenue:0};
               return (
                 <div key={b.id} className="bg-white rounded-[2rem] border border-brand-brown/10 p-5 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all flex flex-col gap-4">
                   <div className="flex items-start justify-between gap-3">
@@ -927,7 +1039,7 @@ export default function OmsDashboard() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <h4 className="font-serif text-base font-black text-brand-brown">{b.name}</h4>
                         <span className={`text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full ${b.is_active?"bg-emerald-50 text-emerald-700 border border-emerald-200/50":"bg-zinc-100 text-zinc-400 border border-zinc-200/50"}`}>{b.is_active?"Active":"Inactive"}</span>
-                        {active>0&&<span className="text-[9px] font-black text-brand-orange bg-brand-orange/10 px-2 py-0.5 rounded-full">{active} active</span>}
+                        {stats.active>0&&<span className="text-[9px] font-black text-brand-orange bg-brand-orange/10 px-2 py-0.5 rounded-full">{stats.active} active</span>}
                       </div>
                       <a href={`tel:${b.phone}`} className="text-xs font-bold text-brand-brown/50 hover:text-brand-orange inline-flex items-center gap-1.5 mt-2"><Phone className="w-3.5 h-3.5 text-brand-orange"/>{b.phone}</a>
                       {b.pincodes&&b.pincodes.length>0&&<p className="text-[10px] font-bold text-brand-brown/40 mt-1">{b.pincodes.join(", ")}</p>}
@@ -936,7 +1048,17 @@ export default function OmsDashboard() {
                     <div className="flex gap-1.5 shrink-0">
                       <button onClick={()=>openEditBaker(b)} className="p-2 rounded-xl border border-brand-brown/10 hover:bg-brand-brown/5 text-brand-brown/40 hover:text-brand-brown cursor-pointer"><Edit2 className="w-3.5 h-3.5"/></button>
                       <button onClick={()=>toggleBakerActive(b.id,b.is_active)} className={`p-2 rounded-xl border cursor-pointer transition-colors ${b.is_active?"border-rose-100 hover:bg-rose-50 text-rose-300 hover:text-rose-600":"border-emerald-100 hover:bg-emerald-50 text-emerald-300 hover:text-emerald-600"}`}>{b.is_active?<XCircle className="w-3.5 h-3.5"/>:<CheckCircle className="w-3.5 h-3.5"/>}</button>
+                      <button onClick={()=>{setDeletingBakerId(b.id);setModal("delete-baker");}} className="p-2 rounded-xl border border-rose-100 hover:bg-rose-50 text-rose-300 hover:text-rose-600 cursor-pointer transition-colors"><Trash2 className="w-3.5 h-3.5"/></button>
                     </div>
+                  </div>
+                  {/* Baker stats */}
+                  <div className="grid grid-cols-3 gap-2">
+                    {[{label:"Active",value:stats.active,color:"text-brand-orange"},{label:"Delivered",value:stats.delivered,color:"text-emerald-700"},{label:"Revenue",value:fmt(stats.revenue),color:"text-brand-brown"}].map(s=>(
+                      <div key={s.label} className="bg-brand-oat/30 rounded-2xl px-3 py-2.5 text-center border border-brand-brown/10">
+                        <p className="text-[8px] font-black uppercase tracking-widest text-brand-brown/40">{s.label}</p>
+                        <p className={`font-serif text-base font-black ${s.color}`}>{s.value}</p>
+                      </div>
+                    ))}
                   </div>
                   <div className="bg-brand-oat/25 border border-brand-brown/10 rounded-2xl px-4 py-3 flex items-center justify-between gap-3 shadow-sm">
                     <div className="min-w-0 flex-grow">
@@ -1021,6 +1143,134 @@ export default function OmsDashboard() {
                 </div>
               )}
             </div>
+          </div>
+        )}
+
+        {/* ── FEEDBACK ── */}
+        {!loading&&tab==="feedback" && (
+          <div className="flex flex-col gap-4 relative z-10">
+            {feedbacks.length===0 && (
+              <div className="text-center py-16 bg-white border border-brand-brown/10 rounded-[2rem] shadow-sm">
+                <span className="text-3xl block mb-2">⭐</span>
+                <p className="text-sm font-bold text-brand-brown/40">No feedback yet.</p>
+                <p className="text-xs font-bold text-brand-brown/30 mt-1">Customer reviews will appear here once submitted.</p>
+              </div>
+            )}
+            {feedbacks.map(fb=>(
+              <div key={fb.id} className="bg-white rounded-[2rem] border border-brand-brown/10 p-5 shadow-sm flex flex-col gap-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-serif text-base font-black text-brand-brown">Flat {fb.flat_number}</p>
+                    {fb.order_id&&<p className="text-[10px] font-bold text-brand-brown/40">Order #{fb.order_id.slice(0,8)}</p>}
+                  </div>
+                  <div className="flex items-center gap-0.5 shrink-0">
+                    {[1,2,3,4,5].map(n=>(
+                      <Star key={n} className={`w-4 h-4 ${n<=fb.rating?"text-brand-orange fill-brand-orange":"text-brand-brown/15"}`}/>
+                    ))}
+                  </div>
+                </div>
+                {fb.comment&&<p className="text-sm font-medium text-brand-brown/70 italic bg-brand-oat/30 border border-brand-brown/5 rounded-2xl px-4 py-3">&quot;{fb.comment}&quot;</p>}
+                <p className="text-[10px] font-bold text-brand-brown/30">{fmtDate(fb.created_at)}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ── SETTINGS ── */}
+        {!loading&&tab==="settings" && (
+          <div className="flex flex-col gap-6 relative z-10">
+
+            {/* Known settings */}
+            <div className="bg-white rounded-[2rem] border border-brand-brown/10 p-6 shadow-sm flex flex-col gap-4">
+              <p className="text-[9px] font-black uppercase tracking-widest text-brand-brown/40 mb-1">Store Settings</p>
+              {[
+                {key:"vacation_mode",label:"Vacation Mode",desc:"true / false — pauses all new orders",placeholder:"true"},
+                {key:"min_order_paise",label:"Min Order (paise)",desc:"e.g. 20000 = ₹200 minimum",placeholder:"20000"},
+                {key:"delivery_days",label:"Delivery Days",desc:"Comma-separated: wed,sat",placeholder:"wed,sat"},
+                {key:"cutoff_hour_ist",label:"Order Cutoff Hour (IST)",desc:"24h integer, e.g. 20 = 8 PM",placeholder:"20"},
+              ].map(({key,label,desc,placeholder})=>{
+                const current = settingValues[key]??"";
+                const edited = settingEdits[key];
+                const val = edited!==undefined ? edited : current;
+                const isDirty = edited!==undefined && edited!==current;
+                const isSaving = savingSettingKey===key;
+                return (
+                  <div key={key} className="flex flex-col sm:flex-row sm:items-center gap-3 py-4 border-b border-brand-brown/5 last:border-0">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-black text-brand-brown">{label}</p>
+                      <p className="text-[10px] font-bold text-brand-brown/40 mt-0.5">{desc}</p>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <input
+                        value={val}
+                        placeholder={placeholder}
+                        onChange={e=>setSettingEdits(p=>({...p,[key]:e.target.value}))}
+                        className="w-40 bg-brand-oat/40 border border-brand-brown/15 rounded-xl px-3 py-2 text-xs font-bold text-brand-brown outline-none focus:border-brand-orange transition-colors"
+                      />
+                      <button
+                        onClick={()=>saveSetting(key)}
+                        disabled={!isDirty||isSaving}
+                        className="px-4 py-2 rounded-xl bg-brand-brown hover:bg-brand-orange text-white text-[10px] font-black uppercase disabled:opacity-30 cursor-pointer flex items-center gap-1.5 transition-colors"
+                      >
+                        {isSaving?<Loader2 className="w-3 h-3 animate-spin"/>:<Send className="w-3 h-3"/>}
+                        Save
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Admin actions */}
+            <div className="bg-white rounded-[2rem] border border-brand-brown/10 p-6 shadow-sm flex flex-col gap-4">
+              <p className="text-[9px] font-black uppercase tracking-widest text-brand-brown/40 mb-1">Admin Actions</p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button onClick={runCron} className="flex-1 inline-flex items-center justify-center gap-2 bg-brand-oat/50 border border-brand-brown/10 hover:bg-brand-brown hover:text-white text-brand-brown/70 text-xs font-black uppercase px-5 py-3 rounded-2xl transition-all cursor-pointer">
+                  <RefreshCw className="w-4 h-4"/>Run Cron Manually
+                </button>
+                <button onClick={exportCSV} className="flex-1 inline-flex items-center justify-center gap-2 bg-brand-oat/50 border border-brand-brown/10 hover:bg-brand-brown hover:text-white text-brand-brown/70 text-xs font-black uppercase px-5 py-3 rounded-2xl transition-all cursor-pointer">
+                  <Download className="w-4 h-4"/>Export Orders CSV
+                </button>
+              </div>
+            </div>
+
+            {/* Active WhatsApp sessions */}
+            <div className="bg-white rounded-[2rem] border border-brand-brown/10 p-6 shadow-sm flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <p className="text-[9px] font-black uppercase tracking-widest text-brand-brown/40">Active WhatsApp Sessions</p>
+                <span className="text-[10px] font-black text-brand-orange bg-brand-orange/10 px-2.5 py-0.5 rounded-lg">{sessions.length} sessions</span>
+              </div>
+              {sessions.length===0&&<p className="text-sm font-bold text-brand-brown/30 text-center py-6">No active sessions.</p>}
+              {sessions.map(s=>{
+                const stepAge = Math.round((Date.now()-new Date(s.updated_at).getTime())/60000);
+                const isStale = stepAge > 60;
+                return (
+                  <div key={s.phone} className={`flex items-start justify-between gap-3 py-3 border-b border-brand-brown/5 last:border-0 ${isStale?"opacity-50":""}`}>
+                    <div>
+                      <p className="text-xs font-black text-brand-brown">{s.phone}</p>
+                      <p className="text-[10px] font-bold text-brand-brown/50 mt-0.5">Step: <span className="text-brand-orange">{s.step}</span></p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className="text-[10px] font-bold text-brand-brown/40">{stepAge}m ago</p>
+                      {isStale&&<p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mt-0.5">Stale</p>}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* All raw settings */}
+            {settings.length > 0 && (
+              <div className="bg-white rounded-[2rem] border border-brand-brown/10 p-6 shadow-sm flex flex-col gap-3">
+                <p className="text-[9px] font-black uppercase tracking-widest text-brand-brown/40 mb-1">All DB Settings</p>
+                {settings.map(s=>(
+                  <div key={s.key} className="flex items-center justify-between py-2 border-b border-dashed border-brand-brown/5 last:border-0">
+                    <span className="text-xs font-bold text-brand-brown/60 font-mono">{s.key}</span>
+                    <span className="text-xs font-black text-brand-brown bg-brand-oat/40 px-2.5 py-0.5 rounded-lg">{s.value}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </main>

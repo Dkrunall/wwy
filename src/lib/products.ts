@@ -112,6 +112,45 @@ export const products: Product[] = [
     ],
     leadTime: "5–6 days · Delivery Wed & Sat",
   },
+  {
+    id: 6,
+    name: "Sourdough Loaf",
+    category: "Breads",
+    badge: "MADE TO ORDER",
+    price: "₹280",
+    priceNum: 280,
+    image: "/p2.png",
+    bgColor: "bg-[#F5EDD7]",
+    desc: "Open crumb. Thick crust. Slow-fermented with our century-old wild culture. Baked when you order.",
+    longDesc:
+      "Our Sourdough Loaf is leavened entirely with our wild culture — no commercial yeast, no shortcuts. A minimum 18-hour cold ferment gives the crumb its character and the crust its depth. Each loaf is scored by hand and baked on a stone. It tastes different every bake, because wild yeast is different every time.",
+    details: [
+      "Stone-milled whole wheat flour · Wild culture · Water · Salt",
+      "18-hour cold ferment · No commercial yeast",
+      "Hand-scored · Stone-baked",
+      "Best eaten within 2 days · Freeze well",
+    ],
+    leadTime: "Baked to order · Delivery Wed & Sat",
+  },
+  {
+    id: 7,
+    name: "Multigrain Bread",
+    category: "Breads",
+    price: "₹220",
+    priceNum: 220,
+    image: "/p1.png",
+    bgColor: "bg-[#E8E0D0]",
+    desc: "Seeds, grains, and wild leavening. Dense, nutritious, and fermented for flavour — not just function.",
+    longDesc:
+      "The Multigrain Bread is our everyday loaf. Sunflower seeds, flax, and rolled oats are soaked overnight before being folded into a whole wheat dough leavened with our wild culture. The result is dense without being heavy — each slice carries the complexity of a long ferment and the texture of whole grain.",
+    details: [
+      "Whole wheat flour · Sunflower seeds · Flax · Rolled oats",
+      "Wild culture leaven · Overnight grain soak",
+      "No preservatives · No commercial yeast",
+      "Best eaten within 3 days · Slices well from frozen",
+    ],
+    leadTime: "Baked to order · Delivery Wed & Sat",
+  },
 ];
 
 export function getProduct(id: number): Product | undefined {

@@ -6,9 +6,12 @@ import { getRazorpay } from "@/lib/razorpay";
 import { findBestBaker } from "@/lib/baker";
 import Anthropic from "@anthropic-ai/sdk";
 
-const VERIFY_TOKEN = process.env.WHATSAPP_VERIFY_TOKEN || "wwy_verify";
-const WA_TOKEN = process.env.WHATSAPP_TOKEN || "";
-const PHONE_ID = process.env.WHATSAPP_PHONE_NUMBER_ID || "";
+import twilio from "twilio";
+
+function getTwilioClient() {
+  return twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+}
+const FROM = process.env.TWILIO_WHATSAPP_FROM || "whatsapp:+14155238886";
 
 interface CartItem {
   id: string;
@@ -18,30 +21,19 @@ interface CartItem {
   deliveryDate: string;
 }
 
-// ── Webhook verification ──────────────────────────────────────────────────────
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  if (
-    searchParams.get("hub.mode") === "subscribe" &&
-    searchParams.get("hub.verify_token") === VERIFY_TOKEN
-  ) {
-    return new NextResponse(searchParams.get("hub.challenge"), { status: 200 });
-  }
-  return new NextResponse("Forbidden", { status: 403 });
-}
-
-// ── Incoming message handler ──────────────────────────────────────────────────
+// ── Incoming message handler (Twilio sends form-encoded POST) ────────────────
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const entry = body?.entry?.[0]?.changes?.[0]?.value;
-  if (!entry?.messages?.[0]) return NextResponse.json({ ok: true });
+  const data = await req.formData();
+  const from = (data.get("From") as string) || "";
+  const text = ((data.get("Body") as string) || "").trim();
 
-  const msg = entry.messages[0];
-  const phone = msg.from;
-  const text = (msg.text?.body || "").trim();
+  // Twilio sends From as "whatsapp:+919876543210" — strip prefix
+  const phone = from.replace("whatsapp:+", "");
+  if (!phone) return new NextResponse("", { status: 200 });
 
   await handleMessage(phone, text);
-  return NextResponse.json({ ok: true });
+  // Twilio expects 200 with empty body (we send via API, not TwiML)
+  return new NextResponse("", { status: 200 });
 }
 
 // ── State machine ─────────────────────────────────────────────────────────────
@@ -83,12 +75,17 @@ async function updateSession(
 }
 
 async function send(to: string, message: string) {
-  if (!WA_TOKEN || !PHONE_ID) return;
-  await fetch(`https://graph.facebook.com/v18.0/${PHONE_ID}/messages`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${WA_TOKEN}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ messaging_product: "whatsapp", to, type: "text", text: { body: message } }),
-  });
+  if (!process.env.TWILIO_ACCOUNT_SID || !process.env.TWILIO_AUTH_TOKEN) return;
+  const normalized = to.startsWith("91") ? to : `91${to}`;
+  try {
+    await getTwilioClient().messages.create({
+      body: message,
+      from: FROM,
+      to: `whatsapp:+${normalized}`,
+    });
+  } catch (err) {
+    console.error("Twilio send error:", err);
+  }
 }
 
 function formatISODate(iso: string): string {
@@ -115,7 +112,7 @@ async function stepIdentify(
   const { data: customer } = await supabase.from("customers").select("*").eq("phone", phone).single();
   if (customer) {
     await updateSession(phone, { step: "menu", temp: {} }, supabase);
-    await send(phone, `Welcome back, ${customer.name}! 🌾\n\n${buildMenuMessage()}`);
+    await send(phone, `Welcome back, ${customer.name}! 🌾\n\n${await buildMenuMessage(supabase)}`);
   } else {
     await updateSession(phone, { step: "collect_name" }, supabase);
     await send(phone, "Welcome to Wild Wild Yeast! 🌾 We bake with love.\n\nFirst, what is your name?");
@@ -149,30 +146,34 @@ async function stepCollectPincode(
     phone, name: temp.name, address: temp.address, pincode: text, flat_number: phone.slice(-6),
   });
   await updateSession(phone, { step: "menu", temp: {}, cart: [] }, supabase);
-  await send(phone, `You're all set, ${temp.name}! 🎉\n\n${buildMenuMessage()}`);
+  await send(phone, `You're all set, ${temp.name}! 🎉\n\n${await buildMenuMessage(supabase)}`);
 }
 
-function buildMenuMessage(): string {
+type MenuProduct = { id: string; name: string; price: number };
+
+async function fetchMenuProducts(supabase: ReturnType<typeof createServerSupabase>): Promise<MenuProduct[]> {
+  const { data } = await supabase
+    .from("products")
+    .select("id, name, price_paise")
+    .eq("available", true)
+    .order("category");
+  return (data || []).map((p) => ({ id: p.id as string, name: p.name as string, price: p.price_paise as number }));
+}
+
+async function buildMenuMessage(supabase: ReturnType<typeof createServerSupabase>): Promise<string> {
+  const products = await fetchMenuProducts(supabase);
+  if (products.length === 0) {
+    return "We don't have anything available right now. Check back soon! 🌾";
+  }
+  const lines = products.map((p, i) => `${i + 1}. ${p.name} — ₹${(p.price / 100).toFixed(0)}`).join("\n");
   return (
     "Here's what we have for you today 🍞\n\n" +
     "Reply with a number to add to your order:\n" +
-    "1. Classic Sourdough Loaf — ₹280\n" +
-    "2. Multigrain Sourdough — ₹320\n" +
-    "3. Ginger Ale (500ml) — ₹150\n" +
-    "4. Kombucha (500ml) — ₹180\n" +
-    "5. Water Kefir (500ml) — ₹160\n" +
+    lines + "\n" +
     "─────────────\n" +
     "Type 0 to Checkout"
   );
 }
-
-const MENU_PRODUCTS = [
-  { id: "1", name: "Classic Sourdough Loaf", price: 28000 },
-  { id: "2", name: "Multigrain Sourdough", price: 32000 },
-  { id: "3", name: "Ginger Ale (500ml)", price: 15000 },
-  { id: "4", name: "Kombucha (500ml)", price: 18000 },
-  { id: "5", name: "Water Kefir (500ml)", price: 16000 },
-];
 
 async function stepMenu(
   phone: string, text: string, session: Record<string, unknown>,
@@ -185,9 +186,10 @@ async function stepMenu(
     await send(phone, buildCartSummary(cart));
     return;
   }
+  const products = await fetchMenuProducts(supabase);
   const idx = parseInt(text) - 1;
-  if (idx >= 0 && idx < MENU_PRODUCTS.length) {
-    const product = MENU_PRODUCTS[idx];
+  if (idx >= 0 && idx < products.length) {
+    const product = products[idx];
     const min = calculateDeliveryDate();
     const temp = (session.temp as Record<string, unknown>) || {};
     await updateSession(phone, {
@@ -242,12 +244,12 @@ async function stepSelectQuantity(
 
   const temp = (session.temp as Record<string, unknown>) || {};
   const productStr = temp.selected_product as string | undefined;
-  const product = productStr ? (JSON.parse(productStr) as typeof MENU_PRODUCTS[0]) : null;
+  const product = productStr ? (JSON.parse(productStr) as MenuProduct) : null;
   const deliveryDate = temp.selected_date as string | undefined;
 
   if (!product || !deliveryDate) {
     await updateSession(phone, { step: "menu", temp: {} }, supabase);
-    await send(phone, buildMenuMessage());
+    await send(phone, await buildMenuMessage(supabase));
     return;
   }
 
@@ -298,7 +300,7 @@ async function stepCheckout(
 
   if (upper === "CANCEL") {
     await updateSession(phone, { step: "menu", cart: [] }, supabase);
-    await send(phone, "Cart cleared. Starting fresh!\n\n" + buildMenuMessage());
+    await send(phone, "Cart cleared. Starting fresh!\n\n" + await buildMenuMessage(supabase));
     return;
   }
 
@@ -320,7 +322,7 @@ async function stepCheckout(
       : cart.map((item, i) => i === itemIdx ? { ...item, qty: newQty } : item);
     if (newCart.length === 0) {
       await updateSession(phone, { step: "menu", cart: [] }, supabase);
-      await send(phone, "Cart is now empty.\n\n" + buildMenuMessage());
+      await send(phone, "Cart is now empty.\n\n" + await buildMenuMessage(supabase));
       return;
     }
     await updateSession(phone, { cart: newCart }, supabase);
@@ -370,6 +372,7 @@ async function stepConfirmOrder(
       delivery_date: deliveryISO,
       razorpay_order_id: rzpOrder.id,
       order_number: orderNumber,
+      source: "whatsapp",
     }).select().single();
 
     if (order) {
@@ -383,11 +386,9 @@ async function stepConfirmOrder(
         }))
       );
 
-      if (customer?.pincode) {
-        const bakerId = await findBestBaker(supabase, customer.pincode);
-        if (bakerId) {
-          await supabase.from("orders").update({ baker_id: bakerId }).eq("id", order.id);
-        }
+      const bakerId = await findBestBaker(supabase, customer?.pincode);
+      if (bakerId) {
+        await supabase.from("orders").update({ baker_id: bakerId }).eq("id", order.id);
       }
     }
 

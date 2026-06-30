@@ -4,7 +4,6 @@ export const dynamic = "force-dynamic";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Script from "next/script";
 import { CartItem } from "@/lib/supabase";
 import { getAvailableDeliverySlots, deliveryDateISO, formatDeliveryDate } from "@/lib/dateUtils";
 
@@ -55,6 +54,15 @@ export default function CartPage() {
     }));
     setDeliverySlots(slots);
     setSelectedDeliveryDate(slots[0]?.iso || "");
+
+    // Load Razorpay checkout SDK
+    if (!document.getElementById("razorpay-sdk")) {
+      const s = document.createElement("script");
+      s.id = "razorpay-sdk";
+      s.src = "https://checkout.razorpay.com/v1/checkout.js";
+      s.async = true;
+      document.body.appendChild(s);
+    }
   }, [router]);
 
   const updateQty = (productId: string, delta: number) => {
@@ -158,9 +166,6 @@ export default function CartPage() {
   }
 
   return (
-    <>
-      <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="beforeInteractive" />
-
       <main className="min-h-screen bg-brand-oat pb-40">
         {/* Header */}
         <header className="sticky top-0 z-40 bg-brand-oat/95 backdrop-blur-sm border-b border-brand-charcoal/5">
@@ -288,6 +293,5 @@ export default function CartPage() {
           </div>
         </div>
       </main>
-    </>
   );
 }

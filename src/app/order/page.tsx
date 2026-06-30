@@ -57,6 +57,15 @@ export default function OrderPage() {
 
     (async () => {
       try {
+        const { data: setting } = await supabase
+          .from("settings")
+          .select("value")
+          .eq("key", "vacation_mode")
+          .single();
+        if (setting?.value === "true") {
+          router.replace("/coming-soon");
+          return;
+        }
         const { data } = await supabase
           .from("products")
           .select("*")

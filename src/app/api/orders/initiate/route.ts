@@ -39,8 +39,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "We are on a short break. Back soon! 🌾" }, { status: 503 });
     }
 
+    // Resolve customer server-side by flat number — don't trust localStorage UUID
+    const { data: customer } = await supabase
+      .from("customers")
+      .select("id, pincode")
+      .eq("flat_number", flat)
+      .single();
+    const resolvedCustomerId = customer?.id ?? null;
+
     const baseTotalPaise = cart.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
-    const { finalTotal, discountPercent } = await applyDiscounts(customerId, baseTotalPaise);
+    const { finalTotal, discountPercent } = await applyDiscounts(resolvedCustomerId ?? "", baseTotalPaise);
 
     const deliveryDate = (chosenDate && isValidDeliveryDate(chosenDate))
       ? new Date(chosenDate + "T00:00:00Z")
@@ -53,7 +61,7 @@ export async function POST(req: NextRequest) {
     const rzpOrder = await razorpay.orders.create({
       amount: finalTotal,
       currency: "INR",
-      notes: { customer_id: customerId, flat_number: flat },
+      notes: { customer_id: resolvedCustomerId ?? "", flat_number: flat },
     });
 
     const orderNumber = generateOrderNumber();
@@ -62,7 +70,7 @@ export async function POST(req: NextRequest) {
     const { data: order, error: orderErr } = await supabase
       .from("orders")
       .insert({
-        customer_id: customerId || null,
+        customer_id: resolvedCustomerId,
         flat_number: flat,
         customer_name: customerName,
         total_paise: finalTotal,
@@ -73,6 +81,7 @@ export async function POST(req: NextRequest) {
         delivery_date: deliveryISO,
         razorpay_order_id: rzpOrder.id,
         order_number: orderNumber,
+        source: "web",
       })
       .select()
       .single();
@@ -91,17 +100,10 @@ export async function POST(req: NextRequest) {
     }));
     await supabase.from("order_items").insert(items);
 
-    // Auto-assign baker by customer pincode
-    const { data: customer } = await supabase
-      .from("customers")
-      .select("pincode")
-      .eq("id", customerId)
-      .single();
-    if (customer?.pincode) {
-      const bakerId = await findBestBaker(supabase, customer.pincode);
-      if (bakerId) {
-        await supabase.from("orders").update({ baker_id: bakerId }).eq("id", order.id);
-      }
+    // Auto-assign baker
+    const bakerId = await findBestBaker(supabase, customer?.pincode);
+    if (bakerId) {
+      await supabase.from("orders").update({ baker_id: bakerId }).eq("id", order.id);
     }
 
     return NextResponse.json({

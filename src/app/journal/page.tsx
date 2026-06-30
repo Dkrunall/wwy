@@ -6,71 +6,9 @@ import Image from "next/image";
 import Navbar from "@/components/Navbar";
 import CartDrawer from "@/components/CartDrawer";
 import Footer from "@/components/Footer";
+import { posts } from "@/lib/journal";
 
 const categories = ["All", "Process", "Ingredients", "Culture", "Recipes"];
-
-const posts = [
-  {
-    id: 1,
-    category: "Process",
-    title: "Why Wild Yeast Behaves Differently Every Time",
-    excerpt: "Wild fermentation is never consistent in the way commercial yeast is. That's not a flaw — it's the whole point. A note on unpredictability and character.",
-    date: "14 Apr 2026",
-    readTime: "5 min",
-    image: "/f1.png",
-    featured: true,
-  },
-  {
-    id: 2,
-    category: "Ingredients",
-    title: "Sourcing Hibiscus: What the Farm Tells the Bottle",
-    excerpt: "The hibiscus in Wild Botanicals comes from a single cooperative in Rajasthan. Here's why that matters, and what it changes in the ferment.",
-    date: "07 Apr 2026",
-    readTime: "4 min",
-    image: "/f2.png",
-    featured: false,
-  },
-  {
-    id: 3,
-    category: "Culture",
-    title: "The Century-Old Starter: A Brief History",
-    excerpt: "Our sourdough culture has been passed down across three generations. What makes an old starter different from a new one — and why it takes time to understand.",
-    date: "28 Mar 2026",
-    readTime: "6 min",
-    image: "/p2.png",
-    featured: false,
-  },
-  {
-    id: 4,
-    category: "Recipes",
-    title: "Using Golden Fizz as a Cooking Base",
-    excerpt: "Beyond the glass. Turmeric ferment as a braising liquid, a dressing acid, a glaze. Three ways to use Golden Fizz in the kitchen.",
-    date: "19 Mar 2026",
-    readTime: "3 min",
-    image: "/p3.png",
-    featured: false,
-  },
-  {
-    id: 5,
-    category: "Process",
-    title: "Temperature, Time, and the Art of the Long Ferment",
-    excerpt: "Every degree changes the outcome. A practical guide to understanding how ambient temperature shapes the character of a slow ferment.",
-    date: "08 Mar 2026",
-    readTime: "7 min",
-    image: "/p1.png",
-    featured: false,
-  },
-  {
-    id: 6,
-    category: "Culture",
-    title: "What 'Living Food' Actually Means",
-    excerpt: "The phrase gets used often. Here is what it means specifically — biologically, culinarily, and in the context of what we make.",
-    date: "22 Feb 2026",
-    readTime: "5 min",
-    image: "/p5.png",
-    featured: false,
-  },
-];
 
 const categoryColors: Record<string, string> = {
   Process:     "bg-brand-terracotta/10 text-brand-terracotta",
@@ -126,7 +64,7 @@ export default function JournalPage() {
       {/* ── Featured Post ── */}
       {featured && (
         <section className="w-full px-4 sm:px-8 xl:px-16 py-12 sm:py-16 border-b border-brand-charcoal/5">
-          <div className="flex flex-col lg:flex-row gap-8 xl:gap-12 items-center group cursor-pointer">
+          <Link href={`/journal/${featured.id}`} className="flex flex-col lg:flex-row gap-8 xl:gap-12 items-center group">
             <div className="w-full lg:w-1/2 rounded-[2rem] sm:rounded-[3rem] overflow-hidden aspect-[3/2] sm:aspect-[4/3] relative shadow-xl">
               <Image
                 src={featured.image}
@@ -156,11 +94,11 @@ export default function JournalPage() {
               <p className="text-sm sm:text-base md:text-lg font-bold text-brand-charcoal/50 leading-relaxed mb-8 max-w-lg">
                 {featured.excerpt}
               </p>
-              <button className="inline-flex items-center gap-3 bg-brand-charcoal text-white hover:bg-brand-terracotta px-8 py-3.5 rounded-full text-[10px] font-black tracking-[0.2em] uppercase transition-all duration-300 active:scale-95 shadow-md">
+              <span className="inline-flex items-center gap-3 bg-brand-charcoal text-white group-hover:bg-brand-terracotta px-8 py-3.5 rounded-full text-[10px] font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-md">
                 Read the Note
-              </button>
+              </span>
             </div>
-          </div>
+          </Link>
         </section>
       )}
 
@@ -187,9 +125,10 @@ export default function JournalPage() {
         {/* Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
           {filteredRest.map(post => (
-            <article
+            <Link
               key={post.id}
-              className="group flex flex-col bg-white rounded-[2rem] overflow-hidden border border-brand-charcoal/5 shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer"
+              href={`/journal/${post.id}`}
+              className="group flex flex-col bg-white rounded-[2rem] overflow-hidden border border-brand-charcoal/5 shadow-sm hover:shadow-xl transition-all duration-500"
             >
               {/* Image */}
               <div className="relative w-full aspect-[3/2] overflow-hidden">
@@ -224,7 +163,7 @@ export default function JournalPage() {
                   </span>
                 </div>
               </div>
-            </article>
+            </Link>
           ))}
         </div>
 

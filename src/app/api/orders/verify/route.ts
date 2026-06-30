@@ -45,9 +45,9 @@ export async function POST(req: NextRequest) {
       .eq("flat_number", order.flat_number)
       .single();
 
-    // Auto-assign baker if not already assigned
-    if (!order.baker_id && customer?.pincode) {
-      const bakerId = await findBestBaker(supabase, customer.pincode);
+    // Auto-assign baker if not already assigned (pincode match preferred, any active baker as fallback)
+    if (!order.baker_id) {
+      const bakerId = await findBestBaker(supabase, customer?.pincode);
       if (bakerId) {
         await supabase.from("orders").update({ baker_id: bakerId }).eq("id", orderId);
       }

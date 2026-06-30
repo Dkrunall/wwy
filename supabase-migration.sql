@@ -67,3 +67,6 @@ CREATE TABLE IF NOT EXISTS feedbacks (
 
 ALTER TABLE feedbacks ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "feedbacks_all" ON feedbacks FOR ALL USING (true);
+
+-- ─── Orders: source channel ──────────────────────────────────────────────────
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'web';

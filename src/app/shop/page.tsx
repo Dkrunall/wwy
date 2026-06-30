@@ -8,7 +8,7 @@ import Footer from "@/components/Footer";
 import { ShoppingBag } from "lucide-react";
 import { products } from "@/lib/products";
 
-const categories = ["All", "Sodas", "Starters", "Storage", "Bundles"];
+const categories = ["All", "Sodas", "Breads", "Starters", "Storage", "Bundles"];
 
 export default function ShopPage() {
   const [activeCategory, setActiveCategory] = useState("All");
