@@ -35,6 +35,11 @@ export function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // API routes and payment page must always be reachable (webhooks, payments)
+  if (pathname.startsWith("/api/") || pathname.startsWith("/pay/")) {
+    return NextResponse.next();
+  }
+
   // Everyone else → coming soon (skip the coming-soon page itself)
   if (pathname !== "/coming-soon") {
     return NextResponse.redirect(new URL("/coming-soon", req.url));
