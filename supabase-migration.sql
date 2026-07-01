@@ -70,3 +70,6 @@ CREATE POLICY "feedbacks_all" ON feedbacks FOR ALL USING (true);
 
 -- ─── Orders: source channel ──────────────────────────────────────────────────
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'web';
+
+-- ─── Customers: email for OTP login ─────────────────────────────────────────
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS email TEXT UNIQUE;

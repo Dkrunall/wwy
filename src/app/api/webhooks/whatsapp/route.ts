@@ -23,6 +23,10 @@ interface CartItem {
 
 // ── Incoming message handler (Twilio sends form-encoded POST) ────────────────
 export async function POST(req: NextRequest) {
+  // WhatsApp bot temporarily disabled
+  void req;
+  return new NextResponse("", { status: 200 });
+
   const data = await req.formData();
   const from = (data.get("From") as string) || "";
   const text = ((data.get("Body") as string) || "").trim();
