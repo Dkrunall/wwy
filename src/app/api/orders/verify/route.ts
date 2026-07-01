@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { verifyPaymentSignature } from "@/lib/razorpay";
-import { sendPaymentConfirmed } from "@/lib/whatsapp";
-import { sendOwnerNotification } from "@/lib/email";
+import { sendPaymentConfirmedToCustomer, sendOwnerNotification } from "@/lib/email";
 import { generateInvoicePDF } from "@/lib/invoice";
 import { findBestBaker } from "@/lib/baker";
 
@@ -89,14 +88,8 @@ export async function POST(req: NextRequest) {
       console.error("Invoice generation failed:", invoiceErr);
     }
 
-    // Send WhatsApp notification
-    if (customer?.phone) {
-      await sendPaymentConfirmed(
-        customer.phone,
-        order.customer_name,
-        order.order_number,
-        invoiceUrl
-      ).catch(console.error);
+    if (customer?.email) {
+      await sendPaymentConfirmedToCustomer(customer.email, order.customer_name, order.order_number, invoiceUrl).catch(console.error);
     }
 
     // Email owner

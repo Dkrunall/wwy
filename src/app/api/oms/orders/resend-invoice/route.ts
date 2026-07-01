@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { generateInvoicePDF } from "@/lib/invoice";
-import { sendPaymentConfirmed } from "@/lib/whatsapp";
+import { sendPaymentConfirmedToCustomer } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
@@ -48,8 +48,8 @@ export async function POST(req: NextRequest) {
     const invoiceUrl = urlData.publicUrl;
     await supabase.from("orders").update({ invoice_url: invoiceUrl }).eq("id", orderId);
 
-    if (customer?.phone) {
-      await sendPaymentConfirmed(customer.phone, order.customer_name, order.order_number, invoiceUrl).catch(console.error);
+    if (customer?.email) {
+      await sendPaymentConfirmedToCustomer(customer.email, order.customer_name, order.order_number, invoiceUrl).catch(console.error);
     }
 
     return NextResponse.json({ ok: true, invoiceUrl });

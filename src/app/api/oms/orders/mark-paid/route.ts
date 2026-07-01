@@ -2,8 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { generateInvoicePDF } from "@/lib/invoice";
-import { sendPaymentConfirmed } from "@/lib/whatsapp";
-import { sendOwnerNotification } from "@/lib/email";
+import { sendPaymentConfirmedToCustomer, sendOwnerNotification } from "@/lib/email";
 import { findBestBaker } from "@/lib/baker";
 
 export async function POST(req: NextRequest) {
@@ -68,8 +67,8 @@ export async function POST(req: NextRequest) {
       await supabase.from("orders").update({ invoice_url: invoiceUrl }).eq("id", orderId);
     } catch (e) { console.error("Invoice gen failed:", e); }
 
-    if (customer?.phone) {
-      await sendPaymentConfirmed(customer.phone, order.customer_name, order.order_number, invoiceUrl).catch(console.error);
+    if (customer?.email) {
+      await sendPaymentConfirmedToCustomer(customer.email, order.customer_name, order.order_number, invoiceUrl).catch(console.error);
     }
     await sendOwnerNotification({
       order_number: order.order_number, customer_name: order.customer_name,

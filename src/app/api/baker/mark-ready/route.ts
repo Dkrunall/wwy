@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
-import { sendDeliveryUpdate } from "@/lib/whatsapp";
+import { sendDeliveryUpdateToCustomer } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
   try {
@@ -43,17 +43,12 @@ export async function POST(req: NextRequest) {
     // Notify customer via WhatsApp
     const { data: customer } = await supabase
       .from("customers")
-      .select("phone")
+      .select("email")
       .eq("flat_number", order.flat_number)
       .single();
 
-    if (customer?.phone) {
-      await sendDeliveryUpdate(
-        customer.phone,
-        order.customer_name,
-        order.order_number,
-        "out_for_delivery"
-      ).catch(console.error);
+    if (customer?.email) {
+      await sendDeliveryUpdateToCustomer(customer.email, order.customer_name, order.order_number, "out_for_delivery").catch(console.error);
     }
 
     return NextResponse.json({ ok: true });

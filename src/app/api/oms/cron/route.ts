@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerSupabase } from "@/lib/supabase-server";
-import { sendDeliveryUpdate } from "@/lib/whatsapp";
+import { sendDeliveryUpdateToCustomer } from "@/lib/email";
 
 // Called manually from OMS or via Vercel Cron (add to vercel.json)
 // Processes delivery status transitions for today's orders.
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
 
   const { data: orders } = await supabase
     .from("orders")
-    .select("*, customers(phone)")
+    .select("*, customers(email)")
     .eq("delivery_date", todayISO)
     .eq("payment_status", "paid");
 
@@ -64,9 +64,9 @@ export async function POST(req: NextRequest) {
       .update({ delivery_status: transition.to, updated_at: new Date().toISOString() })
       .eq("id", order.id);
 
-    const phone = (order.customers as { phone: string } | null)?.phone;
-    if (phone) {
-      await sendDeliveryUpdate(phone, order.customer_name, order.order_number, transition.to).catch(console.error);
+    const email = (order.customers as { email: string } | null)?.email;
+    if (email) {
+      await sendDeliveryUpdateToCustomer(email, order.customer_name, order.order_number, transition.to).catch(console.error);
     }
     processed++;
   }
