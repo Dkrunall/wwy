@@ -99,18 +99,22 @@ export default function DashboardPage() {
     setFlat(storedFlat);
     setCustomerName(storedName || "");
 
-    supabase
-      .from("orders")
-      .select("*, order_items(*)")
-      .eq("flat_number", storedFlat)
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .single()
-      .then(({ data }) => {
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from("orders")
+          .select("*, order_items(*)")
+          .eq("flat_number", storedFlat)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single();
         setLatestOrder(data || null);
+      } catch {
+        // no orders yet
+      } finally {
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      }
+    })();
   }, [router]);
 
   const firstName = customerName.split(" ")[0];
