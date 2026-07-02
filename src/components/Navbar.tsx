@@ -8,13 +8,19 @@ import WhatsAppIcon from "./WhatsAppIcon";
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [initials, setInitials] = useState("");
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const name = localStorage.getItem("wwy_name") || "";
+    const flat = localStorage.getItem("wwy_flat") || "";
+    if (flat) { setLoggedIn(true); setInitials(name?.[0]?.toUpperCase() || flat[0]?.toUpperCase() || "?"); }
   }, []);
 
   const pillBase =
@@ -69,15 +75,26 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* ── Pill 3: Order CTA ── */}
-        <div className={`${pillBase} rounded-full px-2 h-14 flex items-center`}>
-          <Link
-            href="/order"
-            className="flex items-center gap-2 bg-brand-charcoal text-white hover:bg-brand-terracotta transition-colors duration-300 px-5 py-2.5 rounded-full font-black text-[10px] tracking-[0.15em] uppercase shadow-md active:scale-95"
-          >
-            <WhatsAppIcon size={13} />
-            Order Now
-          </Link>
+        {/* ── Pill 3: Order CTA / Avatar ── */}
+        <div className={`${pillBase} rounded-full px-2 h-14 flex items-center gap-2`}>
+          {loggedIn ? (
+            <Link
+              href="/order"
+              className="flex items-center gap-2 bg-brand-charcoal text-white hover:bg-brand-terracotta transition-colors duration-300 px-4 py-2 rounded-full active:scale-95"
+              title="My Account"
+            >
+              <span className="w-6 h-6 rounded-full bg-white/20 text-white font-black text-xs flex items-center justify-center shrink-0">{initials}</span>
+              <span className="font-black text-[10px] tracking-[0.15em] uppercase">My Account</span>
+            </Link>
+          ) : (
+            <Link
+              href="/order"
+              className="flex items-center gap-2 bg-brand-charcoal text-white hover:bg-brand-terracotta transition-colors duration-300 px-5 py-2.5 rounded-full font-black text-[10px] tracking-[0.15em] uppercase shadow-md active:scale-95"
+            >
+              <WhatsAppIcon size={13} />
+              Order Now
+            </Link>
+          )}
         </div>
       </div>
 
@@ -110,14 +127,24 @@ export default function Navbar() {
             {mobileMenuOpen ? "Close" : "Menu"}
           </button>
 
-          {/* Order pill */}
-          <Link
-            href="/order"
-            className={`${pillBase} rounded-full px-4 sm:px-5 h-11 sm:h-12 flex items-center justify-center gap-1.5 font-black text-[9px] sm:text-[10px] tracking-widest uppercase text-brand-charcoal hover:bg-brand-terracotta hover:text-white hover:border-brand-terracotta/40 transition-all duration-300 active:scale-95 whitespace-nowrap`}
-          >
-            <WhatsAppIcon size={12} />
-            Order
-          </Link>
+          {/* Order / Avatar pill */}
+          {loggedIn ? (
+            <Link
+              href="/order"
+              className={`${pillBase} rounded-full px-3 h-11 sm:h-12 flex items-center justify-center gap-2 font-black text-[9px] sm:text-[10px] tracking-widest uppercase text-brand-charcoal hover:bg-brand-terracotta hover:text-white hover:border-brand-terracotta/40 transition-all duration-300 active:scale-95 whitespace-nowrap`}
+            >
+              <span className="w-6 h-6 rounded-full bg-brand-charcoal text-white font-black text-xs flex items-center justify-center shrink-0">{initials}</span>
+              <span>Account</span>
+            </Link>
+          ) : (
+            <Link
+              href="/order"
+              className={`${pillBase} rounded-full px-4 sm:px-5 h-11 sm:h-12 flex items-center justify-center gap-1.5 font-black text-[9px] sm:text-[10px] tracking-widest uppercase text-brand-charcoal hover:bg-brand-terracotta hover:text-white hover:border-brand-terracotta/40 transition-all duration-300 active:scale-95 whitespace-nowrap`}
+            >
+              <WhatsAppIcon size={12} />
+              Order
+            </Link>
+          )}
         </div>
       </div>
 

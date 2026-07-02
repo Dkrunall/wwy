@@ -4,8 +4,7 @@ export const dynamic = "force-dynamic";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { ShoppingBag, ClipboardList, LogOut, ChevronRight, Package, Flame, Truck, CheckCircle, Clock } from "lucide-react";
+import { ShoppingBag, ClipboardList, ChevronRight, Package, Flame, Truck, CheckCircle, Clock } from "lucide-react";
 import { supabase, Order } from "@/lib/supabase";
 
 function fmt(paise: number) { return `₹${(paise / 100).toFixed(0)}`; }
@@ -24,13 +23,6 @@ export default function DashboardPage() {
   const [flat, setFlat] = useState("");
   const [latestOrder, setLatestOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  const handleLogout = async () => {
-    ["wwy_flat","wwy_name","wwy_customer_id","wwy_pincode","wwy_cart"].forEach((k) => localStorage.removeItem(k));
-    await supabase.auth.signOut();
-    router.replace("/order/login");
-  };
 
   useEffect(() => {
     const storedFlat = localStorage.getItem("wwy_flat");
@@ -60,59 +52,7 @@ export default function DashboardPage() {
   const hasActiveOrder = latestOrder && latestOrder.payment_status === "paid" && latestOrder.delivery_status !== "delivered";
 
   return (
-    <div className="min-h-screen bg-brand-oat">
-
-      {/* ── Header ── */}
-      <header className="bg-white border-b border-brand-brown/10 shadow-sm">
-        <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="bg-brand-oat p-1.5 rounded-xl shrink-0">
-              <Image src="/logo.png" alt="WWY" width={26} height={26} className="object-contain" />
-            </div>
-            <div className="min-w-0">
-              <p className="font-black text-brand-brown text-sm leading-none truncate">Wild Wild Yeast</p>
-              <p className="text-[10px] font-bold text-brand-orange leading-none mt-0.5 tracking-wider uppercase">My Account</p>
-            </div>
-          </div>
-
-          {/* Avatar + dropdown */}
-          <div className="relative shrink-0">
-            <button
-              onClick={() => setMenuOpen((o) => !o)}
-              className="w-9 h-9 rounded-full bg-brand-brown text-white font-black text-sm flex items-center justify-center hover:bg-brand-orange transition-colors shrink-0"
-            >
-              {customerName?.[0]?.toUpperCase() || "?"}
-            </button>
-
-            {menuOpen && (
-              <>
-                <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
-                <div className="absolute right-0 top-11 bg-white rounded-2xl shadow-xl border border-brand-brown/10 overflow-hidden min-w-[180px] z-50">
-                  <div className="px-4 py-3 bg-brand-oat/60 border-b border-brand-brown/10">
-                    <p className="font-black text-brand-brown text-sm leading-none">{customerName || "—"}</p>
-                    <p className="text-[10px] font-bold text-brand-brown/40 mt-0.5 uppercase tracking-wider">Flat {flat}</p>
-                  </div>
-                  <button
-                    onClick={() => { setMenuOpen(false); router.push("/order/history"); }}
-                    className="w-full px-4 py-3 text-left text-sm font-black text-brand-brown hover:bg-brand-oat transition-colors flex items-center gap-2"
-                  >
-                    <ClipboardList className="w-4 h-4 text-brand-brown/40" /> My Orders
-                  </button>
-                  <div className="border-t border-brand-brown/10" />
-                  <button
-                    onClick={handleLogout}
-                    className="w-full px-4 py-3 text-left text-sm font-black text-rose-600 hover:bg-rose-50 transition-colors flex items-center gap-2"
-                  >
-                    <LogOut className="w-4 h-4" /> Sign out
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
-
-      <div className="max-w-lg mx-auto px-4 py-5 flex flex-col gap-4">
+    <div className="p-4 md:p-6 flex flex-col gap-4 max-w-xl mx-auto">
 
         {/* ── Welcome card ── */}
         <div className="bg-brand-brown rounded-2xl px-5 py-5">
@@ -226,7 +166,6 @@ export default function DashboardPage() {
           </p>
         </div>
 
-      </div>
     </div>
   );
 }

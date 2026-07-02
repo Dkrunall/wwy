@@ -61,11 +61,6 @@ export default function HistoryPage() {
   const [loading, setLoading] = useState(true);
   const [flat, setFlat] = useState("");
 
-  const handleLogout = async () => {
-    ["wwy_flat","wwy_name","wwy_customer_id","wwy_pincode","wwy_cart"].forEach((k) => localStorage.removeItem(k));
-    await supabase.auth.signOut();
-    router.replace("/order/login");
-  };
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   // Feedback state
@@ -129,31 +124,12 @@ export default function HistoryPage() {
 
   return (
     <main className="min-h-screen bg-brand-oat pb-20">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-white border-b border-brand-brown/10 shadow-sm">
-        <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            <button
-              onClick={() => router.push("/order")}
-              className="w-8 h-8 rounded-xl bg-brand-oat hover:bg-brand-brown/10 flex items-center justify-center transition-colors shrink-0"
-            >
-              <span className="font-black text-brand-brown text-base leading-none">←</span>
-            </button>
-            <div className="min-w-0">
-              <h1 className="font-black text-brand-brown text-sm leading-none">My Orders</h1>
-              {flat && <p className="text-[10px] font-bold text-brand-brown/30 leading-none mt-0.5 uppercase tracking-wider">Flat {flat}</p>}
-            </div>
-          </div>
-          <button
-            onClick={handleLogout}
-            className="text-[11px] font-black tracking-wider uppercase text-brand-brown/30 hover:text-rose-600 transition-colors shrink-0"
-          >
-            Sign out
-          </button>
+      <div className="max-w-xl mx-auto px-4 pt-6">
+        <div className="mb-5">
+          <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-brown/40">Account</p>
+          <h1 className="font-black text-brand-brown text-xl leading-tight mt-0.5">My Orders</h1>
+          {flat && <p className="text-xs font-bold text-brand-brown/30 mt-0.5">Flat {flat}</p>}
         </div>
-      </header>
-
-      <div className="max-w-lg mx-auto px-4 pt-6">
         {loading && (
           <p className="font-black text-brand-charcoal/30 tracking-widest text-xs uppercase animate-pulse text-center py-12">
             Loading...
@@ -290,6 +266,7 @@ export default function HistoryPage() {
             );
           })}
         </div>
+      </div>
       </div>
     </main>
   );

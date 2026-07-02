@@ -94,28 +94,23 @@ export default function ShopPage() {
   return (
     <main className="min-h-screen bg-brand-oat pb-36">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-brand-oat/95 backdrop-blur-sm border-b border-brand-charcoal/5">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
-          <button onClick={() => router.push("/order")} className="text-brand-charcoal/40 hover:text-brand-charcoal transition-colors font-black text-xl leading-none">
-            ←
-          </button>
-          <div className="flex-1">
-            <p className="font-black text-brand-charcoal text-sm leading-none">This Week's Menu</p>
-            <p className="text-[10px] font-bold text-brand-charcoal/40 leading-none mt-0.5">Made when ordered, not before.</p>
-          </div>
-          {cartCount > 0 && (
-            <button onClick={() => router.push("/order/cart")} className="flex items-center gap-2 bg-brand-charcoal text-white rounded-full px-3 py-1.5">
-              <span className="text-xs font-black">{cartCount}</span>
-              <span className="text-xs font-black">·</span>
-              <span className="text-xs font-black">{fmt(cartTotal)}</span>
-            </button>
-          )}
+      <div className="px-4 pt-5 pb-2 max-w-xl mx-auto flex items-center justify-between">
+        <div>
+          <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-brown/40">Menu</p>
+          <h1 className="font-black text-brand-brown text-xl leading-tight">This Week's Menu</h1>
         </div>
-      </header>
+        {cartCount > 0 && (
+          <button onClick={() => router.push("/order/cart")} className="flex items-center gap-2 bg-brand-brown text-white rounded-full px-4 py-2 hover:bg-brand-orange transition-colors">
+            <span className="text-xs font-black">{cartCount} items</span>
+            <span className="text-xs font-black">·</span>
+            <span className="text-xs font-black">{fmt(cartTotal)}</span>
+          </button>
+        )}
+      </div>
 
       {/* Category pills */}
-      <div className="sticky top-[57px] z-30 bg-brand-oat/95 backdrop-blur-sm border-b border-brand-charcoal/5">
-        <div className="max-w-2xl mx-auto">
+      <div className="sticky top-14 md:top-0 z-30 bg-brand-oat/95 backdrop-blur-sm border-b border-brand-brown/10">
+        <div className="max-w-xl mx-auto">
           <div className="flex gap-2 px-4 py-3 overflow-x-auto scrollbar-hide">
             {CATEGORIES.map((cat) => (
               <button
@@ -135,12 +130,12 @@ export default function ShopPage() {
       </div>
 
       {/* Subtitle */}
-      <div className="max-w-2xl mx-auto px-4 py-3">
-        <p className="text-xs font-bold text-brand-charcoal/30 italic">{CATEGORY_SUBTITLES[category]}</p>
+      <div className="max-w-xl mx-auto px-4 py-3">
+        <p className="text-xs font-bold text-brand-brown/30 italic">{CATEGORY_SUBTITLES[category]}</p>
       </div>
 
       {/* Products */}
-      <div className="max-w-2xl mx-auto px-4 flex flex-col gap-3">
+      <div className="max-w-xl mx-auto px-4 flex flex-col gap-3">
         {filtered.length === 0 && (
           <p className="text-sm font-bold text-brand-charcoal/30 py-8 text-center">Nothing here this week. Check back soon.</p>
         )}
