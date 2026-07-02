@@ -130,32 +130,30 @@ export default function HistoryPage() {
   return (
     <main className="min-h-screen bg-brand-oat pb-20">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-brand-oat/95 backdrop-blur-sm border-b border-brand-charcoal/5">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
+      <header className="sticky top-0 z-40 bg-white border-b border-brand-brown/10 shadow-sm">
+        <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => router.push("/order")}
-              className="text-brand-charcoal/40 hover:text-brand-charcoal transition-colors font-black text-xl leading-none"
+              className="w-8 h-8 rounded-xl bg-brand-oat hover:bg-brand-brown/10 flex items-center justify-center transition-colors shrink-0"
             >
-              ←
+              <span className="font-black text-brand-brown text-base leading-none">←</span>
             </button>
-            <div>
-              <h1 className="font-black text-brand-charcoal text-base tracking-tight leading-none">My Orders</h1>
-              {flat && (
-                <p className="text-[10px] font-bold text-brand-charcoal/30 leading-none mt-0.5">Flat {flat}</p>
-              )}
+            <div className="min-w-0">
+              <h1 className="font-black text-brand-brown text-sm leading-none">My Orders</h1>
+              {flat && <p className="text-[10px] font-bold text-brand-brown/30 leading-none mt-0.5 uppercase tracking-wider">Flat {flat}</p>}
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="text-[11px] font-black tracking-wider uppercase text-brand-charcoal/30 hover:text-brand-terracotta transition-colors"
+            className="text-[11px] font-black tracking-wider uppercase text-brand-brown/30 hover:text-rose-600 transition-colors shrink-0"
           >
             Sign out
           </button>
         </div>
       </header>
 
-      <div className="max-w-2xl mx-auto px-4 pt-6">
+      <div className="max-w-lg mx-auto px-4 pt-6">
         {loading && (
           <p className="font-black text-brand-charcoal/30 tracking-widest text-xs uppercase animate-pulse text-center py-12">
             Loading...
