@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase, Order } from "@/lib/supabase";
 
+
 function fmt(paise: number) {
   return `₹${(paise / 100).toFixed(0)}`;
 }
@@ -59,6 +60,12 @@ export default function HistoryPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [flat, setFlat] = useState("");
+
+  const handleLogout = async () => {
+    ["wwy_flat","wwy_name","wwy_customer_id","wwy_pincode","wwy_cart"].forEach((k) => localStorage.removeItem(k));
+    await supabase.auth.signOut();
+    router.replace("/order/login");
+  };
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   // Feedback state
@@ -124,19 +131,27 @@ export default function HistoryPage() {
     <main className="min-h-screen bg-brand-oat pb-20">
       {/* Header */}
       <header className="sticky top-0 z-40 bg-brand-oat/95 backdrop-blur-sm border-b border-brand-charcoal/5">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
-          <button
-            onClick={() => router.push("/order")}
-            className="text-brand-charcoal/40 hover:text-brand-charcoal transition-colors font-black text-xl leading-none"
-          >
-            ←
-          </button>
-          <div>
-            <h1 className="font-black text-brand-charcoal text-base tracking-tight leading-none">My Orders</h1>
-            {flat && (
-              <p className="text-[10px] font-bold text-brand-charcoal/30 leading-none mt-0.5">Flat {flat}</p>
-            )}
+        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => router.push("/order")}
+              className="text-brand-charcoal/40 hover:text-brand-charcoal transition-colors font-black text-xl leading-none"
+            >
+              ←
+            </button>
+            <div>
+              <h1 className="font-black text-brand-charcoal text-base tracking-tight leading-none">My Orders</h1>
+              {flat && (
+                <p className="text-[10px] font-bold text-brand-charcoal/30 leading-none mt-0.5">Flat {flat}</p>
+              )}
+            </div>
           </div>
+          <button
+            onClick={handleLogout}
+            className="text-[11px] font-black tracking-wider uppercase text-brand-charcoal/30 hover:text-brand-terracotta transition-colors"
+          >
+            Sign out
+          </button>
         </div>
       </header>
 

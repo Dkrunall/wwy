@@ -43,6 +43,13 @@ export default function OrderPage() {
   const [category, setCategory] = useState("All");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+    ["wwy_flat","wwy_name","wwy_customer_id","wwy_pincode","wwy_cart"].forEach((k) => localStorage.removeItem(k));
+    await supabase.auth.signOut();
+    router.replace("/order/login");
+  };
 
   useEffect(() => {
     const storedFlat = localStorage.getItem("wwy_flat");
@@ -152,12 +159,38 @@ export default function OrderPage() {
               </p>
             </div>
           </div>
-          <button
-            onClick={() => router.push("/order/history")}
-            className="text-[11px] font-black tracking-wider uppercase text-brand-charcoal/40 hover:text-brand-terracotta transition-colors"
-          >
-            My Orders
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => setMenuOpen((o) => !o)}
+              className="w-9 h-9 rounded-full bg-brand-charcoal text-brand-oat font-black text-sm flex items-center justify-center hover:bg-brand-terracotta transition-colors"
+            >
+              {customerName?.[0]?.toUpperCase() || "?"}
+            </button>
+            {menuOpen && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
+                <div className="absolute right-0 top-11 bg-white rounded-2xl shadow-xl border border-brand-charcoal/5 overflow-hidden min-w-[160px] z-50">
+                  <div className="px-4 py-3 border-b border-brand-charcoal/5">
+                    <p className="font-black text-brand-charcoal text-sm leading-none">{customerName || "—"}</p>
+                    <p className="text-[10px] font-bold text-brand-charcoal/30 mt-0.5">Flat {flat}</p>
+                  </div>
+                  <button
+                    onClick={() => { setMenuOpen(false); router.push("/order/history"); }}
+                    className="w-full px-4 py-3 text-left text-sm font-black text-brand-charcoal hover:bg-brand-oat transition-colors"
+                  >
+                    My Orders
+                  </button>
+                  <div className="border-t border-brand-charcoal/5" />
+                  <button
+                    onClick={handleLogout}
+                    className="w-full px-4 py-3 text-left text-sm font-black text-brand-terracotta hover:bg-brand-oat transition-colors"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </header>
 
