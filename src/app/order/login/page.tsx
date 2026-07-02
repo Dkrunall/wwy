@@ -49,7 +49,7 @@ export default function OrderLoginPage() {
 
   const verifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (otp.trim().length !== 6) { setError("Enter the 6-digit code from your email."); return; }
+    if (otp.trim().length < 6) { setError("Enter the code from your email."); return; }
     setError(""); setLoading(true);
     const { data, error: err } = await supabase.auth.verifyOtp({
       email: email.trim().toLowerCase(),
@@ -137,7 +137,7 @@ export default function OrderLoginPage() {
           </h1>
           <p className="text-sm font-bold text-brand-charcoal/40">
             {step === "email" && "Enter your email — we'll send a one-time code. No password."}
-            {step === "otp" && `Code sent to ${email}. Check your inbox (and spam).`}
+            {step === "otp" && `An 8-digit code was sent to ${email}. Check your inbox (and spam).`}
             {step === "register" && "Just a few details and you're in."}
           </p>
         </div>
@@ -170,14 +170,14 @@ export default function OrderLoginPage() {
           <form onSubmit={verifyOtp} className="w-full flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">
-                6-Digit Code
+                Login Code
               </label>
               <input
                 type="text"
                 inputMode="numeric"
                 autoFocus
-                maxLength={6}
-                placeholder="123456"
+                maxLength={8}
+                placeholder="12345678"
                 value={otp}
                 onChange={(e) => { setOtp(e.target.value.replace(/\D/g, "")); setError(""); }}
                 className={inputCls + " tracking-[0.4em] text-center"}
