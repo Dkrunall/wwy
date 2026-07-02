@@ -166,7 +166,7 @@ export default function HistoryPage() {
           <div className="flex flex-col items-center gap-6 py-16">
             <p className="font-black text-brand-charcoal/20 text-2xl tracking-tight">No orders yet.</p>
             <button
-              onClick={() => router.push("/order")}
+              onClick={() => router.push("/order/shop")}
               className="bg-brand-charcoal text-white font-black text-xs tracking-wider uppercase px-6 py-3 rounded-xl hover:bg-brand-terracotta transition-colors"
             >
               Start ordering →

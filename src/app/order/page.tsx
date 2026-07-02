@@ -2,46 +2,87 @@
 
 export const dynamic = "force-dynamic";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
-import { supabase, Product, CartItem } from "@/lib/supabase";
-
-const CATEGORIES = ["All", "Sodas", "Starters", "Breads", "Bundles", "Storage"];
-
-const CATEGORY_SUBTITLES: Record<string, string> = {
-  All: "Everything we make.",
-  Sodas: "Alive in every sip.",
-  Starters: "A living culture, ready to bake.",
-  Breads: "Wild-fermented. Long-proofed.",
-  Bundles: "A complete introduction.",
-  Storage: "Keep it alive.",
-};
+import { supabase, Order } from "@/lib/supabase";
 
 function fmt(paise: number) {
   return `₹${(paise / 100).toFixed(0)}`;
 }
 
-function getCart(): CartItem[] {
-  try {
-    return JSON.parse(localStorage.getItem("wwy_cart") || "[]");
-  } catch {
-    return [];
-  }
+const STATUS_STEPS = [
+  { key: "placed",           label: "Confirmed" },
+  { key: "resting",          label: "Fermenting" },
+  { key: "baking",           label: "Baking" },
+  { key: "out_for_delivery", label: "On the way" },
+  { key: "delivered",        label: "Delivered" },
+];
+
+const STATUS_EMOJI: Record<string, string> = {
+  placed:            "✓",
+  resting:           "🌙",
+  baking:            "🔥",
+  out_for_delivery:  "🚗",
+  delivered:         "✓",
+};
+
+function OrderTracker({ order }: { order: Order }) {
+  const currentIdx = STATUS_STEPS.findIndex((s) => s.key === (order.delivery_status || "placed"));
+
+  return (
+    <div className="bg-white rounded-2xl p-5 border border-brand-charcoal/5 shadow-sm">
+      <div className="flex items-center justify-between mb-4">
+        <div>
+          <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-charcoal/30">Latest Order</p>
+          <p className="font-black text-brand-charcoal text-sm mt-0.5">
+            #{(order.order_number || order.id.slice(0, 8)).toUpperCase()}
+          </p>
+        </div>
+        <p className="font-black text-brand-charcoal text-lg">{fmt(order.total_paise)}</p>
+      </div>
+
+      {/* Step tracker */}
+      <div className="flex items-center gap-0">
+        {STATUS_STEPS.map((step, idx) => {
+          const done = idx <= currentIdx;
+          const active = idx === currentIdx;
+          const last = idx === STATUS_STEPS.length - 1;
+          return (
+            <React.Fragment key={step.key}>
+              <div className="flex flex-col items-center gap-1.5 shrink-0">
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-black transition-all
+                  ${active ? "bg-brand-charcoal text-white ring-2 ring-brand-charcoal ring-offset-2" :
+                    done ? "bg-brand-orange text-white" : "bg-brand-oat text-brand-charcoal/20"}`}>
+                  {done ? STATUS_EMOJI[step.key] : "·"}
+                </div>
+                <p className={`text-[9px] font-black tracking-wide text-center leading-tight
+                  ${active ? "text-brand-charcoal" : done ? "text-brand-orange" : "text-brand-charcoal/20"}`}>
+                  {step.label}
+                </p>
+              </div>
+              {!last && (
+                <div className={`flex-1 h-0.5 mb-5 ${idx < currentIdx ? "bg-brand-orange" : "bg-brand-charcoal/10"}`} />
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
+
+      {order.delivery_date && (
+        <p className="text-[11px] font-bold text-brand-charcoal/30 mt-4 text-center">
+          Delivery on {new Date(order.delivery_date).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "short" })}
+        </p>
+      )}
+    </div>
+  );
 }
 
-function saveCart(cart: CartItem[]) {
-  localStorage.setItem("wwy_cart", JSON.stringify(cart));
-}
-
-export default function OrderPage() {
+export default function DashboardPage() {
   const router = useRouter();
   const [customerName, setCustomerName] = useState("");
   const [flat, setFlat] = useState("");
-  const [products, setProducts] = useState<Product[]>([]);
-  const [category, setCategory] = useState("All");
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [latestOrder, setLatestOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -54,111 +95,32 @@ export default function OrderPage() {
   useEffect(() => {
     const storedFlat = localStorage.getItem("wwy_flat");
     const storedName = localStorage.getItem("wwy_name");
-    if (!storedFlat) {
-      router.replace("/order/login");
-      return;
-    }
+    if (!storedFlat) { router.replace("/order/login"); return; }
     setFlat(storedFlat);
     setCustomerName(storedName || "");
-    setCart(getCart());
 
-    (async () => {
-      try {
-        const { data: setting } = await supabase
-          .from("settings")
-          .select("value")
-          .eq("key", "vacation_mode")
-          .single();
-        if (setting?.value === "true") {
-          router.replace("/coming-soon");
-          return;
-        }
-        const { data } = await supabase
-          .from("products")
-          .select("*")
-          .eq("available", true)
-          .order("category");
-        setProducts(data || []);
-      } catch {
-        setProducts([]);
-      } finally {
+    supabase
+      .from("orders")
+      .select("*, order_items(*)")
+      .eq("flat_number", storedFlat)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .single()
+      .then(({ data }) => {
+        setLatestOrder(data || null);
         setLoading(false);
-      }
-    })();
+      })
+      .catch(() => setLoading(false));
   }, [router]);
-
-  const getQty = useCallback(
-    (productId: string) => cart.find((i) => i.product_id === productId)?.quantity ?? 0,
-    [cart]
-  );
-
-  const updateQty = useCallback(
-    (product: Product, delta: number) => {
-      setCart((prev) => {
-        const existing = prev.find((i) => i.product_id === product.id);
-        let next: CartItem[];
-        if (!existing) {
-          if (delta <= 0) return prev;
-          next = [
-            ...prev,
-            {
-              product_id: product.id,
-              product_name: product.name,
-              quantity: delta,
-              unit_price_paise: product.price_paise,
-            },
-          ];
-        } else {
-          const newQty = existing.quantity + delta;
-          if (newQty <= 0) {
-            next = prev.filter((i) => i.product_id !== product.id);
-          } else {
-            next = prev.map((i) =>
-              i.product_id === product.id ? { ...i, quantity: newQty } : i
-            );
-          }
-        }
-        saveCart(next);
-        return next;
-      });
-    },
-    []
-  );
-
-  const cartTotal = cart.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
-  const cartCount = cart.reduce((s, i) => s + i.quantity, 0);
-
-  const filtered =
-    category === "All" ? products : products.filter((p) => p.category === category);
 
   const firstName = customerName.split(" ")[0];
 
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-brand-oat flex items-center justify-center">
-        <p className="font-black text-brand-charcoal/30 tracking-widest text-xs uppercase animate-pulse">
-          Loading...
-        </p>
-      </main>
-    );
-  }
-
   return (
-    <main className="min-h-screen bg-brand-oat pb-36">
+    <main className="min-h-screen bg-brand-oat">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-brand-oat/95 backdrop-blur-sm border-b border-brand-charcoal/5">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            <Image src="/WWY-LOGO_White.png" alt="WWY" width={32} height={32} className="object-contain" />
-            <div>
-              <p className="font-black text-brand-charcoal text-sm leading-none">
-                {firstName ? `Hey, ${firstName}.` : "Wild Wild Yeast"}
-              </p>
-              <p className="text-[10px] font-bold text-brand-charcoal/40 leading-none mt-0.5">
-                Flat {flat}
-              </p>
-            </div>
-          </div>
+      <header className="bg-brand-oat border-b border-brand-charcoal/5">
+        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
+          <Image src="/WWY-LOGO_White.png" alt="Wild Wild Yeast" width={36} height={36} className="object-contain" />
           <div className="relative">
             <button
               onClick={() => setMenuOpen((o) => !o)}
@@ -169,22 +131,16 @@ export default function OrderPage() {
             {menuOpen && (
               <>
                 <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
-                <div className="absolute right-0 top-11 bg-white rounded-2xl shadow-xl border border-brand-charcoal/5 overflow-hidden min-w-[160px] z-50">
+                <div className="absolute right-0 top-11 bg-white rounded-2xl shadow-xl border border-brand-charcoal/5 overflow-hidden min-w-[170px] z-50">
                   <div className="px-4 py-3 border-b border-brand-charcoal/5">
                     <p className="font-black text-brand-charcoal text-sm leading-none">{customerName || "—"}</p>
                     <p className="text-[10px] font-bold text-brand-charcoal/30 mt-0.5">Flat {flat}</p>
                   </div>
-                  <button
-                    onClick={() => { setMenuOpen(false); router.push("/order/history"); }}
-                    className="w-full px-4 py-3 text-left text-sm font-black text-brand-charcoal hover:bg-brand-oat transition-colors"
-                  >
+                  <button onClick={() => { setMenuOpen(false); router.push("/order/history"); }} className="w-full px-4 py-3 text-left text-sm font-black text-brand-charcoal hover:bg-brand-oat transition-colors">
                     My Orders
                   </button>
                   <div className="border-t border-brand-charcoal/5" />
-                  <button
-                    onClick={handleLogout}
-                    className="w-full px-4 py-3 text-left text-sm font-black text-brand-terracotta hover:bg-brand-oat transition-colors"
-                  >
+                  <button onClick={handleLogout} className="w-full px-4 py-3 text-left text-sm font-black text-brand-terracotta hover:bg-brand-oat transition-colors">
                     Sign out
                   </button>
                 </div>
@@ -194,162 +150,73 @@ export default function OrderPage() {
         </div>
       </header>
 
-      {/* Hero strip */}
-      <div className="max-w-2xl mx-auto px-4 pt-6 pb-2">
-        <h1 className="font-black text-brand-charcoal leading-none tracking-tighter"
-          style={{ fontSize: "clamp(2rem, 9vw, 3rem)" }}>
-          THIS WEEK'S<br />FERMENTATION.
-        </h1>
-        <p className="text-xs font-bold text-brand-charcoal/40 mt-2">
-          Made when ordered, not before. · Delivery Wed &amp; Sat only.
-        </p>
-      </div>
-
-      {/* Category pills */}
-      <div className="sticky top-[57px] z-30 bg-brand-oat/95 backdrop-blur-sm">
-        <div className="max-w-2xl mx-auto">
-          <div className="flex gap-2 px-4 py-3 overflow-x-auto scrollbar-none">
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setCategory(cat)}
-                className={`shrink-0 px-4 py-2 rounded-full text-[11px] font-black tracking-wider uppercase transition-all duration-200 ${
-                  category === cat
-                    ? "bg-brand-charcoal text-white"
-                    : "bg-white text-brand-charcoal/50 hover:text-brand-charcoal border border-brand-charcoal/10"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
+      {/* Welcome hero */}
+      <div className="bg-brand-charcoal">
+        <div className="max-w-2xl mx-auto px-5 py-8">
+          <p className="text-[11px] font-black tracking-[0.25em] uppercase text-brand-oat/40 mb-1">Welcome back</p>
+          <h1 className="font-black text-brand-oat leading-none tracking-tighter" style={{ fontSize: "clamp(2.2rem, 9vw, 3.2rem)" }}>
+            Hey, {firstName || "there"}.
+          </h1>
+          <p className="text-brand-oat/40 font-bold text-sm mt-2">Flat {flat} · Wild Wild Yeast</p>
         </div>
       </div>
 
-      {/* Category subtitle */}
-      <div className="max-w-2xl mx-auto px-4 pb-4">
-        <p className="text-xs font-bold text-brand-charcoal/30 italic">
-          {CATEGORY_SUBTITLES[category]}
-        </p>
-      </div>
+      <div className="max-w-2xl mx-auto px-4 py-6 flex flex-col gap-5">
 
-      {/* Product grid */}
-      <div className="max-w-2xl mx-auto px-4 flex flex-col gap-3">
-        {filtered.length === 0 && (
-          <p className="text-sm font-bold text-brand-charcoal/30 py-8 text-center">
-            Nothing here this week. Check back soon.
-          </p>
-        )}
-        {filtered.map((product) => {
-          const qty = getQty(product.id);
-          return (
-            <ProductCard
-              key={product.id}
-              product={product}
-              qty={qty}
-              onAdd={() => updateQty(product, 1)}
-              onRemove={() => updateQty(product, -1)}
-            />
-          );
-        })}
-      </div>
-
-      {/* Sticky cart bar */}
-      {cartCount > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-brand-oat/80 backdrop-blur-md border-t border-brand-charcoal/5">
-          <div className="max-w-2xl mx-auto">
-            <button
-              onClick={() => router.push("/order/cart")}
-              className="w-full bg-brand-charcoal hover:bg-brand-terracotta text-white rounded-2xl py-4 px-5 flex items-center justify-between transition-all duration-300 active:scale-[0.98]"
-            >
-              <span className="flex items-center gap-2">
-                <span className="bg-white/20 text-white text-xs font-black w-6 h-6 rounded-full flex items-center justify-center">
-                  {cartCount}
-                </span>
-                <span className="font-black text-sm tracking-wide">View Order</span>
-              </span>
-              <span className="font-black text-sm">{fmt(cartTotal)}</span>
-            </button>
-          </div>
-        </div>
-      )}
-    </main>
-  );
-}
-
-function ProductCard({
-  product,
-  qty,
-  onAdd,
-  onRemove,
-}: {
-  product: Product;
-  qty: number;
-  onAdd: () => void;
-  onRemove: () => void;
-}) {
-  return (
-    <div className="bg-white rounded-2xl p-4 flex gap-4 items-start border border-brand-charcoal/5 shadow-sm">
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between gap-2 mb-1">
-          <Link
-            href={`/order/product/${product.id}`}
-            className="text-left flex-1 min-w-0"
-          >
-            <span className="text-[10px] font-black tracking-[0.15em] uppercase text-brand-charcoal/30 block">
-              {product.category}
-            </span>
-            <h2 className="font-black text-brand-charcoal text-base leading-tight">
-              {product.name}
-            </h2>
-          </Link>
-          <span className="font-black text-brand-charcoal text-sm shrink-0">
-            {fmt(product.price_paise)}
-          </span>
-        </div>
-        {product.description && (
-          <p className="text-xs text-brand-charcoal/50 font-medium leading-relaxed mb-3">
-            {product.description}
-          </p>
-        )}
-
-        {/* Quantity control */}
-        <div className="flex items-center gap-3">
-          {qty === 0 ? (
-            <button
-              onClick={onAdd}
-              className="bg-brand-charcoal text-white hover:bg-brand-terracotta text-xs font-black tracking-wider uppercase px-5 py-2.5 rounded-xl transition-all duration-200 active:scale-[0.97] min-h-[40px]"
-            >
-              Add
-            </button>
-          ) : (
-            <div className="flex items-center gap-2 bg-brand-oat rounded-xl overflow-hidden">
-              <button
-                onClick={onRemove}
-                className="w-10 h-10 flex items-center justify-center font-black text-brand-charcoal text-lg hover:bg-brand-charcoal/10 transition-colors"
-                aria-label="Remove one"
-              >
-                −
-              </button>
-              <span className="font-black text-brand-charcoal text-sm w-5 text-center">
-                {qty}
-              </span>
-              <button
-                onClick={onAdd}
-                className="w-10 h-10 flex items-center justify-center font-black text-brand-terracotta text-lg hover:bg-brand-terracotta/10 transition-colors"
-                aria-label="Add one"
-              >
-                +
-              </button>
+        {/* Active order tracker */}
+        {loading ? (
+          <div className="bg-white rounded-2xl p-5 border border-brand-charcoal/5 animate-pulse h-32" />
+        ) : latestOrder && latestOrder.payment_status === "paid" && latestOrder.delivery_status !== "delivered" ? (
+          <OrderTracker order={latestOrder} />
+        ) : latestOrder ? (
+          <div className="bg-white rounded-2xl p-5 border border-brand-charcoal/5 flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-charcoal/30">Last Order</p>
+              <p className="font-black text-brand-charcoal text-sm mt-0.5">
+                #{(latestOrder.order_number || latestOrder.id.slice(0, 8)).toUpperCase()} · {fmt(latestOrder.total_paise)}
+              </p>
+              <p className="text-[11px] font-bold text-green-700 mt-0.5">Delivered ✓</p>
             </div>
-          )}
-          {qty > 0 && (
-            <span className="text-xs font-bold text-brand-charcoal/40">
-              {fmt(qty * product.price_paise)}
-            </span>
-          )}
+            <button onClick={() => router.push("/order/history")} className="text-xs font-black text-brand-charcoal/30 hover:text-brand-terracotta transition-colors">
+              View all →
+            </button>
+          </div>
+        ) : null}
+
+        {/* Action cards */}
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            onClick={() => router.push("/order/shop")}
+            className="bg-brand-charcoal hover:bg-brand-terracotta text-brand-oat rounded-2xl p-5 text-left transition-all duration-200 active:scale-[0.97] flex flex-col gap-3"
+          >
+            <span className="text-2xl">🛒</span>
+            <div>
+              <p className="font-black text-sm leading-none">Order Now</p>
+              <p className="text-[11px] font-bold text-brand-oat/40 mt-1">Browse this week's menu</p>
+            </div>
+          </button>
+
+          <button
+            onClick={() => router.push("/order/history")}
+            className="bg-white hover:bg-brand-oat border border-brand-charcoal/5 text-brand-charcoal rounded-2xl p-5 text-left transition-all duration-200 active:scale-[0.97] flex flex-col gap-3"
+          >
+            <span className="text-2xl">📋</span>
+            <div>
+              <p className="font-black text-sm leading-none">My Orders</p>
+              <p className="text-[11px] font-bold text-brand-charcoal/30 mt-1">View order history</p>
+            </div>
+          </button>
         </div>
+
+        {/* Info strip */}
+        <div className="bg-brand-gold/10 rounded-2xl px-5 py-4 flex items-center gap-3">
+          <span className="text-lg">🌾</span>
+          <p className="text-xs font-bold text-brand-charcoal/60 leading-relaxed">
+            Made when ordered, not before.<br />Delivery on <strong className="text-brand-charcoal">Wednesdays & Saturdays</strong> only.
+          </p>
+        </div>
+
       </div>
-    </div>
+    </main>
   );
 }
