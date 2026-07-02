@@ -156,7 +156,7 @@ export default function CartPage() {
       <main className="min-h-screen bg-brand-oat flex flex-col items-center justify-center px-5 gap-6">
         <p className="font-black text-brand-charcoal/30 text-2xl tracking-tight">Nothing here yet.</p>
         <button
-          onClick={() => router.push("/order/shop")}
+          onClick={() => router.push("/order")}
           className="bg-brand-charcoal text-white font-black text-sm tracking-wider uppercase px-8 py-4 rounded-2xl hover:bg-brand-terracotta transition-colors"
         >
           ← Back to shop

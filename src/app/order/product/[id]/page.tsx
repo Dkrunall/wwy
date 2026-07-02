@@ -116,7 +116,7 @@ export default function ProductPage() {
     return (
       <main className="min-h-screen bg-brand-oat flex flex-col items-center justify-center gap-6 px-5">
         <p className="font-black text-brand-charcoal/30 text-xl">Product not found.</p>
-        <button onClick={() => router.push("/order/shop")}
+        <button onClick={() => router.push("/order")}
           className="bg-brand-charcoal text-white font-black text-xs tracking-wider uppercase px-6 py-3 rounded-xl hover:bg-brand-terracotta transition-colors">
           ← Back to shop
         </button>

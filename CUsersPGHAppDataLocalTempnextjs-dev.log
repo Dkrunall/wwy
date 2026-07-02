@@ -1,0 +1,119 @@
+
+> wwy-app@0.1.0 dev
+> next dev -p 3010
+
+▲ Next.js 16.2.4 (Turbopack)
+- Local:         http://localhost:3010
+- Network:       http://192.168.1.220:3010
+- Environments: .env.local
+✓ Ready in 489ms
+
+ GET /coming-soon 200 in 322ms (next.js: 166ms, application-code: 155ms)
+[browser] Image with src "/WWY-LOGO_White.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+[browser] Image with src "/can_new.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+[browser] Image with src "/WWY-LOGO_White.png" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET /coming-soon 200 in 39ms (next.js: 2ms, application-code: 36ms)
+[browser] Image with src "/WWY-LOGO_White.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+[browser] Image with src "/can_new.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+[browser] Image with src "/WWY-LOGO_White.png" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+✓ Compiled in 169ms
+ GET /coming-soon 200 in 71ms (next.js: 41ms, application-code: 30ms)
+ GET / 200 in 134ms (next.js: 20ms, application-code: 114ms)
+[browser] Image with src "/p1.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[browser] Image with src "/p3.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[browser] Image with src "/p2.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[browser] Image with src "/p4.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[browser] Image with src "/p5.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+Error: Both middleware file "./src\middleware.ts" and proxy file "./src\proxy.ts" are detected. Please use "./src\proxy.ts" only. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+    at ignore-listed frames
+⨯ unhandledRejection: Error: Both middleware file "./src\middleware.ts" and proxy file "./src\proxy.ts" are detected. Please use "./src\proxy.ts" only. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+    at ignore-listed frames
+⨯ unhandledRejection:  Error: Both middleware file "./src\middleware.ts" and proxy file "./src\proxy.ts" are detected. Please use "./src\proxy.ts" only. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+    at ignore-listed frames
+ GET / 404 in 258ms (next.js: 90ms, application-code: 169ms)
+ GET / 404 in 133ms (next.js: 6ms, application-code: 127ms)
+ GET / 404 in 212ms (next.js: 23ms, application-code: 189ms)
+○ Compiling middleware ...
+ GET / 404 in 51ms (next.js: 4ms, application-code: 48ms)
+ GET / 404 in 47ms (next.js: 3ms, application-code: 44ms)
+ GET / 404 in 42ms (next.js: 3ms, application-code: 39ms)
+ GET / 404 in 47ms (next.js: 9ms, application-code: 38ms)
+ GET / 404 in 47ms (next.js: 4ms, application-code: 43ms)
+ GET / 404 in 47ms (next.js: 3ms, application-code: 43ms)
+ GET / 404 in 57ms (next.js: 6ms, application-code: 52ms)
+ GET /coming-soon 404 in 45ms (next.js: 4ms, application-code: 42ms)
+ GET / 404 in 38ms (next.js: 3ms, application-code: 35ms)
+ HEAD / 404 in 32ms (next.js: 3ms, application-code: 30ms)
+ HEAD /coming-soon 404 in 28ms (next.js: 3ms, application-code: 26ms)
+✓ Compiled in 151.8s
+ GET / 200 in 332ms (next.js: 111ms, application-code: 221ms)
+ GET / 200 in 134ms (next.js: 2ms, application-code: 132ms)
+ GET / 200 in 135ms (next.js: 38ms, application-code: 97ms)
+ GET / 200 in 136ms (next.js: 26ms, application-code: 110ms)
+ GET / 200 in 137ms (next.js: 14ms, application-code: 123ms)
+ GET / 200 in 137ms (next.js: 54ms, application-code: 83ms)
+ GET / 200 in 391ms (next.js: 5ms, application-code: 386ms)
+ GET / 200 in 330ms (next.js: 43ms, application-code: 287ms)
+ GET / 200 in 383ms (next.js: 5ms, application-code: 378ms)
+ GET / 200 in 343ms (next.js: 17ms, application-code: 327ms)
+ GET / 200 in 343ms (next.js: 30ms, application-code: 313ms)
+ GET / 200 in 360ms (next.js: 5ms, application-code: 355ms)
+✓ Compiled in 1377ms
+ GET /coming-soon 200 in 2.6s (next.js: 470ms, proxy.ts: 364ms, application-code: 1785ms)
+[browser] Image with src "/p1.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[browser] Image with src "/WWY-LOGO_White.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+ GET /coming-soon 200 in 193ms (next.js: 3ms, proxy.ts: 4ms, application-code: 186ms)
+[browser] Image with src "/WWY-LOGO_White.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+[browser] Image with src "/WWY-LOGO_White.png" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET /coming-soon 200 in 68ms (next.js: 6ms, proxy.ts: 13ms, application-code: 49ms)
+[browser] Image with src "/WWY-LOGO_White.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+[browser] Image with src "/WWY-LOGO_White.png" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET / 200 in 141ms (next.js: 13ms, proxy.ts: 4ms, application-code: 124ms)
+[browser] Image with src "/p1.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[browser] Image with src "/p3.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[browser] Image with src "/p2.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[browser] Image with src "/p4.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[browser] Image with src "/p5.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+ GET / 200 in 77ms (next.js: 4ms, proxy.ts: 4ms, application-code: 69ms)
+[browser] Image with src "/p1.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[browser] Image with src "/p3.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[browser] Image with src "/p2.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[browser] Image with src "/p4.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+[browser] Image with src "/p5.png" has "fill" but is missing "sizes" prop. Please add it to improve page performance. Read more: https://nextjs.org/docs/api-reference/next/image#sizes
+ GET /coming-soon 200 in 62ms (next.js: 3ms, proxy.ts: 3ms, application-code: 55ms)
+[browser] Image with src "/WWY-LOGO_White.png" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+[browser] Image with src "/WWY-LOGO_White.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+ GET /coming-soon 200 in 76ms (next.js: 2ms, proxy.ts: 4ms, application-code: 70ms)
+[browser] Image with src "/WWY-LOGO_White.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+[browser] Image with src "/WWY-LOGO_White.png" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+ GET /coming-soon 200 in 68ms (next.js: 2ms, proxy.ts: 4ms, application-code: 62ms)
+[browser] Image with src "/WWY-LOGO_White.png" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+[browser] Image with src "/WWY-LOGO_White.png" was detected as the Largest Contentful Paint (LCP). Please add the `loading="eager"` property if this image is above the fold.
+Read more: https://nextjs.org/docs/app/api-reference/components/image#loading
+
+<--- Last few GCs --->
+
+[25996:000001F51ACB1000]  1994671 ms: Scavenge (interleaved) 13596.5 (14796.7) -> 13588.4 (14796.7) MB, pooled: 0 MB, 102.82 / 0.00 ms  (average mu = 0.193, current mu = 0.186) allocation failure; 
+[25996:000001F51ACB1000]  2003427 ms: Mark-Compact 13602.0 (14798.4) -> 13549.0 (14773.8) MB, pooled: 8 MB, 8705.44 / 38.76 ms  (average mu = 0.162, current mu = 0.131) allocation failure; scavenge might not succeed
+
+
+<--- JS stacktrace --->
+
+FATAL ERROR: Ineffective mark-compacts near heap limit Allocation failed - JavaScript heap out of memory
+----- Native stack trace -----
+
+ 1: 00007FF7E5110CD7 node::SetCppgcReference+16599
+ 2: 00007FF7E5074568 v8::base::CPU::num_virtual_address_bits+103336
+ 3: 00007FF7E5BE53B1 v8::Isolate::ReportExternalAllocationLimitReached+65
+ 4: 00007FF7E5BD1F36 v8::Function::Experimental_IsNopFunction+3302
+ 5: 00007FF7E5A2E870 v8::internal::StrongRootAllocatorBase::StrongRootAllocatorBase+33904
+ 6: 00007FF7E5A27CBA v8::internal::StrongRootAllocatorBase::StrongRootAllocatorBase+6330
+ 7: 00007FF7E5A234F5 v8::internal::ThreadIsolation::JitPageReference::Size+190613
+ 8: 00007FF7E53ACF5D BIO_ssl_shutdown+189
+[?25h

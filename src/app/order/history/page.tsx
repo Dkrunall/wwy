@@ -124,12 +124,35 @@ export default function HistoryPage() {
 
   return (
     <main className="min-h-screen bg-brand-oat pb-20">
-      <div className="max-w-xl mx-auto px-4 pt-6">
-        <div className="mb-5">
-          <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-brown/40">Account</p>
-          <h1 className="font-black text-brand-brown text-xl leading-tight mt-0.5">My Orders</h1>
-          {flat && <p className="text-xs font-bold text-brand-brown/30 mt-0.5">Flat {flat}</p>}
+      {/* Header */}
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-brand-brown/10 shadow-sm">
+        <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <button
+              onClick={() => router.push("/order")}
+              className="w-8 h-8 rounded-xl bg-brand-oat hover:bg-brand-brown/10 flex items-center justify-center transition-colors shrink-0"
+            >
+              <span className="font-black text-brand-brown text-base leading-none">←</span>
+            </button>
+            <div className="min-w-0">
+              <h1 className="font-black text-brand-brown text-sm leading-none">My Orders</h1>
+              {flat && <p className="text-[10px] font-bold text-brand-brown/30 leading-none mt-0.5">Flat {flat}</p>}
+            </div>
+          </div>
+          <button
+            onClick={async () => {
+              ["wwy_flat","wwy_name","wwy_customer_id","wwy_pincode","wwy_cart"].forEach((k) => localStorage.removeItem(k));
+              await supabase.auth.signOut();
+              router.replace("/order/login");
+            }}
+            className="text-[11px] font-black tracking-wider uppercase text-brand-brown/30 hover:text-rose-600 transition-colors shrink-0"
+          >
+            Sign out
+          </button>
         </div>
+      </header>
+
+      <div className="max-w-2xl mx-auto px-4 pt-6">
         {loading && (
           <p className="font-black text-brand-charcoal/30 tracking-widest text-xs uppercase animate-pulse text-center py-12">
             Loading...
@@ -140,8 +163,8 @@ export default function HistoryPage() {
           <div className="flex flex-col items-center gap-6 py-16">
             <p className="font-black text-brand-charcoal/20 text-2xl tracking-tight">No orders yet.</p>
             <button
-              onClick={() => router.push("/order/shop")}
-              className="bg-brand-charcoal text-white font-black text-xs tracking-wider uppercase px-6 py-3 rounded-xl hover:bg-brand-terracotta transition-colors"
+              onClick={() => router.push("/order")}
+              className="bg-brand-brown text-white font-black text-xs tracking-wider uppercase px-6 py-3 rounded-xl hover:bg-brand-orange transition-colors"
             >
               Start ordering →
             </button>
