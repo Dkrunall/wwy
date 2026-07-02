@@ -18,9 +18,15 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    const name = localStorage.getItem("wwy_name") || "";
-    const flat = localStorage.getItem("wwy_flat") || "";
-    if (flat) { setLoggedIn(true); setInitials(name?.[0]?.toUpperCase() || flat[0]?.toUpperCase() || "?"); }
+    const checkAuth = () => {
+      const flat = localStorage.getItem("wwy_flat") || "";
+      const name = localStorage.getItem("wwy_name") || "";
+      setLoggedIn(!!flat);
+      setInitials(flat ? (name?.[0]?.toUpperCase() || flat[0]?.toUpperCase() || "?") : "");
+    };
+    checkAuth();
+    window.addEventListener("focus", checkAuth);
+    return () => window.removeEventListener("focus", checkAuth);
   }, []);
 
   const pillBase =
@@ -79,7 +85,7 @@ export default function Navbar() {
         <div className={`${pillBase} rounded-full px-2 h-14 flex items-center gap-2`}>
           {loggedIn ? (
             <Link
-              href="/order"
+              href="/order/account"
               className="flex items-center gap-2 bg-brand-charcoal text-white hover:bg-brand-terracotta transition-colors duration-300 px-4 py-2 rounded-full active:scale-95"
               title="My Account"
             >
@@ -130,7 +136,7 @@ export default function Navbar() {
           {/* Order / Avatar pill */}
           {loggedIn ? (
             <Link
-              href="/order"
+              href="/order/account"
               className={`${pillBase} rounded-full px-3 h-11 sm:h-12 flex items-center justify-center gap-2 font-black text-[9px] sm:text-[10px] tracking-widest uppercase text-brand-charcoal hover:bg-brand-terracotta hover:text-white hover:border-brand-terracotta/40 transition-all duration-300 active:scale-95 whitespace-nowrap`}
             >
               <span className="w-6 h-6 rounded-full bg-brand-charcoal text-white font-black text-xs flex items-center justify-center shrink-0">{initials}</span>

@@ -154,6 +154,12 @@ export default function OrderPage() {
                       <p className="text-[10px] font-bold text-brand-brown/40 mt-0.5">Flat {flat}</p>
                     </div>
                     <button
+                      onClick={() => { setMenuOpen(false); router.push("/order/account"); }}
+                      className="w-full px-4 py-3 text-left text-sm font-black text-brand-brown hover:bg-brand-oat transition-colors"
+                    >
+                      My Account
+                    </button>
+                    <button
                       onClick={() => { setMenuOpen(false); router.push("/order/history"); }}
                       className="w-full px-4 py-3 text-left text-sm font-black text-brand-brown hover:bg-brand-oat transition-colors"
                     >
