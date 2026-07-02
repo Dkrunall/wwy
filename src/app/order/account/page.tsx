@@ -5,10 +5,16 @@ export const dynamic = "force-dynamic";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { ShoppingBag, ClipboardList, LogOut, ChevronRight, Clock, Package, Flame, Truck, CheckCircle } from "lucide-react";
+import {
+  ShoppingBag, ClipboardList, LogOut, ChevronRight,
+  Clock, Package, Flame, Truck, CheckCircle, User, Home,
+} from "lucide-react";
 import { supabase, Order } from "@/lib/supabase";
 
 function fmt(paise: number) { return `₹${(paise / 100).toFixed(0)}`; }
+function fmtDate(iso: string) {
+  return new Date(iso).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+}
 
 const STEPS = [
   { key: "placed",           label: "Confirmed",  Icon: Clock },
@@ -18,12 +24,25 @@ const STEPS = [
   { key: "delivered",        label: "Delivered",  Icon: CheckCircle },
 ];
 
+const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
+  delivered:        { label: "Delivered",       cls: "bg-emerald-50 text-emerald-700 border border-emerald-200/60" },
+  out_for_delivery: { label: "Out for Delivery", cls: "bg-sky-50 text-sky-700 border border-sky-200/60" },
+  baking:           { label: "Baking",           cls: "bg-orange-50 text-orange-700 border border-orange-200/60" },
+  resting:          { label: "Fermenting",       cls: "bg-amber-50 text-amber-700 border border-amber-200/60" },
+  placed:           { label: "Confirmed",        cls: "bg-zinc-50 text-zinc-600 border border-zinc-200/60" },
+};
+
+type Panel = "orders" | "profile";
+
 export default function AccountPage() {
   const router = useRouter();
+  const [panel, setPanel] = useState<Panel>("orders");
   const [customerName, setCustomerName] = useState("");
   const [flat, setFlat] = useState("");
+  const [email, setEmail] = useState("");
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const handleLogout = async () => {
     ["wwy_flat","wwy_name","wwy_customer_id","wwy_pincode","wwy_cart"].forEach((k) => localStorage.removeItem(k));
@@ -40,12 +59,15 @@ export default function AccountPage() {
 
     (async () => {
       try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user?.email) setEmail(user.email);
+
         const { data } = await supabase
           .from("orders")
           .select("*, order_items(*)")
           .eq("flat_number", storedFlat)
           .order("created_at", { ascending: false })
-          .limit(3);
+          .limit(10);
         setRecentOrders(data || []);
       } catch { /* no orders */ } finally {
         setLoading(false);
@@ -53,178 +75,295 @@ export default function AccountPage() {
     })();
   }, [router]);
 
-  const firstName = customerName.split(" ")[0];
   const activeOrder = recentOrders.find((o) => o.payment_status === "paid" && o.delivery_status !== "delivered");
   const currentStep = STEPS.findIndex((s) => s.key === (activeOrder?.delivery_status || "placed"));
+  const totalSpend = recentOrders.filter((o) => o.payment_status === "paid").reduce((s, o) => s + o.total_paise, 0);
+
+  const NAV = [
+    { key: "orders" as Panel,  Icon: ClipboardList, label: "My Orders" },
+    { key: "profile" as Panel, Icon: User,          label: "Profile" },
+  ];
 
   return (
-    <main className="min-h-screen bg-brand-oat">
+    <div className="min-h-screen bg-[#f7f4f0]">
 
-      {/* ── Header ── */}
-      <header className="bg-white border-b border-brand-brown/10 shadow-sm">
-        <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 min-w-0">
+      {/* ── Top header ── */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
+        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
             <button
               onClick={() => router.push("/order")}
-              className="w-8 h-8 rounded-xl bg-brand-oat hover:bg-brand-brown/10 flex items-center justify-center transition-colors shrink-0"
+              className="flex items-center gap-2 text-xs font-black tracking-wider uppercase text-gray-400 hover:text-brand-brown transition-colors"
             >
-              <span className="font-black text-brand-brown text-base leading-none">←</span>
+              <Home className="w-4 h-4" /> Shop
             </button>
-            <div className="bg-brand-oat p-1.5 rounded-xl shrink-0">
-              <Image src="/logo.png" alt="WWY" width={24} height={24} className="object-contain" />
-            </div>
-            <p className="font-black text-brand-brown text-sm leading-none truncate">My Account</p>
+            <span className="text-gray-200 font-bold">/</span>
+            <span className="text-xs font-black tracking-wider uppercase text-brand-brown">My Account</span>
           </div>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-1.5 text-[11px] font-black tracking-wider uppercase text-brand-brown/30 hover:text-rose-600 transition-colors shrink-0"
-          >
-            <LogOut className="w-3.5 h-3.5" /> Sign out
-          </button>
+          <div className="flex items-center gap-2">
+            <div className="bg-brand-oat p-1 rounded-lg">
+              <Image src="/logo.png" alt="WWY" width={26} height={26} className="object-contain" />
+            </div>
+            <span className="font-black text-brand-brown text-sm hidden sm:block">Wild Wild Yeast</span>
+          </div>
         </div>
       </header>
 
-      <div className="max-w-2xl mx-auto px-4 py-5 flex flex-col gap-4">
+      <div className="max-w-5xl mx-auto px-4 py-6 flex flex-col md:flex-row gap-5">
 
-        {/* ── Profile card ── */}
-        <div className="bg-brand-brown rounded-2xl px-5 py-5 flex items-center gap-4">
-          <div className="w-14 h-14 rounded-full bg-white/15 text-white font-black text-2xl flex items-center justify-center shrink-0">
-            {customerName?.[0]?.toUpperCase() || "?"}
-          </div>
-          <div className="min-w-0">
-            <p className="text-[10px] font-black tracking-[0.2em] uppercase text-white/40 mb-0.5">Account</p>
-            <h1 className="font-black text-white text-xl leading-tight truncate">{customerName || "—"}</h1>
-            <p className="text-white/40 text-xs font-bold mt-0.5">Flat {flat}</p>
-          </div>
-        </div>
+        {/* ── Left sidebar ── */}
+        <aside className="w-full md:w-64 shrink-0 flex flex-col gap-4">
 
-        {/* ── Quick actions ── */}
-        <div className="grid grid-cols-2 gap-3">
+          {/* Profile card */}
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="bg-brand-brown px-5 py-5">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-white/15 text-white font-black text-xl flex items-center justify-center shrink-0 border-2 border-white/20">
+                  {customerName?.[0]?.toUpperCase() || "?"}
+                </div>
+                <div className="min-w-0">
+                  <p className="font-black text-white text-base leading-tight truncate">{customerName || "—"}</p>
+                  <p className="text-white/50 text-[11px] font-bold mt-0.5">Flat {flat}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Stats row */}
+            <div className="grid grid-cols-2 divide-x divide-gray-100 border-b border-gray-100">
+              <div className="px-4 py-3 text-center">
+                <p className="font-black text-brand-brown text-lg leading-none">{recentOrders.length}</p>
+                <p className="text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">Orders</p>
+              </div>
+              <div className="px-4 py-3 text-center">
+                <p className="font-black text-brand-brown text-lg leading-none">{fmt(totalSpend)}</p>
+                <p className="text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">Spent</p>
+              </div>
+            </div>
+
+            {/* Nav links */}
+            <nav className="p-2">
+              {NAV.map(({ key, Icon, label }) => (
+                <button
+                  key={key}
+                  onClick={() => setPanel(key)}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-black tracking-widest uppercase transition-all
+                    ${panel === key
+                      ? "bg-brand-brown text-white shadow-sm"
+                      : "text-gray-400 hover:text-brand-brown hover:bg-gray-50"}`}
+                >
+                  <Icon className={`w-4 h-4 shrink-0 ${panel === key ? "text-brand-orange" : "text-gray-300"}`} />
+                  {label}
+                </button>
+              ))}
+            </nav>
+          </div>
+
+          {/* Quick shop */}
           <button
             onClick={() => router.push("/order")}
-            className="bg-white hover:bg-brand-oat border border-brand-brown/10 rounded-2xl p-4 text-left transition-all active:scale-[0.97] shadow-sm flex items-center gap-3"
+            className="bg-brand-brown hover:bg-brand-orange text-white rounded-2xl px-5 py-4 flex items-center justify-between transition-all active:scale-[0.98] shadow-sm"
           >
-            <div className="w-10 h-10 rounded-xl bg-brand-brown flex items-center justify-center shrink-0">
-              <ShoppingBag className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <p className="font-black text-brand-brown text-sm leading-none">Shop</p>
-              <p className="text-[11px] font-bold text-brand-brown/30 mt-0.5">Browse menu</p>
-            </div>
-          </button>
-
-          <button
-            onClick={() => router.push("/order/history")}
-            className="bg-white hover:bg-brand-oat border border-brand-brown/10 rounded-2xl p-4 text-left transition-all active:scale-[0.97] shadow-sm flex items-center gap-3"
-          >
-            <div className="w-10 h-10 rounded-xl bg-brand-oat border border-brand-brown/10 flex items-center justify-center shrink-0">
-              <ClipboardList className="w-5 h-5 text-brand-brown/60" />
-            </div>
-            <div>
-              <p className="font-black text-brand-brown text-sm leading-none">Orders</p>
-              <p className="text-[11px] font-bold text-brand-brown/30 mt-0.5">Order history</p>
-            </div>
-          </button>
-        </div>
-
-        {/* ── Active order tracker ── */}
-        {loading ? (
-          <div className="bg-white rounded-2xl border border-brand-brown/10 p-5 animate-pulse h-32" />
-        ) : activeOrder ? (
-          <div className="bg-white rounded-2xl border border-brand-brown/10 shadow-sm overflow-hidden">
-            <div className="px-5 pt-4 pb-3 border-b border-brand-brown/5 flex items-center justify-between">
-              <div>
-                <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-brown/40">Active Order</p>
-                <p className="font-black text-brand-brown text-sm mt-0.5">
-                  #{(activeOrder.order_number || activeOrder.id.slice(0,8)).toUpperCase()} · {fmt(activeOrder.total_paise)}
-                </p>
+            <div className="flex items-center gap-3">
+              <ShoppingBag className="w-5 h-5 text-brand-orange" style={{ color: "#EBB41F" }} />
+              <div className="text-left">
+                <p className="font-black text-sm leading-none">Order Now</p>
+                <p className="text-white/40 text-[11px] font-bold mt-0.5">Browse this week&apos;s menu</p>
               </div>
-              <button onClick={() => router.push("/order/history")} className="flex items-center gap-0.5 text-[11px] font-black text-brand-orange hover:text-brand-brown transition-colors">
-                Details <ChevronRight className="w-3.5 h-3.5" />
-              </button>
             </div>
-            <div className="px-5 py-4">
-              <div className="flex items-start">
-                {STEPS.map((step, idx) => {
-                  const done = idx <= currentStep;
-                  const active = idx === currentStep;
-                  const StepIcon = step.Icon;
-                  return (
-                    <React.Fragment key={step.key}>
-                      <div className="flex flex-col items-center gap-1.5 shrink-0">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center transition-all
-                          ${active ? "bg-brand-brown ring-2 ring-brand-brown ring-offset-2 shadow-md" : done ? "bg-brand-orange" : "bg-brand-oat border border-brand-brown/10"}`}>
-                          <StepIcon className={`w-3.5 h-3.5 ${done || active ? "text-white" : "text-brand-brown/20"}`} />
-                        </div>
-                        <p className={`text-[9px] font-black tracking-wide text-center leading-tight
-                          ${active ? "text-brand-brown" : done ? "text-brand-orange" : "text-brand-brown/25"}`}
-                          style={{ maxWidth: 44 }}>
-                          {step.label}
+            <ChevronRight className="w-4 h-4 text-white/40" />
+          </button>
+
+          {/* Sign out */}
+          <button
+            onClick={handleLogout}
+            className="bg-white border border-gray-200 hover:border-rose-200 hover:bg-rose-50 text-gray-400 hover:text-rose-600 rounded-2xl px-5 py-3 flex items-center gap-3 transition-all shadow-sm text-xs font-black tracking-widest uppercase"
+          >
+            <LogOut className="w-4 h-4 shrink-0" /> Sign Out
+          </button>
+        </aside>
+
+        {/* ── Main content ── */}
+        <div className="flex-1 min-w-0 flex flex-col gap-4">
+
+          {/* ── ORDERS PANEL ── */}
+          {panel === "orders" && (
+            <>
+              {/* Active order tracker */}
+              {activeOrder && (
+                <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                  <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] font-black tracking-[0.2em] uppercase text-gray-400">Active Order</p>
+                      <p className="font-black text-brand-brown text-base mt-0.5">
+                        #{(activeOrder.order_number || activeOrder.id.slice(0,8)).toUpperCase()}
+                        <span className="font-bold text-gray-400 ml-2 text-sm">· {fmt(activeOrder.total_paise)}</span>
+                      </p>
+                    </div>
+                    {activeOrder.delivery_date && (
+                      <div className="text-right hidden sm:block">
+                        <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">Delivery</p>
+                        <p className="font-black text-brand-brown text-sm mt-0.5">
+                          {new Date(activeOrder.delivery_date).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" })}
                         </p>
                       </div>
-                      {idx < STEPS.length - 1 && (
-                        <div className={`flex-1 h-0.5 mt-4 mx-0.5 ${idx < currentStep ? "bg-brand-orange" : "bg-brand-brown/10"}`} />
+                    )}
+                  </div>
+                  <div className="px-5 py-5">
+                    <div className="flex items-start">
+                      {STEPS.map((step, idx) => {
+                        const done = idx <= currentStep;
+                        const active = idx === currentStep;
+                        const StepIcon = step.Icon;
+                        return (
+                          <React.Fragment key={step.key}>
+                            <div className="flex flex-col items-center gap-1.5 shrink-0">
+                              <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all
+                                ${active ? "bg-brand-brown ring-2 ring-brand-brown ring-offset-2 shadow-lg" : done ? "bg-brand-orange" : "bg-gray-100"}`}>
+                                <StepIcon className={`w-4 h-4 ${done || active ? "text-white" : "text-gray-300"}`} />
+                              </div>
+                              <p className={`text-[9px] font-black tracking-wide text-center leading-tight
+                                ${active ? "text-brand-brown" : done ? "text-brand-orange" : "text-gray-300"}`}
+                                style={{ maxWidth: 48 }}>
+                                {step.label}
+                              </p>
+                            </div>
+                            {idx < STEPS.length - 1 && (
+                              <div className={`flex-1 h-0.5 mt-[18px] mx-1 ${idx < currentStep ? "bg-brand-orange" : "bg-gray-100"}`} />
+                            )}
+                          </React.Fragment>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Orders list */}
+              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+                <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
+                  <p className="font-black text-brand-brown text-sm">Order History</p>
+                  <p className="text-[11px] font-bold text-gray-400">{recentOrders.length} orders</p>
+                </div>
+
+                {loading && (
+                  <div className="px-5 py-10 text-center">
+                    <p className="text-xs font-black text-gray-300 uppercase tracking-widest animate-pulse">Loading...</p>
+                  </div>
+                )}
+
+                {!loading && recentOrders.length === 0 && (
+                  <div className="px-5 py-10 text-center flex flex-col items-center gap-4">
+                    <ShoppingBag className="w-10 h-10 text-gray-200" />
+                    <p className="font-black text-gray-300 text-sm">No orders yet</p>
+                    <button
+                      onClick={() => router.push("/order")}
+                      className="bg-brand-brown text-white font-black text-xs tracking-wider uppercase px-6 py-3 rounded-xl hover:bg-brand-orange transition-colors"
+                    >
+                      Browse Menu →
+                    </button>
+                  </div>
+                )}
+
+                {!loading && recentOrders.map((order) => {
+                  const isPending = order.payment_status !== "paid";
+                  const statusKey = isPending ? "placed" : (order.delivery_status || "placed");
+                  const badge = STATUS_BADGE[statusKey] || STATUS_BADGE.placed;
+                  const isExpanded = expandedId === order.id;
+
+                  return (
+                    <div key={order.id} className="border-b border-gray-50 last:border-0">
+                      <button
+                        onClick={() => setExpandedId(isExpanded ? null : order.id)}
+                        className="w-full px-5 py-4 flex items-center gap-4 text-left hover:bg-gray-50/50 transition-colors"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-brand-oat flex items-center justify-center shrink-0">
+                          <Package className="w-5 h-5 text-brand-brown/40" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-black text-brand-brown text-sm leading-none">
+                              #{(order.order_number || order.id.slice(0,8)).toUpperCase()}
+                            </p>
+                            <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${badge.cls}`}>
+                              {isPending ? "Pending Payment" : badge.label}
+                            </span>
+                          </div>
+                          <p className="text-[11px] font-bold text-gray-400 mt-1">{fmtDate(order.created_at)}</p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="font-black text-brand-brown text-sm">{fmt(order.total_paise)}</p>
+                          <p className="text-[10px] font-bold text-gray-400 mt-0.5">
+                            {order.order_items?.length || 0} item{(order.order_items?.length || 0) !== 1 ? "s" : ""}
+                          </p>
+                        </div>
+                        <ChevronRight className={`w-4 h-4 text-gray-300 shrink-0 transition-transform ${isExpanded ? "rotate-90" : ""}`} />
+                      </button>
+
+                      {isExpanded && order.order_items && (
+                        <div className="px-5 pb-4 bg-gray-50/50">
+                          <div className="border border-gray-100 rounded-xl overflow-hidden bg-white">
+                            {order.order_items.map((item) => (
+                              <div key={item.id} className="flex items-center justify-between px-4 py-3 border-b border-gray-50 last:border-0">
+                                <div className="flex items-center gap-3">
+                                  <span className="w-6 h-6 rounded-lg bg-brand-oat text-brand-brown font-black text-xs flex items-center justify-center shrink-0">{item.quantity}</span>
+                                  <span className="text-sm font-bold text-gray-600">{item.product_name}</span>
+                                </div>
+                                <span className="font-black text-brand-brown text-sm">{fmt(item.quantity * item.unit_price_paise)}</span>
+                              </div>
+                            ))}
+                            <div className="flex items-center justify-between px-4 py-3 bg-brand-oat/40 border-t border-gray-100">
+                              <span className="text-xs font-black uppercase tracking-wider text-gray-500">Total</span>
+                              <span className="font-black text-brand-brown">{fmt(order.total_paise)}</span>
+                            </div>
+                          </div>
+                          {order.invoice_url && (
+                            <a
+                              href={order.invoice_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="mt-3 inline-flex items-center gap-1.5 text-xs font-black text-brand-brown/50 hover:text-brand-orange transition-colors"
+                            >
+                              ↓ Download Invoice
+                            </a>
+                          )}
+                        </div>
                       )}
-                    </React.Fragment>
+                    </div>
                   );
                 })}
               </div>
-              {activeOrder.delivery_date && (
-                <p className="text-[11px] font-bold text-brand-brown/30 mt-3 text-center">
-                  Delivery on {new Date(activeOrder.delivery_date).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "short" })}
-                </p>
-              )}
-            </div>
-          </div>
-        ) : null}
+            </>
+          )}
 
-        {/* ── Recent orders ── */}
-        {!loading && recentOrders.length > 0 && (
-          <div className="bg-white rounded-2xl border border-brand-brown/10 shadow-sm overflow-hidden">
-            <div className="px-5 py-3 border-b border-brand-brown/5 flex items-center justify-between">
-              <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-brown/40">Recent Orders</p>
-              <button onClick={() => router.push("/order/history")} className="text-[11px] font-black text-brand-orange hover:text-brand-brown transition-colors">
-                View all →
-              </button>
-            </div>
-            <div className="flex flex-col divide-y divide-brand-brown/5">
-              {recentOrders.map((order) => (
-                <div key={order.id} className="px-5 py-3 flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="font-black text-brand-brown text-sm leading-none">
-                      #{(order.order_number || order.id.slice(0,8)).toUpperCase()}
-                    </p>
-                    <p className="text-[11px] font-bold text-brand-brown/40 mt-0.5">
-                      {new Date(order.created_at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
-                    </p>
+          {/* ── PROFILE PANEL ── */}
+          {panel === "profile" && (
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="px-5 py-4 border-b border-gray-100">
+                <p className="font-black text-brand-brown text-sm">Profile Details</p>
+              </div>
+              <div className="p-5 flex flex-col gap-4">
+                {[
+                  { label: "Full Name", value: customerName || "—" },
+                  { label: "Flat Number", value: flat || "—" },
+                  { label: "Email Address", value: email || "—" },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex flex-col gap-1">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{label}</p>
+                    <p className="font-black text-brand-brown text-sm bg-gray-50 rounded-xl px-4 py-3 border border-gray-100">{value}</p>
                   </div>
-                  <div className="text-right shrink-0">
-                    <p className="font-black text-brand-brown text-sm">{fmt(order.total_paise)}</p>
-                    <p className={`text-[10px] font-black mt-0.5 ${
-                      order.delivery_status === "delivered" ? "text-emerald-600" :
-                      order.payment_status !== "paid" ? "text-amber-600" : "text-brand-orange"
-                    }`}>
-                      {order.delivery_status === "delivered" ? "Delivered" :
-                       order.payment_status !== "paid" ? "Pending payment" :
-                       order.delivery_status === "out_for_delivery" ? "On the way" : "In progress"}
-                    </p>
-                  </div>
+                ))}
+                <div className="pt-2">
+                  <p className="text-[11px] font-bold text-gray-400">
+                    To update your details, contact us at{" "}
+                    <span className="text-brand-brown font-black">dnyanesh@wildwildyeast.com</span>
+                  </p>
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* ── Info ── */}
-        <div className="bg-white border border-brand-brown/10 rounded-2xl px-5 py-4 flex items-center gap-3 shadow-sm">
-          <Package className="w-5 h-5 text-brand-orange shrink-0" />
-          <p className="text-xs font-bold text-brand-brown/50 leading-relaxed">
-            Made when ordered. Delivery on{" "}
-            <span className="text-brand-brown font-black">Wednesdays & Saturdays only.</span>
-          </p>
         </div>
-
       </div>
-    </main>
+    </div>
   );
 }
