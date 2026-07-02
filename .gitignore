@@ -47,4 +47,12 @@ next-env.d.ts
 WWY_Claude_Code_Master_Prompt.docx
 doc_extract.txt
 
+# Misc files in root
+*.html
+*.png
+*.jpg
+*.jpeg
+prompt_dump.txt
+*.log
+
 
