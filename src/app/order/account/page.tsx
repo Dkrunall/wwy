@@ -100,6 +100,42 @@ export default function AccountPage() {
     })();
   }, [router]);
 
+  // Poll active order status every 30 seconds
+  useEffect(() => {
+    if (!flat) return;
+    const interval = setInterval(async () => {
+      try {
+        const { data } = await supabase
+          .from("orders")
+          .select("*, order_items(*)")
+          .eq("flat_number", flat)
+          .order("created_at", { ascending: false })
+          .limit(10);
+        if (data) setRecentOrders(data);
+      } catch { /* ignore */ }
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [flat]);
+
+  const reorder = async (order: Order) => {
+    if (!order.order_items?.length) return;
+    const productIds = order.order_items.map((i) => i.product_id);
+    const { data: products } = await supabase
+      .from("products")
+      .select("id, price_paise")
+      .in("id", productIds);
+    const priceMap: Record<string, number> = {};
+    for (const p of products || []) priceMap[p.id] = p.price_paise;
+    const cartItems = order.order_items.map((item) => ({
+      product_id: item.product_id,
+      product_name: item.product_name,
+      quantity: item.quantity,
+      unit_price_paise: priceMap[item.product_id] ?? item.unit_price_paise,
+    }));
+    localStorage.setItem("wwy_cart", JSON.stringify(cartItems));
+    router.push("/order");
+  };
+
   const savePhone = async () => {
     const cleaned = phoneEdit.replace(/\D/g, "").slice(-10);
     if (cleaned.length < 10) return;
@@ -351,16 +387,26 @@ export default function AccountPage() {
                               <span className="font-black text-brand-brown">{fmt(order.total_paise)}</span>
                             </div>
                           </div>
-                          {order.invoice_url && (
-                            <a
-                              href={order.invoice_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="mt-3 inline-flex items-center gap-1.5 text-xs font-black text-brand-brown/50 hover:text-brand-orange transition-colors"
-                            >
-                              ↓ Download Invoice
-                            </a>
-                          )}
+                          <div className="flex items-center gap-3 mt-3">
+                            {order.invoice_url && (
+                              <a
+                                href={order.invoice_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 text-xs font-black text-brand-brown/50 hover:text-brand-orange transition-colors"
+                              >
+                                ↓ Invoice
+                              </a>
+                            )}
+                            {order.payment_status === "paid" && order.order_items && order.order_items.length > 0 && (
+                              <button
+                                onClick={() => reorder(order)}
+                                className="ml-auto inline-flex items-center gap-1.5 bg-brand-brown hover:bg-brand-orange text-white text-xs font-black tracking-wider uppercase px-4 py-2 rounded-xl transition-colors"
+                              >
+                                ↺ Reorder
+                              </button>
+                            )}
+                          </div>
                         </div>
                       )}
                     </div>

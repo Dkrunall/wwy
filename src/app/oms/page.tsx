@@ -406,6 +406,15 @@ export default function OmsDashboard() {
     return orders.filter(o=>o.delivery_date===today&&o.payment_status==="paid"&&o.delivery_status!=="delivered"&&o.status!=="cancelled");
   },[orders]);
 
+  const bakerHolidays = useMemo(()=>{
+    const map: Record<string,boolean> = {};
+    for (const s of settings) {
+      if (s.key.startsWith("baker_holiday_") && s.value === "true")
+        map[s.key.replace("baker_holiday_","")] = true;
+    }
+    return map;
+  },[settings]);
+
   const bakerStats = useMemo(()=>{
     const map: Record<string,{active:number;delivered:number;revenue:number}> = {};
     for(const b of bakers) {
@@ -1050,6 +1059,7 @@ export default function OmsDashboard() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <h4 className="font-serif text-base font-black text-brand-brown">{b.name}</h4>
                         <span className={`text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full ${b.is_active?"bg-emerald-50 text-emerald-700 border border-emerald-200/50":"bg-zinc-100 text-zinc-400 border border-zinc-200/50"}`}>{b.is_active?"Active":"Inactive"}</span>
+                        {bakerHolidays[b.id]&&<span className="text-[9px] font-black uppercase px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200/50">On Holiday</span>}
                         {stats.active>0&&<span className="text-[9px] font-black text-brand-orange bg-brand-orange/10 px-2 py-0.5 rounded-full">{stats.active} active</span>}
                       </div>
                       <a href={`tel:${b.phone}`} className="text-xs font-bold text-brand-brown/50 hover:text-brand-orange inline-flex items-center gap-1.5 mt-2"><Phone className="w-3.5 h-3.5 text-brand-orange"/>{b.phone}</a>

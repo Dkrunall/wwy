@@ -24,6 +24,7 @@ interface BakerOrder {
 interface Baker {
   id: string;
   name: string;
+  daily_capacity?: number;
 }
 
 function fmt(paise: number) {
@@ -155,7 +156,7 @@ export default function BakerDashboard() {
   const fetchData = useCallback(async () => {
     const { data: bakerData, error: bakerErr } = await supabase
       .from("bakers")
-      .select("id, name")
+      .select("id, name, daily_capacity")
       .eq("share_token", token)
       .eq("is_active", true)
       .single();
@@ -283,7 +284,16 @@ export default function BakerDashboard() {
             <h1 className="font-serif text-lg font-black tracking-tight leading-none text-white">Baker Dashboard</h1>
             <p className="text-[10px] font-black uppercase tracking-widest text-brand-orange mt-1.5">{baker.name} · {today}</p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            {/* Capacity indicator */}
+            {baker.daily_capacity && (
+              <div className="hidden sm:flex flex-col text-right">
+                <span className="text-[7.5px] font-black uppercase text-brand-orange tracking-widest leading-none mb-0.5">Capacity</span>
+                <span className={`text-[11px] font-black leading-none ${orders.length >= baker.daily_capacity ? "text-rose-400" : "text-white/90"}`}>
+                  {orders.length} / {baker.daily_capacity}
+                </span>
+              </div>
+            )}
             <div className="hidden sm:flex flex-col text-right">
               <span className="text-[7.5px] font-black uppercase text-brand-orange tracking-widest leading-none mb-0.5">BREAD TIME</span>
               <span className="text-[11px] font-black font-mono text-white/90 leading-none">{breadTime}</span>
@@ -345,6 +355,26 @@ export default function BakerDashboard() {
 
         {tab === "today" && (
           <>
+            {/* Cutoff + capacity info strip */}
+            <div className="bg-brand-brown/5 border border-brand-brown/10 rounded-2xl px-4 py-3 flex flex-wrap items-center gap-x-6 gap-y-1">
+              <div>
+                <span className="text-[8px] font-black uppercase tracking-widest text-brand-brown/40">Order Cutoff</span>
+                <p className="text-xs font-black text-brand-brown">12:00 PM IST daily</p>
+              </div>
+              <div>
+                <span className="text-[8px] font-black uppercase tracking-widest text-brand-brown/40">Delivery Days</span>
+                <p className="text-xs font-black text-brand-brown">Wednesday &amp; Saturday</p>
+              </div>
+              {baker.daily_capacity && (
+                <div className="ml-auto">
+                  <span className="text-[8px] font-black uppercase tracking-widest text-brand-brown/40">Today&apos;s Load</span>
+                  <p className={`text-xs font-black ${orders.length >= baker.daily_capacity ? "text-rose-600" : "text-brand-brown"}`}>
+                    {orders.length} of {baker.daily_capacity} slots{orders.length >= baker.daily_capacity ? " — FULL" : ""}
+                  </p>
+                </div>
+              )}
+            </div>
+
             {/* Bake Ledger */}
             <section className="bg-white rounded-3xl border border-brand-brown/5 p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">

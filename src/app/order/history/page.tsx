@@ -72,22 +72,46 @@ export default function HistoryPage() {
   const [feedbackComment, setFeedbackComment] = useState<Record<string, string>>({});
   const [feedbackOpen, setFeedbackOpen] = useState<string | null>(null);
 
+  const reorder = async (order: Order) => {
+    if (!order.order_items?.length) return;
+    const productIds = order.order_items.map((i) => i.product_id);
+    const { data: products } = await supabase.from("products").select("id, price_paise").in("id", productIds);
+    const priceMap: Record<string, number> = {};
+    for (const p of products || []) priceMap[p.id] = p.price_paise;
+    const cartItems = order.order_items.map((item) => ({
+      product_id: item.product_id,
+      product_name: item.product_name,
+      quantity: item.quantity,
+      unit_price_paise: priceMap[item.product_id] ?? item.unit_price_paise,
+    }));
+    localStorage.setItem("wwy_cart", JSON.stringify(cartItems));
+    router.push("/order");
+  };
+
   useEffect(() => {
     const storedFlat = localStorage.getItem("wwy_flat");
     if (!storedFlat) { router.replace("/order/login"); return; }
     setFlat(storedFlat);
 
-    supabase
-      .from("orders")
-      .select("*, order_items(*)")
-      .eq("flat_number", storedFlat)
-      .order("created_at", { ascending: false })
-      .then(({ data }) => {
-        setOrders(data || []);
-        setLoading(false);
-      });
+    const loadOrders = () =>
+      supabase
+        .from("orders")
+        .select("*, order_items(*)")
+        .eq("flat_number", storedFlat)
+        .order("created_at", { ascending: false })
+        .then(({ data }) => { setOrders(data || []); setLoading(false); });
 
-    // Load which orders already have feedback
+    loadOrders();
+
+    // Poll every 30 seconds to refresh active order statuses
+    const interval = setInterval(loadOrders, 30000);
+    return () => clearInterval(interval);
+  }, [router]);
+
+  // Load feedback states once (no polling needed)
+  useEffect(() => {
+    const storedFlat = localStorage.getItem("wwy_flat");
+    if (!storedFlat) return;
     supabase
       .from("feedbacks")
       .select("order_id")
@@ -95,11 +119,11 @@ export default function HistoryPage() {
       .then(({ data }) => {
         if (data) {
           const done: FeedbackState = {};
-          data.forEach((f) => { done[f.order_id] = "done"; });
+          data.forEach((f: { order_id: string }) => { done[f.order_id] = "done"; });
           setFeedbackStates(done);
         }
       });
-  }, [router]);
+  }, []);
 
   const submitFeedback = async (orderId: string) => {
     const rating = feedbackRating[orderId];
@@ -231,16 +255,26 @@ export default function HistoryPage() {
                         Note: {order.notes}
                       </p>
                     )}
-                    {order.invoice_url && (
-                      <a
-                        href={order.invoice_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs font-black text-brand-charcoal/50 hover:text-brand-terracotta transition-colors mt-1 underline underline-offset-2"
-                      >
-                        ↓ Download Invoice
-                      </a>
-                    )}
+                    <div className="flex items-center gap-3 mt-1">
+                      {order.invoice_url && (
+                        <a
+                          href={order.invoice_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs font-black text-brand-charcoal/50 hover:text-brand-terracotta transition-colors underline underline-offset-2"
+                        >
+                          ↓ Invoice
+                        </a>
+                      )}
+                      {order.payment_status === "paid" && order.order_items && order.order_items.length > 0 && (
+                        <button
+                          onClick={() => reorder(order)}
+                          className="ml-auto bg-brand-brown hover:bg-brand-orange text-white text-[10px] font-black tracking-wider uppercase px-3 py-1.5 rounded-xl transition-colors"
+                        >
+                          ↺ Reorder
+                        </button>
+                      )}
+                    </div>
 
                     {/* Feedback for delivered orders */}
                     {isDelivered && (
