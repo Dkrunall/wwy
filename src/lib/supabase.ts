@@ -44,7 +44,7 @@ export type Order = {
   customer_name: string;
   status: "pending" | "confirmed" | "delivered";
   payment_status: "pending" | "paid" | "failed" | null;
-  delivery_status: "placed" | "resting" | "baking" | "out_for_delivery" | "delivered" | null;
+  delivery_status: "placed" | "mixing" | "stretching" | "resting" | "cold_proof" | "baking" | "out_for_delivery" | "delivered" | null;
   total_paise: number;
   notes: string | null;
   order_number: string | null;

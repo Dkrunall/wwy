@@ -117,7 +117,8 @@ export default function HistoryPage() {
       }),
     });
 
-    if (res.ok || (await res.json()).error === "Feedback already submitted") {
+    const data = await res.json().catch(() => ({}));
+    if (res.ok || data.error === "Feedback already submitted") {
       setFeedbackStates((prev) => ({ ...prev, [orderId]: "done" }));
       setFeedbackOpen(null);
     } else {

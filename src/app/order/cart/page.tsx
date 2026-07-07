@@ -82,6 +82,7 @@ export default function CartPage() {
 
   const handlePay = async () => {
     if (cart.length === 0) return;
+    if (!customerId) { setError("Session error — please sign out and sign in again."); return; }
     setError("");
     setLoading(true);
 

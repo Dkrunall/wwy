@@ -44,10 +44,25 @@ export async function sendDeliveryUpdateToCustomer(
   if (!process.env.GMAIL_USER || !email) return;
 
   const updates: Record<string, { subject: string; headline: string; body: string }> = {
+    mixing: {
+      subject: `🫙 Your dough is being mixed — ${orderNumber}`,
+      headline: "Mixing has begun",
+      body: `It's started! <b>${name}</b>, your baker has begun mixing the dough for your order. 🫙 Wild fermentation in progress.`,
+    },
+    stretching: {
+      subject: `🤲 Stretch & fold in progress — ${orderNumber}`,
+      headline: "Stretch & fold",
+      body: `Your dough is being stretched and folded, <b>${name}</b>! 🤲 This is where the structure and chew develops. Good things take time.`,
+    },
     resting: {
-      subject: `🌅 Your dough is resting — ${orderNumber}`,
+      subject: `🌅 Your dough is bulk-resting — ${orderNumber}`,
       headline: "Dough is resting",
-      body: `Good news, <b>${name}</b>! Your sourdough dough is resting and developing flavour. The magic happens overnight. 🌙`,
+      body: `Your sourdough dough is now resting and developing flavour, <b>${name}</b>. The magic happens when we slow down. 🌙`,
+    },
+    cold_proof: {
+      subject: `❄️ Into the fridge — ${orderNumber}`,
+      headline: "Cold proofing",
+      body: `Your dough has gone into the fridge for a slow cold proof, <b>${name}</b>. ❄️ This is what gives our bread its signature tang.`,
     },
     baking: {
       subject: `🔥 Into the oven — ${orderNumber}`,

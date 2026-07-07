@@ -42,15 +42,16 @@ export async function POST(req: NextRequest) {
       .update({ delivery_status: nextStatus, updated_at: new Date().toISOString() })
       .eq("id", orderId);
 
-    // Only email the customer when order goes out for delivery
-    if (nextStatus === "out_for_delivery") {
+    // Email customer on meaningful milestones (not every micro-step)
+    const EMAIL_MILESTONES = ["resting", "baking", "out_for_delivery", "delivered"];
+    if (EMAIL_MILESTONES.includes(nextStatus)) {
       const { data: customer } = await supabase
         .from("customers")
         .select("email")
         .eq("flat_number", order.flat_number)
         .single();
       if (customer?.email) {
-        await sendDeliveryUpdateToCustomer(customer.email, order.customer_name, order.order_number, "out_for_delivery").catch(console.error);
+        await sendDeliveryUpdateToCustomer(customer.email, order.customer_name, order.order_number, nextStatus).catch(console.error);
       }
     }
 

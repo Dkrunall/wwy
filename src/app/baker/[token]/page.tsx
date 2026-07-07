@@ -85,10 +85,22 @@ const STATUS_LABELS: Record<string, string> = {
 const ORDER_SELECT = "id, order_number, flat_number, customer_name, total_paise, delivery_date, delivery_status, payment_status, notes, order_items(product_name, quantity)";
 
 function getBuilding(flatNumber: string): string {
-  const letterPrefix = flatNumber.match(/^([A-Za-z]+)/);
-  if (letterPrefix) return letterPrefix[1].toUpperCase();
-  const numPrefix = flatNumber.match(/^(\d+)/);
-  if (numPrefix) return `Block ${numPrefix[1]}`;
+  const s = flatNumber.trim().toUpperCase();
+  // "Tower A" / "Tower 1"
+  const tower = s.match(/\bTOWER\s*([A-Z0-9]+)/);
+  if (tower) return `Tower ${tower[1]}`;
+  // "A Wing" / "Wing A"
+  const wing = s.match(/([A-Z])\s+WING|WING\s+([A-Z])/);
+  if (wing) return `${wing[1] || wing[2]} Wing`;
+  // Letter prefix: A-101, B/204, A101, B 204
+  const letterFirst = s.match(/^([A-Z]+)[\s\-\/]?\d/);
+  if (letterFirst) return letterFirst[1];
+  // Number-then-letter: 4B → suffix letter is the building
+  const numLetter = s.match(/^\d+([A-Z])$/);
+  if (numLetter) return `Block ${numLetter[1]}`;
+  // Pure number
+  const numOnly = s.match(/^(\d+)/);
+  if (numOnly) return `Floor ${numOnly[1]}`;
   return "Other";
 }
 
@@ -302,7 +314,7 @@ export default function BakerDashboard() {
 
       {/* Holiday banner */}
       {isHoliday && (
-        <div className="max-w-lg mx-auto mt-4 mx-4 px-5 py-3 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-3">
+        <div className="max-w-lg mx-auto mt-4 px-5 py-3 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-3">
           <Palmtree className="w-5 h-5 text-amber-600 shrink-0" />
           <div>
             <p className="font-black text-amber-800 text-sm">You&apos;re marked as on holiday.</p>
