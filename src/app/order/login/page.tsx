@@ -14,6 +14,7 @@ export default function OrderLoginPage() {
   const [otp, setOtp] = useState("");
   const [name, setName] = useState("");
   const [flat, setFlat] = useState("");
+  const [phone, setPhone] = useState("");
   const [pincode, setPincode] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -80,7 +81,21 @@ export default function OrderLoginPage() {
     e.preventDefault();
     if (!name.trim()) { setError("Enter your name."); return; }
     if (!flat.trim()) { setError("Enter your flat number."); return; }
+    if (!phone.trim() || phone.replace(/\D/g,"").length < 10) { setError("Enter a valid 10-digit phone number."); return; }
+    if (!pincode.trim() || pincode.trim().length !== 6) { setError("Enter your 6-digit pincode."); return; }
+
+    // Validate pincode against serviceable bakers
     setError(""); setLoading(true);
+    const { data: bakers } = await supabase
+      .from("bakers")
+      .select("pincodes")
+      .eq("is_active", true);
+    const serviceable = (bakers || []).flatMap((b) => b.pincodes || []);
+    if (serviceable.length > 0 && !serviceable.includes(pincode.trim())) {
+      setError("Sorry, we don't deliver to this pincode yet. We're expanding soon!");
+      setLoading(false);
+      return;
+    }
 
     const { data, error: err } = await supabase
       .from("customers")
@@ -88,7 +103,8 @@ export default function OrderLoginPage() {
         name: name.trim(),
         flat_number: flat.trim().toUpperCase(),
         email: email.trim().toLowerCase(),
-        pincode: pincode.trim() || null,
+        phone: phone.replace(/\D/g,"").slice(-10),
+        pincode: pincode.trim(),
       })
       .select()
       .single();
@@ -230,18 +246,29 @@ export default function OrderLoginPage() {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">
-                Pincode <span className="text-brand-charcoal/20">(optional)</span>
-              </label>
+              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">Phone Number</label>
+              <input
+                type="tel"
+                inputMode="numeric"
+                placeholder="9876543210"
+                value={phone}
+                onChange={(e) => { setPhone(e.target.value); setError(""); }}
+                className={inputCls}
+              />
+              <p className="text-[11px] font-bold text-brand-charcoal/30">So your baker can reach you if needed.</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">Pincode</label>
               <input
                 type="text"
                 inputMode="numeric"
+                maxLength={6}
                 placeholder="400001"
                 value={pincode}
-                onChange={(e) => { setPincode(e.target.value); setError(""); }}
+                onChange={(e) => { setPincode(e.target.value.replace(/\D/g,"")); setError(""); }}
                 className={inputCls}
               />
-              <p className="text-[11px] font-bold text-brand-charcoal/30">Helps us assign the right baker.</p>
+              <p className="text-[11px] font-bold text-brand-charcoal/30">We check if we deliver to your area.</p>
             </div>
             {error && <p className="text-xs font-bold text-brand-terracotta">{error}</p>}
             <button type="submit" disabled={loading} className={btnCls}>

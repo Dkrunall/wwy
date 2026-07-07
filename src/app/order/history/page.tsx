@@ -20,11 +20,14 @@ function fmtDate(iso: string) {
 }
 
 const DELIVERY_STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
-  placed:            { label: "Confirmed — fermenting", color: "text-brand-olive",       bg: "bg-brand-olive/10" },
-  resting:           { label: "Dough resting 🌙",        color: "text-amber-700",         bg: "bg-amber-50" },
-  baking:            { label: "In the oven 🔥",           color: "text-orange-700",        bg: "bg-orange-100" },
-  out_for_delivery:  { label: "Out for delivery 🚗",      color: "text-blue-700",          bg: "bg-blue-100" },
-  delivered:         { label: "Delivered ✓",              color: "text-brand-charcoal/50", bg: "bg-brand-charcoal/5" },
+  placed:            { label: "Confirmed",             color: "text-brand-olive",       bg: "bg-brand-olive/10" },
+  mixing:            { label: "Mixing dough 🫙",        color: "text-amber-700",         bg: "bg-amber-50" },
+  stretching:        { label: "Stretch & fold 🤲",      color: "text-amber-700",         bg: "bg-amber-50" },
+  resting:           { label: "Dough resting 🌙",       color: "text-amber-700",         bg: "bg-amber-50" },
+  cold_proof:        { label: "Cold proofing ❄️",        color: "text-sky-700",           bg: "bg-sky-50" },
+  baking:            { label: "In the oven 🔥",          color: "text-orange-700",        bg: "bg-orange-100" },
+  out_for_delivery:  { label: "Out for delivery 🚗",     color: "text-blue-700",          bg: "bg-blue-100" },
+  delivered:         { label: "Delivered ✓",             color: "text-brand-charcoal/50", bg: "bg-brand-charcoal/5" },
 };
 
 const PAYMENT_STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {

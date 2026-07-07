@@ -17,18 +17,31 @@ function fmtDate(iso: string) {
 }
 
 const STEPS = [
-  { key: "placed",           label: "Confirmed",  Icon: Clock },
-  { key: "resting",          label: "Fermenting", Icon: Package },
-  { key: "baking",           label: "Baking",     Icon: Flame },
-  { key: "out_for_delivery", label: "On the way", Icon: Truck },
-  { key: "delivered",        label: "Delivered",  Icon: CheckCircle },
+  { label: "Confirmed",  Icon: Clock },
+  { label: "Preparing",  Icon: Package },
+  { label: "Baking",     Icon: Flame },
+  { label: "On the way", Icon: Truck },
+  { label: "Delivered",  Icon: CheckCircle },
 ];
+
+function getCustomerStep(status: string | null): number {
+  const s = status || "placed";
+  if (s === "placed") return 0;
+  if (["mixing","stretching","resting","cold_proof"].includes(s)) return 1;
+  if (s === "baking") return 2;
+  if (s === "out_for_delivery") return 3;
+  if (s === "delivered") return 4;
+  return 0;
+}
 
 const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
   delivered:        { label: "Delivered",       cls: "bg-emerald-50 text-emerald-700 border border-emerald-200/60" },
   out_for_delivery: { label: "Out for Delivery", cls: "bg-sky-50 text-sky-700 border border-sky-200/60" },
   baking:           { label: "Baking",           cls: "bg-orange-50 text-orange-700 border border-orange-200/60" },
-  resting:          { label: "Fermenting",       cls: "bg-amber-50 text-amber-700 border border-amber-200/60" },
+  cold_proof:       { label: "Preparing",        cls: "bg-amber-50 text-amber-700 border border-amber-200/60" },
+  resting:          { label: "Preparing",        cls: "bg-amber-50 text-amber-700 border border-amber-200/60" },
+  stretching:       { label: "Preparing",        cls: "bg-amber-50 text-amber-700 border border-amber-200/60" },
+  mixing:           { label: "Preparing",        cls: "bg-amber-50 text-amber-700 border border-amber-200/60" },
   placed:           { label: "Confirmed",        cls: "bg-zinc-50 text-zinc-600 border border-zinc-200/60" },
 };
 
@@ -76,7 +89,7 @@ export default function AccountPage() {
   }, [router]);
 
   const activeOrder = recentOrders.find((o) => o.payment_status === "paid" && o.delivery_status !== "delivered");
-  const currentStep = STEPS.findIndex((s) => s.key === (activeOrder?.delivery_status || "placed"));
+  const currentStep = getCustomerStep(activeOrder?.delivery_status ?? null);
   const totalSpend = recentOrders.filter((o) => o.payment_status === "paid").reduce((s, o) => s + o.total_paise, 0);
 
   const NAV = [
@@ -215,7 +228,7 @@ export default function AccountPage() {
                         const active = idx === currentStep;
                         const StepIcon = step.Icon;
                         return (
-                          <React.Fragment key={step.key}>
+                          <React.Fragment key={step.label}>
                             <div className="flex flex-col items-center gap-1.5 shrink-0">
                               <div className={`w-9 h-9 rounded-full flex items-center justify-center transition-all
                                 ${active ? "bg-brand-brown ring-2 ring-brand-brown ring-offset-2 shadow-lg" : done ? "bg-brand-orange" : "bg-gray-100"}`}>
