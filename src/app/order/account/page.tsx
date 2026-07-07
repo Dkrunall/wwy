@@ -53,6 +53,10 @@ export default function AccountPage() {
   const [customerName, setCustomerName] = useState("");
   const [flat, setFlat] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [phoneEdit, setPhoneEdit] = useState("");
+  const [editingPhone, setEditingPhone] = useState(false);
+  const [phoneSaving, setPhoneSaving] = useState(false);
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -75,6 +79,14 @@ export default function AccountPage() {
         const { data: { user } } = await supabase.auth.getUser();
         if (user?.email) setEmail(user.email);
 
+        // Fetch customer record for phone
+        const { data: customer } = await supabase
+          .from("customers")
+          .select("phone")
+          .eq("flat_number", storedFlat)
+          .single();
+        if (customer?.phone) setPhone(customer.phone);
+
         const { data } = await supabase
           .from("orders")
           .select("*, order_items(*)")
@@ -87,6 +99,16 @@ export default function AccountPage() {
       }
     })();
   }, [router]);
+
+  const savePhone = async () => {
+    const cleaned = phoneEdit.replace(/\D/g, "").slice(-10);
+    if (cleaned.length < 10) return;
+    setPhoneSaving(true);
+    await supabase.from("customers").update({ phone: cleaned }).eq("flat_number", flat);
+    setPhone(cleaned);
+    setEditingPhone(false);
+    setPhoneSaving(false);
+  };
 
   const activeOrder = recentOrders.find((o) => o.payment_status === "paid" && o.delivery_status !== "delivered");
   const currentStep = getCustomerStep(activeOrder?.delivery_status ?? null);
@@ -365,9 +387,56 @@ export default function AccountPage() {
                     <p className="font-black text-brand-brown text-sm bg-gray-50 rounded-xl px-4 py-3 border border-gray-100">{value}</p>
                   </div>
                 ))}
+
+                {/* Phone — editable */}
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Phone Number</p>
+                    {!editingPhone && (
+                      <button
+                        onClick={() => { setPhoneEdit(phone); setEditingPhone(true); }}
+                        className="text-[10px] font-black uppercase tracking-wider text-brand-brown/40 hover:text-brand-orange transition-colors"
+                      >
+                        {phone ? "Edit" : "+ Add"}
+                      </button>
+                    )}
+                  </div>
+                  {editingPhone ? (
+                    <div className="flex gap-2">
+                      <input
+                        type="tel"
+                        inputMode="numeric"
+                        autoFocus
+                        maxLength={10}
+                        placeholder="9876543210"
+                        value={phoneEdit}
+                        onChange={(e) => setPhoneEdit(e.target.value.replace(/\D/g, ""))}
+                        className="flex-1 font-black text-brand-brown text-sm bg-white rounded-xl px-4 py-3 border-2 border-brand-brown/20 focus:border-brand-brown outline-none"
+                      />
+                      <button
+                        onClick={savePhone}
+                        disabled={phoneSaving || phoneEdit.replace(/\D/g,"").length < 10}
+                        className="bg-brand-brown text-white font-black text-xs tracking-wider uppercase px-4 rounded-xl hover:bg-brand-orange transition-colors disabled:opacity-40"
+                      >
+                        {phoneSaving ? "…" : "Save"}
+                      </button>
+                      <button
+                        onClick={() => setEditingPhone(false)}
+                        className="text-gray-400 font-black text-xs px-3 hover:text-gray-600 transition-colors"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="font-black text-brand-brown text-sm bg-gray-50 rounded-xl px-4 py-3 border border-gray-100">
+                      {phone ? `+91 ${phone}` : <span className="text-gray-300 font-bold">Not added yet</span>}
+                    </p>
+                  )}
+                </div>
+
                 <div className="pt-2">
                   <p className="text-[11px] font-bold text-gray-400">
-                    To update your details, contact us at{" "}
+                    To update other details, contact us at{" "}
                     <span className="text-brand-brown font-black">dnyanesh@wildwildyeast.com</span>
                   </p>
                 </div>
