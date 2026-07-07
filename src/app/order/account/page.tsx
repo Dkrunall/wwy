@@ -57,6 +57,10 @@ export default function AccountPage() {
   const [phoneEdit, setPhoneEdit] = useState("");
   const [editingPhone, setEditingPhone] = useState(false);
   const [phoneSaving, setPhoneSaving] = useState(false);
+  const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [addressEdit, setAddressEdit] = useState("");
+  const [editingAddress, setEditingAddress] = useState(false);
+  const [addressSaving, setAddressSaving] = useState(false);
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -79,13 +83,14 @@ export default function AccountPage() {
         const { data: { user } } = await supabase.auth.getUser();
         if (user?.email) setEmail(user.email);
 
-        // Fetch customer record for phone
+        // Fetch customer record for phone + delivery address
         const { data: customer } = await supabase
           .from("customers")
-          .select("phone")
+          .select("phone, address")
           .eq("flat_number", storedFlat)
           .single();
         if (customer?.phone) setPhone(customer.phone);
+        if (customer?.address) setDeliveryAddress(customer.address);
 
         const { data } = await supabase
           .from("orders")
@@ -144,6 +149,16 @@ export default function AccountPage() {
     setPhone(cleaned);
     setEditingPhone(false);
     setPhoneSaving(false);
+  };
+
+  const saveAddress = async () => {
+    const trimmed = addressEdit.trim();
+    if (!trimmed) return;
+    setAddressSaving(true);
+    await supabase.from("customers").update({ address: trimmed }).eq("flat_number", flat);
+    setDeliveryAddress(trimmed);
+    setEditingAddress(false);
+    setAddressSaving(false);
   };
 
   const activeOrder = recentOrders.find((o) => o.payment_status === "paid" && o.delivery_status !== "delivered");
@@ -279,6 +294,19 @@ export default function AccountPage() {
                       </div>
                     )}
                   </div>
+                  {activeOrder.delivery_status === "out_for_delivery" && activeOrder.borzo_tracking_url && (
+                    <div className="px-5 py-3 bg-sky-50 border-b border-sky-100 flex items-center justify-between gap-3">
+                      <p className="text-xs font-bold text-sky-700">Your bread is on its way! 🚗</p>
+                      <a
+                        href={activeOrder.borzo_tracking_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 text-[10px] font-black tracking-wider uppercase text-sky-700 hover:text-sky-900 underline underline-offset-2"
+                      >
+                        Track courier →
+                      </a>
+                    </div>
+                  )}
                   <div className="px-5 py-5">
                     <div className="flex items-start">
                       {STEPS.map((step, idx) => {
@@ -478,6 +506,53 @@ export default function AccountPage() {
                       {phone ? `+91 ${phone}` : <span className="text-gray-300 font-bold">Not added yet</span>}
                     </p>
                   )}
+                </div>
+
+                {/* Delivery address — editable */}
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Delivery Address</p>
+                    {!editingAddress && (
+                      <button
+                        onClick={() => { setAddressEdit(deliveryAddress); setEditingAddress(true); }}
+                        className="text-[10px] font-black uppercase tracking-wider text-brand-brown/40 hover:text-brand-orange transition-colors"
+                      >
+                        {deliveryAddress ? "Edit" : "+ Add"}
+                      </button>
+                    )}
+                  </div>
+                  {editingAddress ? (
+                    <div className="flex flex-col gap-2">
+                      <textarea
+                        autoFocus
+                        rows={3}
+                        placeholder="Full address incl. building, street, area, city, pincode"
+                        value={addressEdit}
+                        onChange={(e) => setAddressEdit(e.target.value)}
+                        className="font-bold text-brand-brown text-sm bg-white rounded-xl px-4 py-3 border-2 border-brand-brown/20 focus:border-brand-brown outline-none resize-none"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={saveAddress}
+                          disabled={addressSaving || !addressEdit.trim()}
+                          className="flex-1 bg-brand-brown text-white font-black text-xs tracking-wider uppercase px-4 py-2.5 rounded-xl hover:bg-brand-orange transition-colors disabled:opacity-40"
+                        >
+                          {addressSaving ? "Saving…" : "Save"}
+                        </button>
+                        <button
+                          onClick={() => setEditingAddress(false)}
+                          className="text-gray-400 font-black text-xs px-4 hover:text-gray-600 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="font-bold text-brand-brown text-sm bg-gray-50 rounded-xl px-4 py-3 border border-gray-100 leading-snug">
+                      {deliveryAddress || <span className="text-gray-300">Not added yet</span>}
+                    </p>
+                  )}
+                  <p className="text-[11px] font-bold text-gray-400">This is where the courier delivers your bread.</p>
                 </div>
 
                 <div className="pt-2">

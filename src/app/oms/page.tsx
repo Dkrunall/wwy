@@ -534,7 +534,7 @@ export default function OmsDashboard() {
 
           {/* Baker Modal */}
           {(modal==="add-baker"||modal==="edit-baker") && (
-            <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 flex flex-col gap-5" onClick={e=>e.stopPropagation()}>
+            <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 flex flex-col gap-5 overflow-y-auto max-h-[90vh]" onClick={e=>e.stopPropagation()}>
               <div className="flex items-center justify-between">
                 <h2 className="font-serif text-xl font-black text-brand-brown">{modal==="add-baker"?"Add Baker":"Edit Baker"}</h2>
                 <button onClick={closeModal} className="p-2 hover:bg-brand-brown/5 rounded-full"><X className="w-4 h-4 text-brand-brown/50"/></button>
