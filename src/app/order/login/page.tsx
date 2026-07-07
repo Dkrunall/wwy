@@ -9,7 +9,8 @@ import { supabase } from "@/lib/supabase";
 
 export default function OrderLoginPage() {
   const router = useRouter();
-  const [step, setStep] = useState<"email" | "otp" | "register">("email");
+  const [step, setStep] = useState<"email" | "otp" | "register" | "update">("email");
+  const [existingCustomerId, setExistingCustomerId] = useState("");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [name, setName] = useState("");
@@ -71,7 +72,13 @@ export default function OrderLoginPage() {
       localStorage.setItem("wwy_name", customer.name);
       localStorage.setItem("wwy_customer_id", customer.id);
       if (customer.pincode) localStorage.setItem("wwy_pincode", customer.pincode);
-      router.push("/order");
+      // If phone is missing, ask for it before proceeding
+      if (!customer.phone) {
+        setExistingCustomerId(customer.id);
+        setStep("update");
+      } else {
+        router.push("/order");
+      }
     } else {
       setStep("register");
     }
@@ -118,6 +125,18 @@ export default function OrderLoginPage() {
     router.push("/order");
   };
 
+  const updatePhone = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!phone.trim() || phone.replace(/\D/g,"").length < 10) { setError("Enter a valid 10-digit phone number."); return; }
+    setError(""); setLoading(true);
+    await supabase
+      .from("customers")
+      .update({ phone: phone.replace(/\D/g,"").slice(-10) })
+      .eq("id", existingCustomerId);
+    setLoading(false);
+    router.push("/order");
+  };
+
   const inputCls = "w-full bg-white border-2 border-brand-charcoal/10 focus:border-brand-terracotta rounded-2xl px-5 py-4 font-black text-brand-charcoal text-xl placeholder:text-brand-charcoal/20 outline-none transition-colors";
   const btnCls = "w-full bg-brand-charcoal text-white hover:bg-brand-terracotta disabled:opacity-50 rounded-2xl py-5 font-black text-sm tracking-[0.15em] uppercase transition-all duration-300 active:scale-[0.98] min-h-[56px]";
 
@@ -150,11 +169,13 @@ export default function OrderLoginPage() {
             {step === "email" && "ORDER\nONLINE."}
             {step === "otp" && "CHECK\nYOUR EMAIL."}
             {step === "register" && "FIRST TIME?\nGOOD TASTE."}
+            {step === "update" && "ONE LAST\nTHING."}
           </h1>
           <p className="text-sm font-bold text-brand-charcoal/40">
             {step === "email" && "Enter your email — we'll send a one-time code. No password."}
             {step === "otp" && `An 8-digit code was sent to ${email}. Check your inbox (and spam).`}
             {step === "register" && "Just a few details and you're in."}
+            {step === "update" && "Add your phone number so your baker can reach you."}
           </p>
         </div>
 
@@ -273,6 +294,33 @@ export default function OrderLoginPage() {
             {error && <p className="text-xs font-bold text-brand-terracotta">{error}</p>}
             <button type="submit" disabled={loading} className={btnCls}>
               {loading ? "Saving..." : "Start ordering →"}
+            </button>
+          </form>
+        )}
+
+        {/* ── Step 4: Add phone (existing user, no phone on file) ── */}
+        {step === "update" && (
+          <form onSubmit={updatePhone} className="w-full flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">Phone Number</label>
+              <input
+                type="tel"
+                inputMode="numeric"
+                autoFocus
+                placeholder="9876543210"
+                value={phone}
+                onChange={(e) => { setPhone(e.target.value); setError(""); }}
+                className={inputCls}
+              />
+              <p className="text-[11px] font-bold text-brand-charcoal/30">So your baker can reach you if needed.</p>
+            </div>
+            {error && <p className="text-xs font-bold text-brand-terracotta">{error}</p>}
+            <button type="submit" disabled={loading} className={btnCls}>
+              {loading ? "Saving..." : "Continue →"}
+            </button>
+            <button type="button" onClick={() => router.push("/order")}
+              className="text-xs font-bold text-brand-charcoal/30 hover:text-brand-terracotta transition-colors text-center">
+              Skip for now
             </button>
           </form>
         )}
