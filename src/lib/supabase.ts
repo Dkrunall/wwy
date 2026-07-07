@@ -54,6 +54,8 @@ export type Order = {
   invoice_url: string | null;
   baker_id: string | null;
   admin_notes: string | null;
+  borzo_order_id: string | null;
+  borzo_tracking_url: string | null;
   created_at: string;
   updated_at: string;
   order_items?: OrderItem[];
@@ -83,6 +85,9 @@ export type Baker = {
   daily_capacity: number;
   is_active: boolean;
   share_token: string;
+  address: string | null;
+  lat: number | null;
+  lng: number | null;
   created_at: string;
 };
 

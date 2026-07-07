@@ -19,11 +19,12 @@ interface Order {
   total_paise: number; status: string; payment_status: string | null;
   delivery_status: string | null; delivery_date: string | null; invoice_url: string | null;
   baker_id: string | null; notes: string | null; admin_notes: string | null;
+  borzo_order_id: string | null; borzo_tracking_url: string | null;
   source: string | null; created_at: string; order_items?: OrderItem[];
 }
 interface Product { id: string; name: string; category: string; description?: string | null; price_paise: number; available: boolean; }
 interface Customer { id: string; name: string; flat_number: string; phone: string | null; address?: string | null; pincode?: string | null; created_at: string; }
-interface Baker { id: string; name: string; phone: string; is_active: boolean; share_token: string; pincodes?: string[]; daily_capacity?: number; }
+interface Baker { id: string; name: string; phone: string; is_active: boolean; share_token: string; pincodes?: string[]; daily_capacity?: number; address?: string | null; lat?: number | null; lng?: number | null; }
 interface Setting { key: string; value: string; }
 interface Feedback { id: string; order_id: string | null; flat_number: string; rating: number; comment: string | null; created_at: string; }
 interface Session { phone: string; step: string; cart: unknown; temp: unknown; updated_at: string; }
@@ -113,7 +114,7 @@ export default function OmsDashboard() {
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [actionOrder, setActionOrder] = useState<Order | null>(null);
   const [productForm, setProductForm] = useState({name:"",category:"",description:"",price:"",available:true});
-  const [bakerForm, setBakerForm] = useState({name:"",phone:"",pincodes:"",daily_capacity:"20",is_active:true});
+  const [bakerForm, setBakerForm] = useState({name:"",phone:"",pincodes:"",daily_capacity:"20",is_active:true,address:"",lat:"",lng:""});
   const [customerForm, setCustomerForm] = useState({name:"",phone:"",address:"",pincode:""});
   const [deliveryDateInput, setDeliveryDateInput] = useState("");
   const [formSaving, setFormSaving] = useState(false);
@@ -296,14 +297,14 @@ export default function OmsDashboard() {
   };
 
   // ── Baker CRUD ──
-  const openAddBaker = () => { setEditingBaker(null); setBakerForm({name:"",phone:"",pincodes:"",daily_capacity:"20",is_active:true}); setFormError(""); setModal("add-baker"); };
-  const openEditBaker = (b: Baker) => { setEditingBaker(b); setBakerForm({name:b.name,phone:b.phone,pincodes:(b.pincodes||[]).join(", "),daily_capacity:String(b.daily_capacity||20),is_active:b.is_active}); setFormError(""); setModal("edit-baker"); };
+  const openAddBaker = () => { setEditingBaker(null); setBakerForm({name:"",phone:"",pincodes:"",daily_capacity:"20",is_active:true,address:"",lat:"",lng:""}); setFormError(""); setModal("add-baker"); };
+  const openEditBaker = (b: Baker) => { setEditingBaker(b); setBakerForm({name:b.name,phone:b.phone,pincodes:(b.pincodes||[]).join(", "),daily_capacity:String(b.daily_capacity||20),is_active:b.is_active,address:b.address||"",lat:b.lat!=null?String(b.lat):"",lng:b.lng!=null?String(b.lng):""}); setFormError(""); setModal("edit-baker"); };
   const saveBaker = async () => {
     if(!bakerForm.name.trim()){setFormError("Name required.");return;}
     if(!bakerForm.phone.trim()){setFormError("Phone required.");return;}
     setFormSaving(true);
     const pincodes = bakerForm.pincodes.split(",").map(p=>p.trim()).filter(Boolean);
-    const payload = {name:bakerForm.name.trim(),phone:bakerForm.phone.trim(),pincodes,daily_capacity:parseInt(bakerForm.daily_capacity)||20,is_active:bakerForm.is_active};
+    const payload = {name:bakerForm.name.trim(),phone:bakerForm.phone.trim(),pincodes,daily_capacity:parseInt(bakerForm.daily_capacity)||20,is_active:bakerForm.is_active,address:bakerForm.address.trim()||null,lat:bakerForm.lat?parseFloat(bakerForm.lat):null,lng:bakerForm.lng?parseFloat(bakerForm.lng):null};
     if(editingBaker) {
       const {error} = await supabase.from("bakers").update(payload).eq("id",editingBaker.id);
       if(error){setFormError("Save failed: "+error.message);setFormSaving(false);return;}
@@ -543,6 +544,14 @@ export default function OmsDashboard() {
                 <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Phone</label><input className={inputCls} type="tel" placeholder="9876543210" value={bakerForm.phone} onChange={e=>setBakerForm(f=>({...f,phone:e.target.value}))}/></div>
                 <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Pincodes <span className="normal-case font-bold text-brand-brown/30">(comma-separated)</span></label><input className={inputCls} placeholder="400001, 400002" value={bakerForm.pincodes} onChange={e=>setBakerForm(f=>({...f,pincodes:e.target.value}))}/></div>
                 <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Daily Capacity</label><input className={inputCls} type="number" min="1" placeholder="20" value={bakerForm.daily_capacity} onChange={e=>setBakerForm(f=>({...f,daily_capacity:e.target.value}))}/></div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Pickup Address <span className="normal-case font-bold text-brand-brown/30">(for Borzo dispatch)</span></label>
+                  <textarea className={inputCls+" resize-none text-sm"} rows={2} placeholder="Full kitchen address incl. street, area, city, pincode" value={bakerForm.address} onChange={e=>setBakerForm(f=>({...f,address:e.target.value}))}/>
+                </div>
+                <div className="flex gap-3">
+                  <div className="flex flex-col gap-1.5 flex-1"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Latitude</label><input className={inputCls} type="number" step="any" placeholder="19.0760" value={bakerForm.lat} onChange={e=>setBakerForm(f=>({...f,lat:e.target.value}))}/></div>
+                  <div className="flex flex-col gap-1.5 flex-1"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Longitude</label><input className={inputCls} type="number" step="any" placeholder="72.8777" value={bakerForm.lng} onChange={e=>setBakerForm(f=>({...f,lng:e.target.value}))}/></div>
+                </div>
                 <div className="flex items-center justify-between bg-brand-oat/40 border border-brand-brown/10 rounded-2xl px-4 py-3">
                   <span className="text-sm font-bold text-brand-brown/70">Active (accepts orders)</span>
                   <button onClick={()=>setBakerForm(f=>({...f,is_active:!f.is_active}))} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${bakerForm.is_active?"bg-brand-orange":"bg-brand-brown/20"}`}><span className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${bakerForm.is_active?"translate-x-4.5":"translate-x-0.5"}`}/></button>
@@ -959,6 +968,7 @@ export default function OmsDashboard() {
                             </button>
                           )}
                           {order.invoice_url&&<a href={order.invoice_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 bg-brand-brown/5 border border-brand-brown/10 hover:bg-brand-brown hover:text-white text-brand-brown/70 text-[10px] font-black uppercase px-3 py-2 rounded-xl transition-all"><FileText className="w-3 h-3"/>PDF</a>}
+                          {order.borzo_tracking_url&&<a href={order.borzo_tracking_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white text-[10px] font-black uppercase px-3 py-2 rounded-xl border border-sky-200 hover:border-sky-600 transition-all"><Activity className="w-3 h-3"/>Borzo Track</a>}
                           {customerPhone&&<a href={`https://wa.me/91${customerPhone.replace(/\D/g,"")}?text=Hi%20${encodeURIComponent(order.customer_name)}%2C%20your%20WWY%20order%20${encodeURIComponent(order.order_number||"")}%3A%20`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white text-[10px] font-black uppercase px-3 py-2 rounded-xl border border-emerald-200/50 hover:border-emerald-600 transition-all"><MessageCircle className="w-3 h-3"/>WA</a>}
                           {!isCancelled&&<button onClick={()=>{setActionOrder(order);setDeliveryDateInput(order.delivery_date||"");setModal("edit-delivery");}} className="inline-flex items-center gap-1.5 bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white text-[10px] font-black uppercase px-3 py-2 rounded-xl border border-sky-200 hover:border-sky-600 transition-all cursor-pointer"><CalendarDays className="w-3 h-3"/>Date</button>}
                           {!isCancelled&&order.delivery_status!=="delivered"&&<button onClick={()=>{setActionOrder(order);setModal("cancel-order");}} className="inline-flex items-center gap-1.5 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white text-[10px] font-black uppercase px-3 py-2 rounded-xl border border-rose-200 hover:border-rose-600 transition-all cursor-pointer"><XCircle className="w-3 h-3"/>Cancel</button>}

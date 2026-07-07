@@ -15,6 +15,7 @@ export default function OrderLoginPage() {
   const [otp, setOtp] = useState("");
   const [name, setName] = useState("");
   const [flat, setFlat] = useState("");
+  const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
   const [pincode, setPincode] = useState("");
   const [error, setError] = useState("");
@@ -112,6 +113,7 @@ export default function OrderLoginPage() {
         email: email.trim().toLowerCase(),
         phone: phone.replace(/\D/g,"").slice(-10),
         pincode: pincode.trim(),
+        address: address.trim() || null,
       })
       .select()
       .single();
@@ -265,6 +267,17 @@ export default function OrderLoginPage() {
                 onChange={(e) => { setFlat(e.target.value); setError(""); }}
                 className={inputCls}
               />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">Delivery Address</label>
+              <textarea
+                rows={2}
+                placeholder="e.g. Flat 4B, Tower C, Sunshine Apartments, Linking Road, Bandra West, Mumbai"
+                value={address}
+                onChange={(e) => { setAddress(e.target.value); setError(""); }}
+                className={inputCls + " resize-none leading-snug text-base"}
+              />
+              <p className="text-[11px] font-bold text-brand-charcoal/30">Full address so the courier can find you.</p>
             </div>
             <div className="flex flex-col gap-2">
               <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">Phone Number</label>
