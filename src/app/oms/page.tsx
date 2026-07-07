@@ -183,8 +183,16 @@ export default function OmsDashboard() {
   const advanceDelivery = async (orderId: string, cur: string) => {
     const next = D_NEXT[cur]; if(!next) return;
     setUpdatingId(orderId);
-    await supabase.from("orders").update({delivery_status:next,updated_at:new Date().toISOString()}).eq("id",orderId);
-    setOrders(p=>p.map(o=>o.id===orderId?{...o,delivery_status:next}:o));
+    const r = await fetch("/api/oms/orders/advance",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({orderId,nextStatus:next})});
+    const d = await r.json();
+    if(d.ok) {
+      setOrders(p=>p.map(o=>o.id===orderId?{
+        ...o,
+        delivery_status:next,
+        borzo_order_id: d.updatePayload?.borzo_order_id ?? o.borzo_order_id,
+        borzo_tracking_url: d.updatePayload?.borzo_tracking_url ?? o.borzo_tracking_url,
+      }:o));
+    }
     setUpdatingId(null);
   };
   const assignBaker = async (orderId: string, bakerId: string|null) => {
@@ -970,7 +978,7 @@ export default function OmsDashboard() {
                           {order.invoice_url&&<a href={order.invoice_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 bg-brand-brown/5 border border-brand-brown/10 hover:bg-brand-brown hover:text-white text-brand-brown/70 text-[10px] font-black uppercase px-3 py-2 rounded-xl transition-all"><FileText className="w-3 h-3"/>PDF</a>}
                           {order.borzo_tracking_url&&<a href={order.borzo_tracking_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white text-[10px] font-black uppercase px-3 py-2 rounded-xl border border-sky-200 hover:border-sky-600 transition-all"><Activity className="w-3 h-3"/>Borzo Track</a>}
                           {customerPhone&&<a href={`https://wa.me/91${customerPhone.replace(/\D/g,"")}?text=Hi%20${encodeURIComponent(order.customer_name)}%2C%20your%20WWY%20order%20${encodeURIComponent(order.order_number||"")}%3A%20`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-600 text-emerald-700 hover:text-white text-[10px] font-black uppercase px-3 py-2 rounded-xl border border-emerald-200/50 hover:border-emerald-600 transition-all"><MessageCircle className="w-3 h-3"/>WA</a>}
-                          {!isCancelled&&<button onClick={()=>{setActionOrder(order);setDeliveryDateInput(order.delivery_date||"");setModal("edit-delivery");}} className="inline-flex items-center gap-1.5 bg-sky-50 hover:bg-sky-600 text-sky-700 hover:text-white text-[10px] font-black uppercase px-3 py-2 rounded-xl border border-sky-200 hover:border-sky-600 transition-all cursor-pointer"><CalendarDays className="w-3 h-3"/>Date</button>}
+                          {!isCancelled&&<button onClick={()=>{setActionOrder(order);setDeliveryDateInput(order.delivery_date||"");setModal("edit-delivery");}} className="inline-flex items-center gap-1.5 bg-violet-50 hover:bg-violet-600 text-violet-700 hover:text-white text-[10px] font-black uppercase px-3 py-2 rounded-xl border border-violet-200 hover:border-violet-600 transition-all cursor-pointer"><CalendarDays className="w-3 h-3"/>Date</button>}
                           {!isCancelled&&order.delivery_status!=="delivered"&&<button onClick={()=>{setActionOrder(order);setModal("cancel-order");}} className="inline-flex items-center gap-1.5 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white text-[10px] font-black uppercase px-3 py-2 rounded-xl border border-rose-200 hover:border-rose-600 transition-all cursor-pointer"><XCircle className="w-3 h-3"/>Cancel</button>}
                         </div>
                       </div>
@@ -1075,6 +1083,10 @@ export default function OmsDashboard() {
                       <a href={`tel:${b.phone}`} className="text-xs font-bold text-brand-brown/50 hover:text-brand-orange inline-flex items-center gap-1.5 mt-2"><Phone className="w-3.5 h-3.5 text-brand-orange"/>{b.phone}</a>
                       {b.pincodes&&b.pincodes.length>0&&<p className="text-[10px] font-bold text-brand-brown/40 mt-1">{b.pincodes.join(", ")}</p>}
                       {b.daily_capacity&&<p className="text-[10px] font-bold text-brand-brown/40">Capacity: {b.daily_capacity}/day</p>}
+                      {b.address
+                        ?<p className="text-[10px] font-black text-emerald-700 inline-flex items-center gap-1 mt-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"/>Borzo pickup set</p>
+                        :<p className="text-[10px] font-black text-amber-700 inline-flex items-center gap-1 mt-1"><span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block"/>No pickup address — Borzo won&apos;t dispatch</p>
+                      }
                     </div>
                     <div className="flex gap-1.5 shrink-0">
                       <button onClick={()=>openEditBaker(b)} className="p-2 rounded-xl border border-brand-brown/10 hover:bg-brand-brown/5 text-brand-brown/40 hover:text-brand-brown cursor-pointer"><Edit2 className="w-3.5 h-3.5"/></button>

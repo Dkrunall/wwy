@@ -73,3 +73,11 @@ ALTER TABLE orders ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'web';
 
 -- ─── Customers: email for OTP login ─────────────────────────────────────────
 ALTER TABLE customers ADD COLUMN IF NOT EXISTS email TEXT UNIQUE;
+
+-- ─── Borzo delivery integration ──────────────────────────────────────────────
+ALTER TABLE bakers ADD COLUMN IF NOT EXISTS address TEXT;
+ALTER TABLE bakers ADD COLUMN IF NOT EXISTS lat     FLOAT8;
+ALTER TABLE bakers ADD COLUMN IF NOT EXISTS lng     FLOAT8;
+
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS borzo_order_id     TEXT;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS borzo_tracking_url TEXT;
