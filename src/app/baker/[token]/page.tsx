@@ -411,7 +411,15 @@ export default function BakerDashboard() {
                   <p className="text-[11px] font-bold text-gray-400">{queue.length} orders</p>
                 </div>
 
-                {queue.length === 0 && (
+                {baker.daily_capacity && queue.length >= baker.daily_capacity && (
+                  <div className="mx-5 mt-4 bg-rose-50 border border-rose-200 rounded-xl px-4 py-3">
+                    <p className="text-xs font-black text-rose-700">
+                      ⚠ Queue full — {queue.length}/{baker.daily_capacity} orders. No new orders will be assigned until you complete some.
+                    </p>
+                  </div>
+                )}
+
+              {queue.length === 0 && (
                   <div className="px-5 py-14 text-center flex flex-col items-center gap-3">
                     <Package className="w-10 h-10 text-gray-200" />
                     <p className="font-black text-gray-300 text-sm">No active orders.</p>
@@ -556,8 +564,17 @@ export default function BakerDashboard() {
               </div>
 
               {historyLoading && (
-                <div className="px-5 py-10 text-center">
-                  <p className="text-xs font-black text-gray-300 uppercase tracking-widest animate-pulse">Loading…</p>
+                <div className="flex flex-col divide-y divide-gray-50">
+                  {[1,2,3].map((n) => (
+                    <div key={n} className="px-5 py-4 flex items-center gap-4 animate-pulse">
+                      <div className="w-10 h-10 rounded-xl bg-gray-100 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="h-3.5 bg-gray-100 rounded w-32 mb-2" />
+                        <div className="h-2.5 bg-gray-50 rounded w-20" />
+                      </div>
+                      <div className="h-3.5 bg-gray-100 rounded w-12 shrink-0" />
+                    </div>
+                  ))}
                 </div>
               )}
 

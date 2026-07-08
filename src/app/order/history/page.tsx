@@ -71,6 +71,7 @@ export default function HistoryPage() {
   const [feedbackRating, setFeedbackRating] = useState<Record<string, number>>({});
   const [feedbackComment, setFeedbackComment] = useState<Record<string, string>>({});
   const [feedbackOpen, setFeedbackOpen] = useState<string | null>(null);
+  const [feedbackError, setFeedbackError] = useState<string | null>(null);
 
   const reorder = async (order: Order) => {
     if (!order.order_items?.length) return;
@@ -145,8 +146,10 @@ export default function HistoryPage() {
     if (res.ok || data.error === "Feedback already submitted") {
       setFeedbackStates((prev) => ({ ...prev, [orderId]: "done" }));
       setFeedbackOpen(null);
+      setFeedbackError(null);
     } else {
       setFeedbackStates((prev) => ({ ...prev, [orderId]: "idle" }));
+      setFeedbackError("Couldn't submit feedback. Please try again.");
     }
   };
 
@@ -182,9 +185,15 @@ export default function HistoryPage() {
 
       <div className="max-w-2xl mx-auto px-4 pt-6">
         {loading && (
-          <p className="font-black text-brand-charcoal/30 tracking-widest text-xs uppercase animate-pulse text-center py-12">
-            Loading...
-          </p>
+          <div className="flex flex-col gap-3">
+            {[1,2,3].map((n) => (
+              <div key={n} className="bg-white rounded-2xl px-4 py-4 border border-brand-charcoal/5 animate-pulse">
+                <div className="h-5 bg-brand-charcoal/6 rounded-full w-28 mb-2" />
+                <div className="h-4 bg-brand-charcoal/8 rounded w-16 mb-1" />
+                <div className="h-3 bg-brand-charcoal/4 rounded w-40" />
+              </div>
+            ))}
+          </div>
         )}
 
         {!loading && orders.length === 0 && (
@@ -295,16 +304,19 @@ export default function HistoryPage() {
                               onChange={(e) => setFeedbackComment((prev) => ({ ...prev, [order.id]: e.target.value }))}
                               className="w-full bg-brand-oat border border-brand-charcoal/10 rounded-xl px-3 py-2 text-sm font-medium text-brand-charcoal placeholder:text-brand-charcoal/20 outline-none resize-none"
                             />
+                            {feedbackError && (
+                              <p className="text-xs font-bold text-red-600">{feedbackError}</p>
+                            )}
                             <div className="flex gap-2">
                               <button
-                                onClick={() => submitFeedback(order.id)}
+                                onClick={() => { setFeedbackError(null); submitFeedback(order.id); }}
                                 disabled={!feedbackRating[order.id] || fbState === "submitting"}
                                 className="flex-1 bg-brand-charcoal disabled:opacity-40 text-white font-black text-xs tracking-wider uppercase px-4 py-2.5 rounded-xl transition-colors hover:bg-brand-terracotta"
                               >
                                 {fbState === "submitting" ? "Sending..." : "Submit"}
                               </button>
                               <button
-                                onClick={() => setFeedbackOpen(null)}
+                                onClick={() => { setFeedbackOpen(null); setFeedbackError(null); }}
                                 className="px-4 py-2.5 text-xs font-black text-brand-charcoal/40 hover:text-brand-charcoal transition-colors"
                               >
                                 Cancel

@@ -38,6 +38,7 @@ export default function OrderPage() {
   const [category, setCategory] = useState("All");
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -58,10 +59,10 @@ export default function OrderPage() {
       try {
         const { data: setting } = await supabase.from("settings").select("value").eq("key", "vacation_mode").single();
         if (setting?.value === "true") { router.replace("/coming-soon"); return; }
-        const { data } = await supabase.from("products").select("*").eq("available", true).order("category");
-        setProducts(data || []);
+        const { data, error: fetchErr } = await supabase.from("products").select("*").eq("available", true).order("category");
+        if (fetchErr) { setLoadError(true); } else { setProducts(data || []); }
       } catch {
-        setProducts([]);
+        setLoadError(true);
       } finally {
         setLoading(false);
       }
@@ -97,8 +98,38 @@ export default function OrderPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-brand-oat flex items-center justify-center">
-        <p className="font-black text-brand-charcoal/30 tracking-widest text-xs uppercase animate-pulse">Loading...</p>
+      <main className="min-h-screen bg-brand-oat pb-36">
+        <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-brand-brown/10 shadow-sm h-14" />
+        <div className="max-w-2xl mx-auto px-4 pt-5 pb-3">
+          <div className="h-8 bg-brand-brown/8 rounded-xl w-56 mb-2 animate-pulse" />
+          <div className="h-3 bg-brand-brown/5 rounded w-40 animate-pulse" />
+        </div>
+        <div className="max-w-2xl mx-auto px-4 flex flex-col gap-3 pt-2">
+          {[1,2,3,4].map((n) => (
+            <div key={n} className="bg-white rounded-2xl p-4 border border-brand-brown/8 shadow-sm animate-pulse">
+              <div className="h-2.5 bg-brand-brown/8 rounded w-16 mb-2" />
+              <div className="h-4 bg-brand-brown/10 rounded w-3/4 mb-3" />
+              <div className="h-3 bg-brand-brown/5 rounded w-full mb-1" />
+              <div className="h-3 bg-brand-brown/5 rounded w-2/3 mb-4" />
+              <div className="h-9 bg-brand-brown/8 rounded-xl w-20" />
+            </div>
+          ))}
+        </div>
+      </main>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <main className="min-h-screen bg-brand-oat flex flex-col items-center justify-center px-5 gap-5">
+        <p className="font-black text-brand-charcoal/30 text-xl tracking-tight">Couldn&apos;t load menu.</p>
+        <p className="text-sm font-bold text-brand-charcoal/30">Check your connection and try again.</p>
+        <button
+          onClick={() => { setLoadError(false); setLoading(true); window.location.reload(); }}
+          className="bg-brand-charcoal text-white font-black text-xs tracking-wider uppercase px-6 py-3 rounded-xl hover:bg-brand-terracotta transition-colors"
+        >
+          Retry
+        </button>
       </main>
     );
   }
@@ -219,7 +250,19 @@ export default function OrderPage() {
       {/* ── Product list ── */}
       <div className="max-w-2xl mx-auto px-4 flex flex-col gap-3">
         {filtered.length === 0 && (
-          <p className="text-sm font-bold text-brand-brown/30 py-8 text-center">Nothing here this week. Check back soon.</p>
+          <div className="flex flex-col items-center gap-4 py-12">
+            <p className="text-sm font-bold text-brand-brown/30 text-center">
+              {category === "All" ? "Nothing available this week. Check back soon." : `No ${category} available right now.`}
+            </p>
+            {category !== "All" && (
+              <button
+                onClick={() => setCategory("All")}
+                className="text-xs font-black tracking-wider uppercase text-brand-brown/50 hover:text-brand-brown border border-brand-brown/20 hover:border-brand-brown/40 px-5 py-2 rounded-xl transition-colors"
+              >
+                ← Back to All
+              </button>
+            )}
+          </div>
         )}
         {filtered.map((product) => (
           <ProductCard

@@ -54,8 +54,22 @@ function ConfirmContent() {
 
   if (!order) {
     return (
-      <main className="min-h-screen bg-brand-oat flex items-center justify-center px-5">
-        <p className="font-black text-brand-charcoal/40 text-center">Order not found.</p>
+      <main className="min-h-screen bg-brand-oat flex flex-col items-center justify-center px-5 gap-5">
+        <p className="font-black text-brand-charcoal/40 text-center text-xl">Order not found.</p>
+        <div className="flex flex-col gap-2 w-full max-w-xs">
+          <button
+            onClick={() => router.push("/order/account")}
+            className="w-full bg-brand-charcoal hover:bg-brand-terracotta text-white font-black text-xs tracking-wider uppercase px-6 py-3 rounded-2xl transition-all"
+          >
+            My Orders
+          </button>
+          <button
+            onClick={() => router.push("/order")}
+            className="w-full text-brand-charcoal/40 hover:text-brand-terracotta font-black text-xs tracking-wider uppercase py-2 transition-colors"
+          >
+            ← Back to Shop
+          </button>
+        </div>
       </main>
     );
   }

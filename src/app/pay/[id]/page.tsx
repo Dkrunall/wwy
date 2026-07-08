@@ -59,6 +59,14 @@ export default function PayPage() {
 
   useEffect(() => { fetchOrder(); }, [fetchOrder]);
 
+  // Auto-redirect if already paid
+  useEffect(() => {
+    if (order?.payment_status === "paid") {
+      const t = setTimeout(() => router.push(`/order/confirm?id=${order.id}`), 2500);
+      return () => clearTimeout(t);
+    }
+  }, [order, router]);
+
   const handlePay = async () => {
     if (!order) return;
     setPaying(true);
@@ -118,9 +126,23 @@ export default function PayPage() {
 
   if (!order) {
     return (
-      <main className="min-h-screen bg-[#FAF6F0] flex flex-col items-center justify-center px-5 gap-4">
+      <main className="min-h-screen bg-[#FAF6F0] flex flex-col items-center justify-center px-5 gap-5">
         <p className="font-black text-2xl text-[#2C1A0E]/30 tracking-tight">Order Not Found</p>
-        <p className="text-sm text-[#2C1A0E]/40">This payment link may have expired or already been used.</p>
+        <p className="text-sm text-[#2C1A0E]/40 text-center">This payment link may have expired or already been used.</p>
+        <div className="flex flex-col gap-2 w-full max-w-xs">
+          <button
+            onClick={() => router.push("/order")}
+            className="w-full bg-[#2C1A0E] text-white font-black text-sm tracking-wider uppercase px-6 py-3 rounded-2xl hover:bg-[#C9A96E] transition-all"
+          >
+            ← Back to Shop
+          </button>
+          <button
+            onClick={() => router.push("/order/account")}
+            className="w-full bg-white border border-[#2C1A0E]/10 text-[#2C1A0E]/50 font-black text-xs tracking-wider uppercase px-6 py-3 rounded-2xl hover:bg-[#FAF6F0] transition-all"
+          >
+            My Orders
+          </button>
+        </div>
       </main>
     );
   }
@@ -132,6 +154,7 @@ export default function PayPage() {
           <p className="text-[11px] font-black tracking-[0.25em] uppercase text-green-600 mb-3">✓ Already Paid</p>
           <p className="font-black text-[#2C1A0E] text-2xl tracking-tight">Order {order.order_number}</p>
           <p className="text-sm text-[#2C1A0E]/40 mt-2">This order has already been paid. Thank you! 🌾</p>
+          <p className="text-xs text-[#2C1A0E]/30 mt-1">Redirecting to your order...</p>
         </div>
         <button
           onClick={() => router.push(`/order/confirm?id=${order.id}`)}

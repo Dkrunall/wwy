@@ -65,6 +65,13 @@ export default function CartPage() {
     }
   }, [router]);
 
+  // Auto-dismiss the "Payment cancelled" error after 5 seconds
+  useEffect(() => {
+    if (!error) return;
+    const t = setTimeout(() => setError(""), 5000);
+    return () => clearTimeout(t);
+  }, [error]);
+
   const updateQty = (productId: string, delta: number) => {
     setCart((prev) => {
       const next = prev
@@ -286,10 +293,13 @@ export default function CartPage() {
         {/* Pay button */}
         <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-brand-oat/80 backdrop-blur-md border-t border-brand-charcoal/5">
           <div className="max-w-2xl mx-auto flex flex-col gap-2">
+            {deliverySlots.length > 0 && !selectedDeliveryDate && !loading && (
+              <p className="text-[11px] font-bold text-brand-charcoal/40 text-center">Choose a delivery date above to continue.</p>
+            )}
             <button
               onClick={handlePay}
-              disabled={loading || cart.length === 0}
-              className="w-full bg-brand-charcoal hover:bg-brand-terracotta disabled:opacity-50 text-white rounded-2xl py-5 font-black text-sm tracking-[0.15em] uppercase transition-all duration-300 active:scale-[0.98] min-h-[56px]"
+              disabled={loading || cart.length === 0 || !selectedDeliveryDate}
+              className="w-full bg-brand-charcoal hover:bg-brand-terracotta disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl py-5 font-black text-sm tracking-[0.15em] uppercase transition-all duration-300 active:scale-[0.98] min-h-[56px]"
             >
               {loading ? "Opening payment..." : `Pay · ${fmt(displayTotal)}`}
             </button>

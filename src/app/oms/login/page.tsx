@@ -3,11 +3,12 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { Key, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 
 export default function OmsLoginPage() {
   const router = useRouter();
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -16,8 +17,6 @@ export default function OmsLoginPage() {
     if (!password.trim()) { setError("Enter the admin password."); return; }
     setError("");
     setLoading(true);
-
-    await new Promise((r) => setTimeout(r, 300));
 
     const res = await fetch("/api/oms/auth", {
       method: "POST",
@@ -69,16 +68,23 @@ export default function OmsLoginPage() {
               </label>
               <div className="relative">
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   autoFocus
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => { setPassword(e.target.value); setError(""); }}
                   className="w-full bg-brand-brown/5 border-2 border-brand-brown/10 focus:border-brand-orange focus:ring-4 focus:ring-brand-orange/5 rounded-2xl pl-5 pr-12 py-4 font-mono text-brand-brown text-xl placeholder:text-brand-brown/20 outline-none transition-all"
                 />
-                <Key className="w-5 h-5 text-brand-brown/25 absolute right-4 top-1/2 -translate-y-1/2" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-brand-brown/30 hover:text-brand-brown/60 transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
               </div>
-              {error && <p className="text-xs font-bold text-rose-650 mt-1">{error}</p>}
+              {error && <p className="text-xs font-bold text-rose-600 mt-1">{error}</p>}
             </div>
             <button
               type="submit"
