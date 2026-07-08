@@ -4,16 +4,20 @@ export const dynamic = "force-dynamic";
 
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
+import Image from "next/image";
+import {
+  RefreshCw, Loader2, CheckCircle2, MessageCircle,
+  ChevronDown, ChevronUp, Palmtree, Package, Clock,
+} from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { Clock, RefreshCw, Loader2, CheckCircle2, MessageCircle, ChevronDown, ChevronUp, Palmtree } from "lucide-react";
 
 interface BakerOrder {
   id: string;
-  order_number: string;
+  order_number: string | null;
   flat_number: string;
   customer_name: string;
   total_paise: number;
-  delivery_date: string;
+  delivery_date: string | null;
   delivery_status: string;
   payment_status: string;
   notes: string | null;
@@ -27,87 +31,44 @@ interface Baker {
   daily_capacity?: number;
 }
 
-function fmt(paise: number) {
-  return `₹${(paise / 100).toFixed(0)}`;
-}
+const fmt = (p: number) => `₹${(p / 100).toFixed(0)}`;
+const fmtDate = (d: string | null) =>
+  d ? new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short" }) : "—";
 
-// ── Baker status chain (granular bread-making stages) ──
-const BAKER_STEPS = [
-  { key: "placed",           label: "Placed",        short: "Placed" },
-  { key: "mixing",           label: "Mixing",         short: "Mixing" },
-  { key: "stretching",       label: "Stretch & Fold", short: "Stretch" },
-  { key: "resting",          label: "Bulk Rest",      short: "Rest" },
-  { key: "cold_proof",       label: "Cold Proof",     short: "Cold" },
-  { key: "baking",           label: "Baking",         short: "Baking" },
-  { key: "out_for_delivery", label: "In Transit",     short: "Transit" },
-  { key: "delivered",        label: "Delivered",      short: "Done" },
+const STEPS = [
+  { key: "placed",           short: "Placed" },
+  { key: "mixing",           short: "Mixing" },
+  { key: "stretching",       short: "Stretch" },
+  { key: "resting",          short: "Rest" },
+  { key: "cold_proof",       short: "Proof" },
+  { key: "baking",           short: "Baking" },
+  { key: "out_for_delivery", short: "Transit" },
+  { key: "delivered",        short: "Done" },
 ];
 
-const BAKER_NEXT: Record<string, string> = {
-  placed:    "mixing",
-  mixing:    "stretching",
-  stretching:"resting",
-  resting:   "cold_proof",
-  cold_proof:"baking",
-  baking:    "out_for_delivery",
+const NEXT: Record<string, string> = {
+  placed: "mixing", mixing: "stretching", stretching: "resting",
+  resting: "cold_proof", cold_proof: "baking", baking: "out_for_delivery",
 };
 
-const BAKER_BTN: Record<string, string> = {
-  placed:    "Start Mixing",
-  mixing:    "Stretch & Fold Done",
-  stretching:"Start Bulk Rest",
-  resting:   "Start Cold Proof",
-  cold_proof:"Into the Oven",
-  baking:    "Ready for Delivery →",
+const BTN_LABEL: Record<string, string> = {
+  placed: "Start Mixing", mixing: "Stretch & Fold Done",
+  stretching: "Start Bulk Rest", resting: "Start Cold Proof",
+  cold_proof: "Into the Oven", baking: "Ready for Pickup →",
 };
 
-const D_THEME: Record<string, { bg: string; text: string; border: string; pulse: string }> = {
-  placed:           { bg: "bg-zinc-50",      text: "text-zinc-600",   border: "border-zinc-200/60",   pulse: "bg-zinc-400" },
-  mixing:           { bg: "bg-yellow-50",    text: "text-yellow-800", border: "border-yellow-200/50", pulse: "bg-yellow-500" },
-  stretching:       { bg: "bg-yellow-50",    text: "text-yellow-800", border: "border-yellow-200/50", pulse: "bg-yellow-500" },
-  resting:          { bg: "bg-amber-50/60",  text: "text-amber-800",  border: "border-amber-200/50",  pulse: "bg-amber-500" },
-  cold_proof:       { bg: "bg-sky-50/60",    text: "text-sky-800",    border: "border-sky-200/50",    pulse: "bg-sky-400" },
-  baking:           { bg: "bg-orange-50/60", text: "text-orange-800", border: "border-orange-200/50", pulse: "bg-orange-500" },
-  out_for_delivery: { bg: "bg-sky-50/60",    text: "text-sky-850",    border: "border-sky-200/50",    pulse: "bg-sky-500" },
-  delivered:        { bg: "bg-emerald-50/60",text: "text-emerald-800",border: "border-emerald-200/50",pulse: "bg-emerald-500" },
-};
-
-const STATUS_LABELS: Record<string, string> = {
-  placed:           "Placed",
-  mixing:           "Mixing",
-  stretching:       "Stretch & Fold",
-  resting:          "Bulk Rest",
-  cold_proof:       "Cold Proof",
-  baking:           "Baking",
-  out_for_delivery: "Out for Delivery",
-  delivered:        "Delivered",
+const STATUS_BADGE: Record<string, { label: string; cls: string; dot: string }> = {
+  placed:           { label: "Placed",        cls: "bg-zinc-50 text-zinc-600 border-zinc-200/60",     dot: "bg-zinc-400" },
+  mixing:           { label: "Mixing",        cls: "bg-yellow-50 text-yellow-700 border-yellow-200",  dot: "bg-yellow-500" },
+  stretching:       { label: "Stretching",    cls: "bg-yellow-50 text-yellow-700 border-yellow-200",  dot: "bg-yellow-500" },
+  resting:          { label: "Bulk Rest",     cls: "bg-amber-50 text-amber-700 border-amber-200",     dot: "bg-amber-500" },
+  cold_proof:       { label: "Cold Proof",    cls: "bg-sky-50 text-sky-700 border-sky-200",           dot: "bg-sky-400" },
+  baking:           { label: "Baking",        cls: "bg-orange-50 text-orange-700 border-orange-200",  dot: "bg-orange-500" },
+  out_for_delivery: { label: "In Transit",    cls: "bg-sky-50 text-sky-700 border-sky-200",           dot: "bg-sky-500" },
+  delivered:        { label: "Delivered",     cls: "bg-emerald-50 text-emerald-700 border-emerald-200", dot: "bg-emerald-500" },
 };
 
 const ORDER_SELECT = "id, order_number, flat_number, customer_name, total_paise, delivery_date, delivery_status, payment_status, notes, order_items(product_name, quantity)";
-
-function getBuilding(flatNumber: string): string {
-  const s = flatNumber.trim().toUpperCase();
-  // "Tower A" / "Tower 1"
-  const tower = s.match(/\bTOWER\s*([A-Z0-9]+)/);
-  if (tower) return `Tower ${tower[1]}`;
-  // "A Wing" / "Wing A"
-  const wing = s.match(/([A-Z])\s+WING|WING\s+([A-Z])/);
-  if (wing) return `${wing[1] || wing[2]} Wing`;
-  // Letter prefix: A-101, B/204, A101, B 204
-  const letterFirst = s.match(/^([A-Z]+)[\s\-\/]?\d/);
-  if (letterFirst) return letterFirst[1];
-  // Number-then-letter: 4B → suffix letter is the building
-  const numLetter = s.match(/^\d+([A-Z])$/);
-  if (numLetter) return `Block ${numLetter[1]}`;
-  // Pure number
-  const numOnly = s.match(/^(\d+)/);
-  if (numOnly) return `Floor ${numOnly[1]}`;
-  return "Other";
-}
-
-function getStepIndex(status: string | null) {
-  return BAKER_STEPS.findIndex((s) => s.key === (status || "placed"));
-}
 
 export default function BakerDashboard() {
   const params = useParams();
@@ -115,80 +76,53 @@ export default function BakerDashboard() {
 
   const [baker, setBaker] = useState<Baker | null>(null);
   const [bakerId, setBakerId] = useState<string | null>(null);
-  const [orders, setOrders] = useState<BakerOrder[]>([]);
+  const [queue, setQueue] = useState<BakerOrder[]>([]);
   const [history, setHistory] = useState<BakerOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [error, setError] = useState("");
   const [advancingId, setAdvancingId] = useState<string | null>(null);
-  const [tab, setTab] = useState<"today" | "history">("today");
+  const [tab, setTab] = useState<"queue" | "history">("queue");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [isHoliday, setIsHoliday] = useState(false);
   const [holidayLoading, setHolidayLoading] = useState(false);
 
-  const [breadTime, setBreadTime] = useState("");
-  useEffect(() => {
-    const updateTime = () => {
-      setBreadTime(new Date().toLocaleTimeString("en-IN", {
-        timeZone: "Asia/Kolkata",
-        hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true,
-      }));
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const todayISO = new Date().toISOString().slice(0, 10);
-
-  const enrichWithPhones = async (rawOrders: BakerOrder[]): Promise<BakerOrder[]> => {
-    if (!rawOrders.length) return rawOrders;
-    const flatNumbers = [...new Set(rawOrders.map((o) => o.flat_number))];
-    const { data: customers } = await supabase
-      .from("customers")
-      .select("flat_number, phone")
-      .in("flat_number", flatNumbers);
-    const phoneMap: Record<string, string | null> = {};
-    for (const c of customers || []) phoneMap[c.flat_number] = c.phone;
-    return rawOrders.map((o) => ({ ...o, customer_phone: phoneMap[o.flat_number] ?? null }));
+  const enrichPhones = async (rows: BakerOrder[]): Promise<BakerOrder[]> => {
+    if (!rows.length) return rows;
+    const flats = [...new Set(rows.map((o) => o.flat_number))];
+    const { data: custs } = await supabase.from("customers").select("flat_number, phone").in("flat_number", flats);
+    const map: Record<string, string | null> = {};
+    for (const c of custs || []) map[c.flat_number] = c.phone;
+    return rows.map((o) => ({ ...o, customer_phone: map[o.flat_number] ?? null }));
   };
 
   const fetchData = useCallback(async () => {
-    const { data: bakerData, error: bakerErr } = await supabase
+    const { data: b, error: bErr } = await supabase
       .from("bakers")
       .select("id, name, daily_capacity")
       .eq("share_token", token)
       .eq("is_active", true)
       .single();
 
-    if (bakerErr || !bakerData) {
-      setError("Invalid or expired dashboard link.");
-      setLoading(false);
-      return;
-    }
-    setBaker(bakerData);
-    setBakerId(bakerData.id);
+    if (bErr || !b) { setError("Invalid or expired link."); setLoading(false); return; }
+    setBaker(b);
+    setBakerId(b.id);
 
     const [{ data: ordersData }, { data: holidaySetting }] = await Promise.all([
       supabase
         .from("orders")
         .select(ORDER_SELECT)
-        .eq("baker_id", bakerData.id)
-        .eq("delivery_date", todayISO)
+        .eq("baker_id", b.id)
         .eq("payment_status", "paid")
+        .not("delivery_status", "eq", "delivered")
         .order("created_at", { ascending: true }),
-      supabase
-        .from("settings")
-        .select("value")
-        .eq("key", `baker_holiday_${bakerData.id}`)
-        .single(),
+      supabase.from("settings").select("value").eq("key", `baker_holiday_${b.id}`).single(),
     ]);
 
     setIsHoliday(holidaySetting?.value === "true");
-    const enriched = await enrichWithPhones((ordersData || []) as BakerOrder[]);
-    setOrders(enriched);
+    setQueue(await enrichPhones((ordersData || []) as BakerOrder[]));
     setLoading(false);
-  }, [token, todayISO]);
+  }, [token]);
 
   const fetchHistory = useCallback(async () => {
     if (!bakerId) return;
@@ -198,21 +132,21 @@ export default function BakerDashboard() {
       .select(ORDER_SELECT)
       .eq("baker_id", bakerId)
       .eq("payment_status", "paid")
-      .lt("delivery_date", todayISO)
-      .order("delivery_date", { ascending: false })
-      .limit(50);
+      .eq("delivery_status", "delivered")
+      .order("updated_at", { ascending: false })
+      .limit(40);
     setHistory((data || []) as BakerOrder[]);
     setHistoryLoading(false);
-  }, [bakerId, todayISO]);
+  }, [bakerId]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
-  useEffect(() => { if (tab === "history") fetchHistory(); }, [tab, fetchHistory]);
+  useEffect(() => { if (tab === "history" && bakerId) fetchHistory(); }, [tab, bakerId, fetchHistory]);
   useEffect(() => {
-    const interval = setInterval(() => { if (tab === "today") fetchData(); }, 60000);
-    return () => clearInterval(interval);
+    const iv = setInterval(() => { if (tab === "queue") fetchData(); }, 60000);
+    return () => clearInterval(iv);
   }, [fetchData, tab]);
 
-  const advanceStatus = async (orderId: string, nextStatus: string) => {
+  const advance = async (orderId: string, nextStatus: string) => {
     setAdvancingId(orderId);
     const res = await fetch("/api/baker/mark-ready", {
       method: "POST",
@@ -220,9 +154,11 @@ export default function BakerDashboard() {
       body: JSON.stringify({ orderId, token, nextStatus }),
     });
     if (res.ok) {
-      setOrders((prev) =>
-        prev.map((o) => o.id === orderId ? { ...o, delivery_status: nextStatus } : o)
-      );
+      if (nextStatus === "delivered") {
+        setQueue((p) => p.filter((o) => o.id !== orderId));
+      } else {
+        setQueue((p) => p.map((o) => o.id === orderId ? { ...o, delivery_status: nextStatus } : o));
+      }
     }
     setAdvancingId(null);
   };
@@ -238,366 +174,311 @@ export default function BakerDashboard() {
     setHolidayLoading(false);
   };
 
+  // Bake totals across queue
   const bakeList: Record<string, number> = {};
-  for (const order of orders) {
-    for (const item of order.order_items || []) {
+  for (const o of queue)
+    for (const item of o.order_items || [])
       bakeList[item.product_name] = (bakeList[item.product_name] || 0) + item.quantity;
-    }
-  }
 
-  // Group orders by building
-  const groupedOrders: Record<string, BakerOrder[]> = {};
-  for (const order of orders) {
-    const building = getBuilding(order.flat_number);
-    if (!groupedOrders[building]) groupedOrders[building] = [];
-    groupedOrders[building].push(order);
-  }
-  const buildingKeys = Object.keys(groupedOrders).sort();
-
+  // ── Loading ──────────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <main className="min-h-screen bg-brand-oat flex flex-col items-center justify-center gap-3">
-        <Loader2 className="w-8 h-8 text-brand-orange animate-spin" />
-        <p className="font-black text-brand-brown/40 tracking-widest text-[10px] uppercase animate-pulse">Syncing Oven Ledger...</p>
+        <Loader2 className="w-7 h-7 text-brand-orange animate-spin" />
+        <p className="text-[10px] font-black uppercase tracking-widest text-brand-brown/40 animate-pulse">Loading dashboard…</p>
       </main>
     );
   }
 
   if (error || !baker) {
     return (
-      <main className="min-h-screen bg-brand-oat flex flex-col items-center justify-center gap-4 px-5">
-        <span className="text-4xl">🌾</span>
-        <p className="font-serif font-black text-2xl text-brand-brown tracking-tight">Invalid Link</p>
-        <p className="text-xs font-bold text-brand-brown/40">{error || "This dashboard link is invalid or expired."}</p>
+      <main className="min-h-screen bg-brand-oat flex flex-col items-center justify-center gap-4 px-5 text-center">
+        <Image src="/WWY-LOGO_White.png" alt="WWY" width={64} height={64} className="object-contain opacity-40" />
+        <p className="font-black text-brand-brown text-lg tracking-tight">Invalid Link</p>
+        <p className="text-xs font-bold text-brand-brown/40">{error}</p>
       </main>
     );
   }
 
-  const today = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });
-
   return (
-    <main className="min-h-screen bg-brand-oat/30 pb-16">
-      {/* Header */}
-      <header className="bg-brand-brown text-brand-oat px-5 py-4 sticky top-0 z-40 shadow-md">
-        <div className="max-w-lg mx-auto flex items-center justify-between gap-4">
-          <div>
-            <h1 className="font-serif text-lg font-black tracking-tight leading-none text-white">Baker Dashboard</h1>
-            <p className="text-[10px] font-black uppercase tracking-widest text-brand-orange mt-1.5">{baker.name} · {today}</p>
-          </div>
+    <main className="min-h-screen bg-brand-oat pb-20">
+
+      {/* ── Header ──────────────────────────────────────────────────────────── */}
+      <header className="bg-white border-b border-brand-brown/8 sticky top-0 z-40 shadow-sm">
+        <div className="max-w-lg mx-auto px-5 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            {/* Capacity indicator */}
-            {baker.daily_capacity && (
-              <div className="hidden sm:flex flex-col text-right">
-                <span className="text-[7.5px] font-black uppercase text-brand-orange tracking-widest leading-none mb-0.5">Capacity</span>
-                <span className={`text-[11px] font-black leading-none ${orders.length >= baker.daily_capacity ? "text-rose-400" : "text-white/90"}`}>
-                  {orders.length} / {baker.daily_capacity}
-                </span>
-              </div>
-            )}
-            <div className="hidden sm:flex flex-col text-right">
-              <span className="text-[7.5px] font-black uppercase text-brand-orange tracking-widest leading-none mb-0.5">BREAD TIME</span>
-              <span className="text-[11px] font-black font-mono text-white/90 leading-none">{breadTime}</span>
+            <Image src="/WWY-LOGO_White.png" alt="WWY" width={36} height={36} className="object-contain" />
+            <div>
+              <p className="font-black text-brand-brown text-sm leading-none">{baker.name}</p>
+              <p className="text-[9px] font-black uppercase tracking-widest text-brand-brown/40 mt-0.5">Baker Dashboard</p>
             </div>
-            {/* Holiday toggle */}
+          </div>
+          <div className="flex items-center gap-2">
             <button
               onClick={toggleHoliday}
               disabled={holidayLoading}
-              title={isHoliday ? "You're on holiday — click to go active" : "Mark yourself on holiday"}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[9px] font-black tracking-widest uppercase transition-all border ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-[9px] font-black tracking-widest uppercase transition-all border cursor-pointer ${
                 isHoliday
-                  ? "bg-amber-400 border-amber-300 text-amber-900"
-                  : "bg-white/10 border-white/10 text-white/50 hover:bg-white/15"
+                  ? "bg-amber-100 border-amber-300 text-amber-800"
+                  : "bg-brand-oat border-brand-brown/10 text-brand-brown/50 hover:text-brand-brown"
               }`}
             >
               {holidayLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Palmtree className="w-3 h-3" />}
-              <span className="hidden sm:inline">{isHoliday ? "On Holiday" : "Holiday"}</span>
+              {isHoliday ? "On Holiday" : "Holiday"}
             </button>
-            <button
-              onClick={fetchData}
-              className="p-2 hover:bg-white/5 rounded-xl transition-all cursor-pointer text-brand-oat/60 hover:text-white"
-            >
+            <button onClick={fetchData} className="p-2 rounded-xl hover:bg-brand-oat text-brand-brown/30 hover:text-brand-brown transition-all cursor-pointer">
               <RefreshCw className="w-4 h-4" />
             </button>
           </div>
         </div>
       </header>
 
-      {/* Holiday banner */}
+      {/* ── Holiday banner ───────────────────────────────────────────────────── */}
       {isHoliday && (
-        <div className="max-w-lg mx-auto mt-4 px-5 py-3 bg-amber-50 border border-amber-200 rounded-2xl flex items-center gap-3">
-          <Palmtree className="w-5 h-5 text-amber-600 shrink-0" />
-          <div>
-            <p className="font-black text-amber-800 text-sm">You&apos;re marked as on holiday.</p>
-            <p className="text-[11px] font-bold text-amber-600">New orders won&apos;t be assigned to you today. Toggle off to resume.</p>
+        <div className="max-w-lg mx-auto mt-4 px-4">
+          <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 flex items-center gap-3">
+            <Palmtree className="w-4 h-4 text-amber-600 shrink-0" />
+            <p className="text-xs font-bold text-amber-800">You&apos;re on holiday — no new orders will be assigned.</p>
           </div>
         </div>
       )}
 
-      {/* Tabs */}
-      <div className="bg-white border-b border-brand-brown/5 sticky top-[68px] z-30 shadow-sm">
-        <div className="max-w-lg mx-auto flex">
-          {(["today", "history"] as const).map((t) => (
+      {/* ── Tabs ────────────────────────────────────────────────────────────── */}
+      <div className="max-w-lg mx-auto px-4 pt-5">
+        <div className="bg-white rounded-2xl border border-brand-brown/8 flex overflow-hidden shadow-sm">
+          {(["queue", "history"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
-              className={`flex-1 py-3.5 text-[10px] font-black tracking-[0.2em] uppercase transition-colors relative cursor-pointer ${
-                tab === t ? "text-brand-orange" : "text-brand-brown/40 hover:text-brand-brown"
+              className={`flex-1 py-3 text-[10px] font-black tracking-[0.18em] uppercase transition-colors cursor-pointer ${
+                tab === t
+                  ? "bg-brand-brown text-white"
+                  : "text-brand-brown/40 hover:text-brand-brown"
               }`}
             >
-              {t === "today" ? `Today (${orders.length})` : "History"}
-              {tab === t && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand-orange" />}
+              {t === "queue" ? `Queue (${queue.length})` : "History"}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="max-w-lg mx-auto px-4 pt-6 flex flex-col gap-6">
+      <div className="max-w-lg mx-auto px-4 pt-5 flex flex-col gap-4">
 
-        {tab === "today" && (
+        {/* ── QUEUE TAB ───────────────────────────────────────────────────────── */}
+        {tab === "queue" && (
           <>
-            {/* Cutoff + capacity info strip */}
-            <div className="bg-brand-brown/5 border border-brand-brown/10 rounded-2xl px-4 py-3 flex flex-wrap items-center gap-x-6 gap-y-1">
-              <div>
-                <span className="text-[8px] font-black uppercase tracking-widest text-brand-brown/40">Order Cutoff</span>
-                <p className="text-xs font-black text-brand-brown">12:00 PM IST daily</p>
-              </div>
-              <div>
-                <span className="text-[8px] font-black uppercase tracking-widest text-brand-brown/40">Delivery Days</span>
-                <p className="text-xs font-black text-brand-brown">Wednesday &amp; Saturday</p>
-              </div>
-              {baker.daily_capacity && (
-                <div className="ml-auto">
-                  <span className="text-[8px] font-black uppercase tracking-widest text-brand-brown/40">Today&apos;s Load</span>
-                  <p className={`text-xs font-black ${orders.length >= baker.daily_capacity ? "text-rose-600" : "text-brand-brown"}`}>
-                    {orders.length} of {baker.daily_capacity} slots{orders.length >= baker.daily_capacity ? " — FULL" : ""}
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Bake Ledger */}
-            <section className="bg-white rounded-3xl border border-brand-brown/5 p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <p className="text-[9px] font-black tracking-widest uppercase text-brand-orange">Today&apos;s Bake Ledger</p>
-                <span className="text-[10px] font-bold text-brand-brown/40">Total batches</span>
-              </div>
-              {Object.keys(bakeList).length === 0 ? (
-                <p className="text-xs font-bold text-brand-brown/45 italic">No batches to bake today.</p>
-              ) : (
-                <div className="flex flex-col gap-3">
+            {/* Bake ledger */}
+            {Object.keys(bakeList).length > 0 && (
+              <div className="bg-white rounded-3xl border border-brand-brown/8 p-5 shadow-sm">
+                <p className="text-[9px] font-black tracking-widest uppercase text-brand-orange mb-4">Today&apos;s Bake Ledger</p>
+                <div className="flex flex-col gap-2.5">
                   {Object.entries(bakeList).map(([name, qty]) => (
-                    <div key={name} className="flex items-center justify-between border-b border-dashed border-brand-brown/10 pb-2.5 last:border-0 last:pb-0">
+                    <div key={name} className="flex items-center justify-between">
                       <span className="font-serif text-sm font-black text-brand-brown">{name}</span>
-                      <span className="font-serif text-lg font-black text-brand-orange bg-brand-orange/5 border border-brand-orange/15 px-3 py-0.5 rounded-xl">×{qty}</span>
+                      <span className="font-serif text-base font-black text-brand-orange bg-brand-orange/8 px-3 py-0.5 rounded-xl border border-brand-orange/15">×{qty}</span>
                     </div>
                   ))}
                 </div>
-              )}
-            </section>
-
-            {/* Orders grouped by building */}
-            {orders.length === 0 ? (
-              <div className="bg-white border border-brand-brown/5 rounded-3xl py-12 text-center shadow-sm">
-                <span className="text-2xl block mb-1">🌾</span>
-                <p className="text-xs font-bold text-brand-brown/40">No orders assigned for today.</p>
               </div>
-            ) : (
-              buildingKeys.map((building) => (
-                <section key={building}>
-                  <div className="flex items-center gap-3 mb-3">
-                    <p className="text-[9px] font-black tracking-widest uppercase text-brand-brown/40">
-                      {building}
-                    </p>
-                    <div className="flex-1 h-px bg-brand-brown/8" />
-                    <span className="text-[9px] font-black text-brand-brown/30">{groupedOrders[building].length} order{groupedOrders[building].length !== 1 ? "s" : ""}</span>
-                  </div>
-                  <div className="flex flex-col gap-3.5">
-                    {groupedOrders[building].map((order) => {
-                      const theme = D_THEME[order.delivery_status] || D_THEME.placed;
-                      const nextStatus = BAKER_NEXT[order.delivery_status];
-                      const btnLabel = BAKER_BTN[order.delivery_status];
-                      const isDone = !nextStatus;
-                      const waPhone = order.customer_phone?.replace(/\D/g, "").slice(-10);
-                      const isExpanded = expandedId === order.id;
-                      const stepIdx = getStepIndex(order.delivery_status);
+            )}
 
-                      return (
-                        <div key={order.id} className="bg-white rounded-3xl border border-brand-brown/5 shadow-sm overflow-hidden">
-                          {/* Card header — always visible */}
-                          <div className="px-5 pt-5 pb-4 flex flex-col gap-3">
-                            {/* Top row */}
-                            <div className="flex items-start justify-between gap-3">
-                              <div>
-                                <p className="font-serif font-black text-brand-brown text-base leading-none">Flat {order.flat_number}</p>
-                                <p className="text-[10px] font-bold text-brand-brown/45 mt-1.5 uppercase tracking-wide">{order.customer_name} · {order.order_number}</p>
-                              </div>
-                              <span className={`text-[8.5px] font-black tracking-widest uppercase px-2.5 py-1 rounded-xl border ${theme.bg} ${theme.text} ${theme.border} inline-flex items-center gap-1.5 shrink-0`}>
-                                <span className={`w-1.5 h-1.5 rounded-full ${theme.pulse} ${!isDone ? "animate-ping" : ""}`} />
-                                {STATUS_LABELS[order.delivery_status] || order.delivery_status}
+            {/* Capacity */}
+            {baker.daily_capacity && (
+              <div className="flex items-center gap-3 px-1">
+                <div className="flex-1 h-1.5 bg-brand-brown/8 rounded-full overflow-hidden">
+                  <div
+                    className={`h-full rounded-full transition-all ${queue.length >= baker.daily_capacity ? "bg-rose-500" : "bg-brand-orange"}`}
+                    style={{ width: `${Math.min((queue.length / baker.daily_capacity) * 100, 100)}%` }}
+                  />
+                </div>
+                <p className={`text-[10px] font-black shrink-0 ${queue.length >= baker.daily_capacity ? "text-rose-600" : "text-brand-brown/50"}`}>
+                  {queue.length} / {baker.daily_capacity} orders
+                </p>
+              </div>
+            )}
+
+            {/* Empty state */}
+            {queue.length === 0 && (
+              <div className="bg-white rounded-3xl border border-brand-brown/8 py-16 text-center shadow-sm">
+                <Package className="w-8 h-8 text-brand-brown/15 mx-auto mb-3" />
+                <p className="text-sm font-black text-brand-brown/30">No active orders.</p>
+                <p className="text-xs font-bold text-brand-brown/20 mt-1">New orders will appear here once assigned and paid.</p>
+              </div>
+            )}
+
+            {/* Order cards */}
+            {queue.map((order) => {
+              const badge = STATUS_BADGE[order.delivery_status] || STATUS_BADGE.placed;
+              const nextStatus = NEXT[order.delivery_status];
+              const btnLabel = BTN_LABEL[order.delivery_status];
+              const isDone = !nextStatus;
+              const stepIdx = STEPS.findIndex((s) => s.key === (order.delivery_status || "placed"));
+              const isExpanded = expandedId === order.id;
+              const waPhone = order.customer_phone?.replace(/\D/g, "").slice(-10);
+
+              return (
+                <div key={order.id} className="bg-white rounded-3xl border border-brand-brown/8 shadow-sm overflow-hidden">
+
+                  {/* Card body */}
+                  <div className="p-5 flex flex-col gap-4">
+
+                    {/* Top row: flat + status */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="font-serif font-black text-brand-brown text-xl leading-none">Flat {order.flat_number}</p>
+                        <p className="text-[10px] font-bold text-brand-brown/40 uppercase tracking-wider mt-1.5">
+                          {order.customer_name}
+                          {order.order_number ? ` · ${order.order_number}` : ""}
+                          {order.delivery_date ? ` · ${fmtDate(order.delivery_date)}` : ""}
+                        </p>
+                      </div>
+                      <span className={`text-[8px] font-black tracking-widest uppercase px-2.5 py-1 rounded-xl border inline-flex items-center gap-1.5 shrink-0 ${badge.cls}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${badge.dot} ${!isDone ? "animate-ping" : ""}`} />
+                        {badge.label}
+                      </span>
+                    </div>
+
+                    {/* Progress dots */}
+                    <div className="flex items-center gap-1">
+                      {STEPS.map((step, idx) => {
+                        const done = stepIdx >= idx;
+                        const active = stepIdx === idx;
+                        return (
+                          <React.Fragment key={step.key}>
+                            <div className="flex flex-col items-center gap-1 shrink-0">
+                              <div className={`rounded-full transition-all ${
+                                active
+                                  ? "w-3 h-3 bg-brand-orange ring-2 ring-brand-orange/25"
+                                  : done
+                                  ? "w-2.5 h-2.5 bg-brand-brown"
+                                  : "w-2 h-2 bg-brand-brown/10"
+                              }`} />
+                              <span className={`text-[6px] font-black leading-none ${active ? "text-brand-orange" : done ? "text-brand-brown/50" : "text-brand-brown/15"}`}>
+                                {step.short}
                               </span>
                             </div>
+                            {idx < STEPS.length - 1 && (
+                              <div className={`flex-1 h-px mb-3 ${stepIdx > idx ? "bg-brand-brown/30" : "bg-brand-brown/8"}`} />
+                            )}
+                          </React.Fragment>
+                        );
+                      })}
+                    </div>
 
-                            {/* 8-step bread timeline */}
-                            <div className="flex items-center gap-0.5 overflow-x-auto pb-1 scrollbar-none">
-                              {BAKER_STEPS.map((step, idx, arr) => {
-                                const done = stepIdx >= idx;
-                                const active = order.delivery_status === step.key;
-                                return (
-                                  <React.Fragment key={step.key}>
-                                    <div className="flex flex-col items-center shrink-0" style={{ minWidth: 32 }}>
-                                      <span className={`w-4 h-4 rounded-full flex items-center justify-center text-[7px] font-black border transition-all ${
-                                        active
-                                          ? "bg-brand-orange border-brand-orange text-white ring-2 ring-brand-orange/20 scale-125"
-                                          : done
-                                          ? "bg-brand-brown border-brand-brown text-white"
-                                          : "bg-white border-brand-brown/15 text-brand-brown/20"
-                                      }`}>
-                                        {done && !active ? "✓" : idx + 1}
-                                      </span>
-                                      <span className={`text-[6.5px] font-black mt-0.5 tracking-wide text-center leading-none ${
-                                        active ? "text-brand-orange" : done ? "text-brand-brown" : "text-brand-brown/20"
-                                      }`} style={{ maxWidth: 32 }}>
-                                        {step.short}
-                                      </span>
-                                    </div>
-                                    {idx < arr.length - 1 && (
-                                      <div className={`flex-1 h-px min-w-1 max-w-5 ${stepIdx > idx ? "bg-brand-brown/50" : "bg-brand-brown/10"}`} />
-                                    )}
-                                  </React.Fragment>
-                                );
-                              })}
-                            </div>
+                    {/* Items preview + expand */}
+                    <button
+                      onClick={() => setExpandedId(isExpanded ? null : order.id)}
+                      className="flex items-center justify-between w-full text-left cursor-pointer"
+                    >
+                      <p className="text-[10px] font-black text-brand-brown/40 uppercase tracking-widest">
+                        {(order.order_items || []).map((i) => `${i.product_name} ×${i.quantity}`).join(" · ")}
+                      </p>
+                      {isExpanded ? <ChevronUp className="w-3.5 h-3.5 text-brand-brown/30 shrink-0" /> : <ChevronDown className="w-3.5 h-3.5 text-brand-brown/30 shrink-0" />}
+                    </button>
 
-                            {/* Action buttons */}
-                            <div className="flex items-center gap-2 justify-between">
-                              <span className="font-serif font-black text-brand-brown text-sm">{fmt(order.total_paise)}</span>
-                              <div className="flex items-center gap-2">
-                                {/* WA button */}
-                                {waPhone && (
-                                  <a
-                                    href={`https://wa.me/91${waPhone}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-black text-[9px] tracking-widest uppercase px-3 py-2 rounded-xl border border-emerald-200/50 transition-colors shadow-sm"
-                                  >
-                                    <MessageCircle className="w-3.5 h-3.5" />
-                                    <span>WA</span>
-                                  </a>
-                                )}
-                                {/* Expand to see items */}
-                                <button
-                                  onClick={() => setExpandedId(isExpanded ? null : order.id)}
-                                  className="inline-flex items-center gap-1 bg-brand-oat hover:bg-brand-brown/10 text-brand-brown font-black text-[9px] tracking-widest uppercase px-3 py-2 rounded-xl border border-brand-brown/10 transition-colors"
-                                >
-                                  {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-                                  Items
-                                </button>
-                                {/* Advance status */}
-                                {!isDone ? (
-                                  <button
-                                    onClick={() => advanceStatus(order.id, nextStatus)}
-                                    disabled={advancingId === order.id}
-                                    className={`inline-flex items-center gap-1.5 font-black text-[9px] tracking-widest uppercase px-4 py-2 rounded-xl transition-all active:scale-95 shadow-sm ${
-                                      nextStatus === "out_for_delivery"
-                                        ? "bg-brand-orange hover:bg-amber-500 text-white shadow-brand-orange/20"
-                                        : "bg-brand-brown hover:bg-brand-orange text-white shadow-brand-brown/10"
-                                    }`}
-                                  >
-                                    {advancingId === order.id
-                                      ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                      : btnLabel}
-                                  </button>
-                                ) : (
-                                  <span className="inline-flex items-center gap-1 text-[9px] font-black tracking-widest uppercase text-emerald-700 bg-emerald-50/50 border border-emerald-200/50 px-3 py-2 rounded-xl">
-                                    <CheckCircle2 className="w-3.5 h-3.5" />
-                                    {order.delivery_status === "delivered" ? "Delivered" : "In Transit"}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
+                    {/* Action row */}
+                    <div className="flex items-center gap-2 pt-1 border-t border-brand-brown/6">
+                      <span className="font-serif font-black text-brand-brown text-base mr-auto">{fmt(order.total_paise)}</span>
 
-                          {/* Expandable items + notes */}
-                          {isExpanded && (
-                            <div className="border-t border-brand-brown/5 px-5 py-4 bg-brand-oat/30 flex flex-col gap-3">
-                              <div className="flex flex-col gap-2">
-                                {(order.order_items || []).map((item, i) => (
-                                  <div key={i} className="flex items-center justify-between">
-                                    <span className="text-xs font-bold text-brand-brown/70">{item.product_name}</span>
-                                    <span className="font-serif text-sm font-black text-brand-brown bg-brand-brown/5 px-2.5 py-0.5 rounded-lg">×{item.quantity}</span>
-                                  </div>
-                                ))}
-                              </div>
-                              {order.notes && (
-                                <div className="bg-brand-orange/5 border border-brand-orange/10 rounded-2xl px-4 py-3">
-                                  <p className="text-[9px] font-black tracking-widest uppercase text-brand-orange mb-0.5">Note from Customer</p>
-                                  <p className="text-xs font-medium text-brand-brown italic">&ldquo;{order.notes}&rdquo;</p>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
+                      {waPhone && (
+                        <a
+                          href={`https://wa.me/91${waPhone}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-200/50 transition-colors"
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                        </a>
+                      )}
+
+                      {!isDone ? (
+                        <button
+                          onClick={() => advance(order.id, nextStatus)}
+                          disabled={advancingId === order.id}
+                          className={`flex items-center gap-2 font-black text-[10px] tracking-widest uppercase px-5 py-2.5 rounded-2xl transition-all active:scale-[0.97] shadow-sm cursor-pointer ${
+                            nextStatus === "out_for_delivery"
+                              ? "bg-brand-orange hover:bg-amber-500 text-white"
+                              : "bg-brand-brown hover:bg-brand-orange text-white"
+                          }`}
+                        >
+                          {advancingId === order.id
+                            ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            : btnLabel}
+                        </button>
+                      ) : (
+                        <span className="flex items-center gap-1.5 text-[10px] font-black tracking-widest uppercase text-emerald-700 bg-emerald-50 px-4 py-2.5 rounded-2xl border border-emerald-200/50">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          {order.delivery_status === "delivered" ? "Delivered" : "In Transit"}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </section>
-              ))
-            )}
+
+                  {/* Expanded: items + notes */}
+                  {isExpanded && (
+                    <div className="border-t border-brand-brown/6 bg-brand-oat/40 px-5 py-4 flex flex-col gap-3">
+                      {(order.order_items || []).map((item, i) => (
+                        <div key={i} className="flex items-center justify-between">
+                          <span className="text-sm font-bold text-brand-brown/70">{item.product_name}</span>
+                          <span className="font-serif text-sm font-black text-brand-brown bg-white px-2.5 py-0.5 rounded-lg border border-brand-brown/8">×{item.quantity}</span>
+                        </div>
+                      ))}
+                      {order.notes && (
+                        <div className="mt-1 bg-brand-orange/5 border border-brand-orange/10 rounded-2xl px-4 py-3">
+                          <p className="text-[9px] font-black tracking-widest uppercase text-brand-orange mb-1">Customer Note</p>
+                          <p className="text-xs font-medium text-brand-brown/70 italic">&ldquo;{order.notes}&rdquo;</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </>
         )}
 
+        {/* ── HISTORY TAB ─────────────────────────────────────────────────────── */}
         {tab === "history" && (
-          <section>
-            <p className="text-[9px] font-black tracking-widest uppercase text-brand-brown/40 mb-3">Past Deliveries</p>
+          <>
             {historyLoading && (
-              <div className="flex flex-col items-center justify-center py-12 gap-2">
+              <div className="flex flex-col items-center justify-center py-16 gap-3">
                 <Loader2 className="w-6 h-6 text-brand-orange animate-spin" />
-                <p className="text-[9px] font-black tracking-widest text-brand-brown/30 uppercase">Fetching archive...</p>
+                <p className="text-[9px] font-black tracking-widest uppercase text-brand-brown/30">Loading history…</p>
               </div>
             )}
             {!historyLoading && history.length === 0 && (
-              <div className="bg-white border border-brand-brown/5 rounded-3xl py-12 text-center shadow-sm">
-                <span className="text-2xl block mb-1">📦</span>
-                <p className="text-xs font-bold text-brand-brown/40">No past deliveries found.</p>
+              <div className="bg-white rounded-3xl border border-brand-brown/8 py-16 text-center shadow-sm">
+                <Clock className="w-7 h-7 text-brand-brown/15 mx-auto mb-3" />
+                <p className="text-sm font-black text-brand-brown/30">No past deliveries yet.</p>
               </div>
             )}
-            <div className="flex flex-col gap-3.5">
-              {history.map((order) => {
-                const theme = D_THEME[order.delivery_status] || D_THEME.placed;
-                const deliveryLabel = new Date(order.delivery_date).toLocaleDateString("en-IN", {
-                  weekday: "short", day: "numeric", month: "short",
-                });
-                return (
-                  <div key={order.id} className="bg-white rounded-3xl border border-brand-brown/5 p-5 shadow-sm flex flex-col gap-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="font-serif font-black text-brand-brown text-base leading-none">Flat {order.flat_number}</p>
-                        <p className="text-[10px] font-bold text-brand-brown/45 mt-1.5 uppercase tracking-wide">
-                          {order.customer_name} · {order.order_number} · {deliveryLabel}
-                        </p>
-                      </div>
-                      <span className={`text-[8.5px] font-black tracking-widest uppercase px-2.5 py-1 rounded-xl border ${theme.bg} ${theme.text} ${theme.border} inline-flex items-center gap-1.5`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${theme.pulse}`} />
-                        {STATUS_LABELS[order.delivery_status] || order.delivery_status}
-                      </span>
-                    </div>
-                    <div className="flex flex-col gap-1.5 border-t border-brand-brown/5 pt-3">
-                      {(order.order_items || []).map((item, i) => (
-                        <div key={i} className="flex items-center justify-between">
-                          <span className="text-xs font-bold text-brand-brown/70">{item.product_name}</span>
-                          <span className="font-serif text-sm font-black text-brand-brown bg-brand-brown/5 px-2.5 py-0.5 rounded-lg">×{item.quantity}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex items-center justify-between border-t border-brand-brown/5 pt-3">
-                      <span className="font-serif font-black text-brand-brown text-sm">{fmt(order.total_paise)}</span>
-                      <Clock className="w-3.5 h-3.5 text-brand-brown/20" />
-                    </div>
+            {history.map((order) => (
+              <div key={order.id} className="bg-white rounded-3xl border border-brand-brown/8 p-5 shadow-sm flex flex-col gap-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-serif font-black text-brand-brown text-lg leading-none">Flat {order.flat_number}</p>
+                    <p className="text-[10px] font-bold text-brand-brown/40 uppercase tracking-wider mt-1.5">
+                      {order.customer_name}
+                      {order.delivery_date ? ` · ${fmtDate(order.delivery_date)}` : ""}
+                    </p>
                   </div>
-                );
-              })}
-            </div>
-          </section>
+                  <span className="text-[8px] font-black tracking-widest uppercase px-2.5 py-1 rounded-xl border bg-emerald-50 text-emerald-700 border-emerald-200 inline-flex items-center gap-1.5">
+                    <CheckCircle2 className="w-2.5 h-2.5" />
+                    Delivered
+                  </span>
+                </div>
+                <div className="flex flex-col gap-1.5 border-t border-brand-brown/6 pt-3">
+                  {(order.order_items || []).map((item, i) => (
+                    <div key={i} className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-brand-brown/60">{item.product_name}</span>
+                      <span className="font-serif text-sm font-black text-brand-brown">×{item.quantity}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className="font-serif font-black text-brand-brown text-sm border-t border-brand-brown/6 pt-3">{fmt(order.total_paise)}</p>
+              </div>
+            ))}
+          </>
         )}
 
       </div>
