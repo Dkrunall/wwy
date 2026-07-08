@@ -64,6 +64,8 @@ export default function AccountPage() {
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [phoneSaveError, setPhoneSaveError] = useState("");
+  const [addressSaveError, setAddressSaveError] = useState("");
 
   const handleLogout = async () => {
     ["wwy_flat","wwy_name","wwy_customer_id","wwy_pincode","wwy_cart"].forEach((k) => localStorage.removeItem(k));
@@ -145,9 +147,14 @@ export default function AccountPage() {
     const cleaned = phoneEdit.replace(/\D/g, "").slice(-10);
     if (cleaned.length < 10) return;
     setPhoneSaving(true);
-    await supabase.from("customers").update({ phone: cleaned }).eq("flat_number", flat);
-    setPhone(cleaned);
-    setEditingPhone(false);
+    setPhoneSaveError("");
+    const { error } = await supabase.from("customers").update({ phone: cleaned }).eq("flat_number", flat);
+    if (error) {
+      setPhoneSaveError("Couldn't save. Please try again.");
+    } else {
+      setPhone(cleaned);
+      setEditingPhone(false);
+    }
     setPhoneSaving(false);
   };
 
@@ -155,9 +162,14 @@ export default function AccountPage() {
     const trimmed = addressEdit.trim();
     if (!trimmed) return;
     setAddressSaving(true);
-    await supabase.from("customers").update({ address: trimmed }).eq("flat_number", flat);
-    setDeliveryAddress(trimmed);
-    setEditingAddress(false);
+    setAddressSaveError("");
+    const { error } = await supabase.from("customers").update({ address: trimmed }).eq("flat_number", flat);
+    if (error) {
+      setAddressSaveError("Couldn't save. Please try again.");
+    } else {
+      setDeliveryAddress(trimmed);
+      setEditingAddress(false);
+    }
     setAddressSaving(false);
   };
 
@@ -345,8 +357,17 @@ export default function AccountPage() {
                 </div>
 
                 {loading && (
-                  <div className="px-5 py-10 text-center">
-                    <p className="text-xs font-black text-gray-300 uppercase tracking-widest animate-pulse">Loading...</p>
+                  <div className="flex flex-col divide-y divide-gray-50">
+                    {[1,2,3].map((n) => (
+                      <div key={n} className="px-5 py-4 flex items-center gap-4 animate-pulse">
+                        <div className="flex-1 min-w-0">
+                          <div className="h-5 bg-gray-100 rounded-full w-24 mb-2" />
+                          <div className="h-3 bg-gray-50 rounded w-20 mb-1" />
+                          <div className="h-3 bg-gray-50 rounded w-32" />
+                        </div>
+                        <div className="h-4 bg-gray-100 rounded w-10 shrink-0" />
+                      </div>
+                    ))}
                   </div>
                 )}
 
@@ -475,6 +496,7 @@ export default function AccountPage() {
                       </button>
                     )}
                   </div>
+                  {phoneSaveError && <p className="text-xs font-bold text-red-600">{phoneSaveError}</p>}
                   {editingPhone ? (
                     <div className="flex gap-2">
                       <input
@@ -495,7 +517,7 @@ export default function AccountPage() {
                         {phoneSaving ? "…" : "Save"}
                       </button>
                       <button
-                        onClick={() => setEditingPhone(false)}
+                        onClick={() => { setEditingPhone(false); setPhoneSaveError(""); }}
                         className="text-gray-400 font-black text-xs px-3 hover:text-gray-600 transition-colors"
                       >
                         ✕
@@ -540,12 +562,13 @@ export default function AccountPage() {
                           {addressSaving ? "Saving…" : "Save"}
                         </button>
                         <button
-                          onClick={() => setEditingAddress(false)}
+                          onClick={() => { setEditingAddress(false); setAddressSaveError(""); }}
                           className="text-gray-400 font-black text-xs px-4 hover:text-gray-600 transition-colors"
                         >
                           Cancel
                         </button>
                       </div>
+                      {addressSaveError && <p className="text-xs font-bold text-red-600">{addressSaveError}</p>}
                     </div>
                   ) : (
                     <p className="font-bold text-brand-brown text-sm bg-gray-50 rounded-xl px-4 py-3 border border-gray-100 leading-snug">
