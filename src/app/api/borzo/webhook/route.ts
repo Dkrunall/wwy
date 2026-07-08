@@ -9,6 +9,13 @@ import { createServerSupabase } from "@/lib/supabase-server";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
+
+    const expectedToken = process.env.BORZO_WEBHOOK_TOKEN;
+    if (expectedToken && body.token !== expectedToken) {
+      console.warn("[Borzo webhook] invalid token received");
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const supabase = createServerSupabase();
 
     // Delivery-level callback — client_order_id is our order UUID
