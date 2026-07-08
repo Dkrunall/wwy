@@ -24,7 +24,7 @@ interface Order {
 }
 interface Product { id: string; name: string; category: string; description?: string | null; price_paise: number; available: boolean; }
 interface Customer { id: string; name: string; flat_number: string; phone: string | null; address?: string | null; pincode?: string | null; created_at: string; }
-interface Baker { id: string; name: string; phone: string; is_active: boolean; share_token: string; pincodes?: string[]; daily_capacity?: number; address?: string | null; lat?: number | null; lng?: number | null; }
+interface Baker { id: string; name: string; email?: string | null; phone: string; is_active: boolean; share_token: string; pincodes?: string[]; daily_capacity?: number; address?: string | null; lat?: number | null; lng?: number | null; }
 interface Setting { key: string; value: string; }
 interface Feedback { id: string; order_id: string | null; flat_number: string; rating: number; comment: string | null; created_at: string; }
 interface Session { phone: string; step: string; cart: unknown; temp: unknown; updated_at: string; }
@@ -114,7 +114,7 @@ export default function OmsDashboard() {
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [actionOrder, setActionOrder] = useState<Order | null>(null);
   const [productForm, setProductForm] = useState({name:"",category:"",description:"",price:"",available:true});
-  const [bakerForm, setBakerForm] = useState({name:"",phone:"",pincodes:"",daily_capacity:"20",is_active:true,address:"",lat:"",lng:""});
+  const [bakerForm, setBakerForm] = useState({name:"",email:"",phone:"",pincodes:"",daily_capacity:"20",is_active:true,address:"",lat:"",lng:""});
   const [customerForm, setCustomerForm] = useState({name:"",phone:"",address:"",pincode:""});
   const [deliveryDateInput, setDeliveryDateInput] = useState("");
   const [formSaving, setFormSaving] = useState(false);
@@ -305,14 +305,14 @@ export default function OmsDashboard() {
   };
 
   // ── Baker CRUD ──
-  const openAddBaker = () => { setEditingBaker(null); setBakerForm({name:"",phone:"",pincodes:"",daily_capacity:"20",is_active:true,address:"",lat:"",lng:""}); setFormError(""); setModal("add-baker"); };
-  const openEditBaker = (b: Baker) => { setEditingBaker(b); setBakerForm({name:b.name,phone:b.phone,pincodes:(b.pincodes||[]).join(", "),daily_capacity:String(b.daily_capacity||20),is_active:b.is_active,address:b.address||"",lat:b.lat!=null?String(b.lat):"",lng:b.lng!=null?String(b.lng):""}); setFormError(""); setModal("edit-baker"); };
+  const openAddBaker = () => { setEditingBaker(null); setBakerForm({name:"",email:"",phone:"",pincodes:"",daily_capacity:"20",is_active:true,address:"",lat:"",lng:""}); setFormError(""); setModal("add-baker"); };
+  const openEditBaker = (b: Baker) => { setEditingBaker(b); setBakerForm({name:b.name,email:b.email||"",phone:b.phone,pincodes:(b.pincodes||[]).join(", "),daily_capacity:String(b.daily_capacity||20),is_active:b.is_active,address:b.address||"",lat:b.lat!=null?String(b.lat):"",lng:b.lng!=null?String(b.lng):""}); setFormError(""); setModal("edit-baker"); };
   const saveBaker = async () => {
     if(!bakerForm.name.trim()){setFormError("Name required.");return;}
     if(!bakerForm.phone.trim()){setFormError("Phone required.");return;}
     setFormSaving(true);
     const pincodes = bakerForm.pincodes.split(",").map(p=>p.trim()).filter(Boolean);
-    const payload = {name:bakerForm.name.trim(),phone:bakerForm.phone.trim(),pincodes,daily_capacity:parseInt(bakerForm.daily_capacity)||20,is_active:bakerForm.is_active,address:bakerForm.address.trim()||null,lat:bakerForm.lat?parseFloat(bakerForm.lat):null,lng:bakerForm.lng?parseFloat(bakerForm.lng):null};
+    const payload = {name:bakerForm.name.trim(),email:bakerForm.email.trim()||null,phone:bakerForm.phone.trim(),pincodes,daily_capacity:parseInt(bakerForm.daily_capacity)||20,is_active:bakerForm.is_active,address:bakerForm.address.trim()||null,lat:bakerForm.lat?parseFloat(bakerForm.lat):null,lng:bakerForm.lng?parseFloat(bakerForm.lng):null};
     if(editingBaker) {
       const {error} = await supabase.from("bakers").update(payload).eq("id",editingBaker.id);
       if(error){setFormError("Save failed: "+error.message);setFormSaving(false);return;}
@@ -549,6 +549,7 @@ export default function OmsDashboard() {
               </div>
               <div className="flex flex-col gap-3">
                 <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Name</label><input className={inputCls} autoFocus placeholder="Priya Mehta" value={bakerForm.name} onChange={e=>setBakerForm(f=>({...f,name:e.target.value}))}/></div>
+                <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Email <span className="normal-case font-bold text-brand-brown/30">(for order notifications)</span></label><input className={inputCls} type="email" placeholder="baker@example.com" value={bakerForm.email} onChange={e=>setBakerForm(f=>({...f,email:e.target.value}))}/></div>
                 <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Phone</label><input className={inputCls} type="tel" placeholder="9876543210" value={bakerForm.phone} onChange={e=>setBakerForm(f=>({...f,phone:e.target.value}))}/></div>
                 <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Pincodes <span className="normal-case font-bold text-brand-brown/30">(comma-separated)</span></label><input className={inputCls} placeholder="400001, 400002" value={bakerForm.pincodes} onChange={e=>setBakerForm(f=>({...f,pincodes:e.target.value}))}/></div>
                 <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Daily Capacity</label><input className={inputCls} type="number" min="1" placeholder="20" value={bakerForm.daily_capacity} onChange={e=>setBakerForm(f=>({...f,daily_capacity:e.target.value}))}/></div>

@@ -82,6 +82,7 @@ export type CartItem = {
 export type Baker = {
   id: string;
   name: string;
+  email: string | null;
   phone: string;
   pincodes: string[];
   daily_capacity: number;

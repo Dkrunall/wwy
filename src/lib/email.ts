@@ -101,6 +101,59 @@ export async function sendDeliveryUpdateToCustomer(
   });
 }
 
+interface BakerOrderEmailData {
+  orderNumber: string;
+  customerName: string;
+  flatNumber: string;
+  deliveryDate?: string | null;
+  items: { product_name: string; quantity: number }[];
+  notes?: string | null;
+  dashboardUrl: string;
+}
+
+export async function sendNewOrderToBaker(
+  email: string,
+  bakerName: string,
+  order: BakerOrderEmailData
+): Promise<void> {
+  if (!process.env.GMAIL_USER || !email) return;
+
+  const itemLines = order.items
+    .map((i) => `<li style="padding:4px 0">${i.product_name} × ${i.quantity}</li>`)
+    .join("");
+
+  const deliveryLabel = order.deliveryDate
+    ? new Date(order.deliveryDate + "T00:00:00").toLocaleDateString("en-IN", {
+        weekday: "long", day: "numeric", month: "long",
+      })
+    : null;
+
+  const html = `
+    <div style="font-family:sans-serif;max-width:520px;margin:0 auto;color:#2c1a0e">
+      <h2 style="color:#c9a96e;margin-bottom:4px">New Order Assigned 🍞</h2>
+      <p style="margin-top:0;color:#888;font-size:13px">Wild Wild Yeast</p>
+      <p>Hi <b>${bakerName}</b>, a new order has been assigned to you.</p>
+      <p><b>Order:</b> ${order.orderNumber}<br/>
+         <b>Customer:</b> ${order.customerName} · Flat ${order.flatNumber}${deliveryLabel ? `<br/><b>Delivery:</b> ${deliveryLabel}` : ""}</p>
+      <ul style="padding-left:16px;margin:12px 0">${itemLines}</ul>
+      ${order.notes ? `<p style="font-style:italic;color:#888">Note: ${order.notes}</p>` : ""}
+      <p style="margin-top:20px">
+        <a href="${order.dashboardUrl}" style="background:#2c1a0e;color:white;padding:12px 24px;text-decoration:none;border-radius:8px;font-weight:bold;display:inline-block">
+          Open Baker Dashboard →
+        </a>
+      </p>
+      <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
+      <p style="font-size:12px;color:#aaa">Wild Wild Yeast · Handcrafted with love 🌾</p>
+    </div>`;
+
+  await createTransporter().sendMail({
+    from: `Wild Wild Yeast <${process.env.GMAIL_USER}>`,
+    to: email,
+    subject: `New Order ${order.orderNumber} — ${order.customerName} · Flat ${order.flatNumber}`,
+    html,
+  });
+}
+
 interface OrderEmailData {
   order_number: string;
   customer_name: string;

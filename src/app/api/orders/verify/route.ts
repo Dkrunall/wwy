@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { verifyPaymentSignature } from "@/lib/razorpay";
-import { sendPaymentConfirmedToCustomer, sendOwnerNotification } from "@/lib/email";
+import { sendPaymentConfirmedToCustomer, sendOwnerNotification, sendNewOrderToBaker } from "@/lib/email";
 import { generateInvoicePDF } from "@/lib/invoice";
 import { findBestBaker } from "@/lib/baker";
 
@@ -49,6 +49,19 @@ export async function POST(req: NextRequest) {
       const bakerId = await findBestBaker(supabase, customer?.pincode);
       if (bakerId) {
         await supabase.from("orders").update({ baker_id: bakerId }).eq("id", orderId);
+        const { data: baker } = await supabase.from("bakers").select("name, email, share_token").eq("id", bakerId).single();
+        if (baker?.email) {
+          const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://wildwildyeast.com";
+          sendNewOrderToBaker(baker.email, baker.name, {
+            orderNumber: order.order_number,
+            customerName: order.customer_name,
+            flatNumber: order.flat_number,
+            deliveryDate: order.delivery_date,
+            items: order.order_items || [],
+            notes: order.notes,
+            dashboardUrl: `${appUrl}/baker/${baker.share_token}`,
+          }).catch(console.error);
+        }
       }
     }
 
