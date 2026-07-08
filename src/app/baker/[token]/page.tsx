@@ -95,6 +95,7 @@ export default function BakerDashboard() {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [isHoliday, setIsHoliday] = useState(false);
   const [holidayLoading, setHolidayLoading] = useState(false);
+  const [deliveredCount, setDeliveredCount] = useState(0);
 
   // profile edit
   const [phoneEdit, setPhoneEdit] = useState("");
@@ -126,7 +127,7 @@ export default function BakerDashboard() {
     setBaker(b);
     setBakerId(b.id);
 
-    const [{ data: ordersData }, { data: holidaySetting }] = await Promise.all([
+    const [{ data: ordersData }, { data: holidaySetting }, { count }] = await Promise.all([
       supabase
         .from("orders")
         .select(ORDER_SELECT)
@@ -135,9 +136,16 @@ export default function BakerDashboard() {
         .not("delivery_status", "eq", "delivered")
         .order("created_at", { ascending: true }),
       supabase.from("settings").select("value").eq("key", `baker_holiday_${b.id}`).single(),
+      supabase
+        .from("orders")
+        .select("id", { count: "exact", head: true })
+        .eq("baker_id", b.id)
+        .eq("payment_status", "paid")
+        .eq("delivery_status", "delivered"),
     ]);
 
     setIsHoliday(holidaySetting?.value === "true");
+    setDeliveredCount(count ?? 0);
     setQueue(await enrichPhones((ordersData || []) as BakerOrder[]));
     setLoading(false);
   }, [token]);
@@ -220,7 +228,7 @@ export default function BakerDashboard() {
   };
 
   // ── derived ──────────────────────────────────────────────────────────────────
-  const totalBaked = history.length;
+  const totalBaked = deliveredCount;
   const bakeList: Record<string, number> = {};
   for (const o of queue)
     for (const item of o.order_items || [])

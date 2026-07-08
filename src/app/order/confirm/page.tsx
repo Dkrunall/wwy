@@ -150,7 +150,7 @@ function ConfirmContent() {
         {/* Actions */}
         <div className="w-full flex flex-col gap-3">
           <button
-            onClick={() => router.push("/order/history")}
+            onClick={() => router.push("/order/account")}
             className="w-full bg-brand-charcoal hover:bg-brand-terracotta text-white rounded-2xl py-4 font-black text-sm tracking-[0.15em] uppercase transition-all duration-300 active:scale-[0.98]"
           >
             Track My Order

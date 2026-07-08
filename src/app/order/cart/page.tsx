@@ -5,7 +5,6 @@ export const dynamic = "force-dynamic";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CartItem } from "@/lib/supabase";
-import { getAvailableDeliverySlots, deliveryDateISO, formatDeliveryDate } from "@/lib/dateUtils";
 
 function fmt(paise: number) {
   return `₹${(paise / 100).toFixed(0)}`;
@@ -48,12 +47,13 @@ export default function CartPage() {
     setCustomerName(localStorage.getItem("wwy_name") || "");
     setCart(getCart());
 
-    const slots = getAvailableDeliverySlots(5).map((d) => ({
-      iso: deliveryDateISO(d),
-      label: formatDeliveryDate(d),
-    }));
-    setDeliverySlots(slots);
-    setSelectedDeliveryDate(slots[0]?.iso || "");
+    fetch("/api/orders/delivery-slots")
+      .then((r) => r.json())
+      .then(({ slots }) => {
+        setDeliverySlots(slots || []);
+        setSelectedDeliveryDate(slots?.[0]?.iso || "");
+      })
+      .catch(() => {});
 
     // Load Razorpay checkout SDK
     if (!document.getElementById("razorpay-sdk")) {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { getRazorpay } from "@/lib/razorpay";
 import { applyDiscounts } from "@/lib/discounts";
-import { calculateDeliveryDate, deliveryDateISO, formatDeliveryDate, isValidDeliveryDate } from "@/lib/dateUtils";
+import { calculateDeliveryDate, deliveryDateISO, formatDeliveryDate, isValidDeliveryDate, parseDeliveryDays } from "@/lib/dateUtils";
 import { CartItem } from "@/lib/supabase";
 import { findBestBaker } from "@/lib/baker";
 
@@ -29,15 +29,19 @@ export async function POST(req: NextRequest) {
 
     const supabase = createServerSupabase();
 
-    // Check vacation mode
-    const { data: setting } = await supabase
+    // Fetch all relevant settings in one query
+    const { data: settingsRows } = await supabase
       .from("settings")
-      .select("value")
-      .eq("key", "vacation_mode")
-      .single();
-    if (setting?.value === "true") {
+      .select("key, value")
+      .in("key", ["vacation_mode", "delivery_days", "cutoff_hour_ist"]);
+    const settingsMap = Object.fromEntries((settingsRows || []).map((s) => [s.key, s.value]));
+
+    if (settingsMap.vacation_mode === "true") {
       return NextResponse.json({ error: "We are on a short break. Back soon! 🌾" }, { status: 503 });
     }
+
+    const deliveryDays = settingsMap.delivery_days ? parseDeliveryDays(settingsMap.delivery_days) : [3, 6];
+    const cutoffHour = settingsMap.cutoff_hour_ist ? parseInt(settingsMap.cutoff_hour_ist, 10) : 12;
 
     // Resolve customer server-side by flat number — don't trust localStorage UUID
     const { data: customer } = await supabase
@@ -50,9 +54,9 @@ export async function POST(req: NextRequest) {
     const baseTotalPaise = cart.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
     const { finalTotal, discountPercent } = await applyDiscounts(resolvedCustomerId ?? "", baseTotalPaise);
 
-    const deliveryDate = (chosenDate && isValidDeliveryDate(chosenDate))
+    const deliveryDate = (chosenDate && isValidDeliveryDate(chosenDate, deliveryDays, cutoffHour))
       ? new Date(chosenDate + "T00:00:00Z")
-      : calculateDeliveryDate();
+      : calculateDeliveryDate(deliveryDays, cutoffHour);
     const deliveryISO = deliveryDateISO(deliveryDate);
     const deliveryLabel = formatDeliveryDate(deliveryDate);
 

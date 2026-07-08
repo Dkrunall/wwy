@@ -31,6 +31,7 @@ export type Customer = {
   id: string;
   name: string;
   flat_number: string;
+  email: string | null;
   phone: string | null;
   address: string | null;
   pincode: string | null;
@@ -56,6 +57,7 @@ export type Order = {
   admin_notes: string | null;
   borzo_order_id: string | null;
   borzo_tracking_url: string | null;
+  source: string | null;
   created_at: string;
   updated_at: string;
   order_items?: OrderItem[];

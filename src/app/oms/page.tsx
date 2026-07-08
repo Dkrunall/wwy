@@ -143,7 +143,7 @@ export default function OmsDashboard() {
   const fetchData = useCallback(async () => {
     setLoading(true);
     const [oR, pR, cR, bR, vacR, sR, fR, sesR] = await Promise.all([
-      supabase.from("orders").select("*, order_items(*)").order("created_at",{ascending:false}),
+      supabase.from("orders").select("*, order_items(*)").order("created_at",{ascending:false}).limit(500),
       supabase.from("products").select("*").order("category"),
       supabase.from("customers").select("*").order("created_at",{ascending:false}),
       supabase.from("bakers").select("*").order("name"),
@@ -169,7 +169,7 @@ export default function OmsDashboard() {
   useEffect(()=>{
     const iv = setInterval(async ()=>{
       const {count} = await supabase.from("orders").select("id",{count:"exact",head:true});
-      if(count && count > orders.length) setNewOrdersAlert(count - orders.length);
+      if(count && count > orders.length && orders.length < 500) setNewOrdersAlert(count - orders.length);
     }, 30000);
     return ()=>clearInterval(iv);
   },[orders.length]);
