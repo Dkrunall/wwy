@@ -232,23 +232,28 @@ export default function CartPage() {
               Choose Delivery Date
             </label>
             <div className="flex flex-col gap-2">
-              {deliverySlots.map((slot) => (
-                <button
-                  key={slot.iso}
-                  type="button"
-                  onClick={() => setSelectedDeliveryDate(slot.iso)}
-                  className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl border-2 text-left transition-all ${
-                    selectedDeliveryDate === slot.iso
-                      ? "border-brand-charcoal bg-brand-charcoal text-white"
-                      : "border-brand-charcoal/10 bg-white text-brand-charcoal hover:border-brand-charcoal/30"
-                  }`}
-                >
-                  <span className="font-black text-sm">{slot.label}</span>
-                  {selectedDeliveryDate === slot.iso && (
-                    <span className="text-white text-xs font-black tracking-wider uppercase">Selected ✓</span>
-                  )}
-                </button>
-              ))}
+              {deliverySlots.length === 0
+                ? [1,2,3].map((n) => (
+                    <div key={n} className="h-12 rounded-2xl bg-brand-charcoal/5 animate-pulse" />
+                  ))
+                : deliverySlots.map((slot) => (
+                  <button
+                    key={slot.iso}
+                    type="button"
+                    onClick={() => setSelectedDeliveryDate(slot.iso)}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl border-2 text-left transition-all ${
+                      selectedDeliveryDate === slot.iso
+                        ? "border-brand-charcoal bg-brand-charcoal text-white"
+                        : "border-brand-charcoal/10 bg-white text-brand-charcoal hover:border-brand-charcoal/30"
+                    }`}
+                  >
+                    <span className="font-black text-sm">{slot.label}</span>
+                    {selectedDeliveryDate === slot.iso && (
+                      <span className="text-white text-xs font-black tracking-wider uppercase">Selected ✓</span>
+                    )}
+                  </button>
+                ))
+              }
             </div>
             {deliveryLabel && (
               <p className="text-[10px] font-bold text-green-700 px-1">
