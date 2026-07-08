@@ -8,6 +8,7 @@ import Image from "next/image";
 import {
   RefreshCw, Loader2, CheckCircle2, MessageCircle,
   ChevronDown, ChevronUp, Palmtree, Package, Clock,
+  User, Phone, MapPin, Save, Pencil, X,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -28,6 +29,8 @@ interface BakerOrder {
 interface Baker {
   id: string;
   name: string;
+  phone?: string | null;
+  address?: string | null;
   daily_capacity?: number;
 }
 
@@ -82,10 +85,18 @@ export default function BakerDashboard() {
   const [historyLoading, setHistoryLoading] = useState(false);
   const [error, setError] = useState("");
   const [advancingId, setAdvancingId] = useState<string | null>(null);
-  const [tab, setTab] = useState<"queue" | "history">("queue");
+  const [tab, setTab] = useState<"queue" | "history" | "profile">("queue");
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [isHoliday, setIsHoliday] = useState(false);
   const [holidayLoading, setHolidayLoading] = useState(false);
+  // profile edit state
+  const [phoneEdit, setPhoneEdit] = useState("");
+  const [editingPhone, setEditingPhone] = useState(false);
+  const [phoneSaving, setPhoneSaving] = useState(false);
+  const [addressEdit, setAddressEdit] = useState("");
+  const [editingAddress, setEditingAddress] = useState(false);
+  const [addressSaving, setAddressSaving] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
 
   const enrichPhones = async (rows: BakerOrder[]): Promise<BakerOrder[]> => {
     if (!rows.length) return rows;
@@ -99,7 +110,7 @@ export default function BakerDashboard() {
   const fetchData = useCallback(async () => {
     const { data: b, error: bErr } = await supabase
       .from("bakers")
-      .select("id, name, daily_capacity")
+      .select("id, name, phone, address, daily_capacity")
       .eq("share_token", token)
       .eq("is_active", true)
       .single();
@@ -246,7 +257,7 @@ export default function BakerDashboard() {
       {/* ── Tabs ────────────────────────────────────────────────────────────── */}
       <div className="max-w-lg mx-auto px-4 pt-5">
         <div className="bg-white rounded-2xl border border-brand-brown/8 flex overflow-hidden shadow-sm">
-          {(["queue", "history"] as const).map((t) => (
+          {(["queue", "history", "profile"] as const).map((t) => (
             <button
               key={t}
               onClick={() => setTab(t)}
@@ -256,7 +267,7 @@ export default function BakerDashboard() {
                   : "text-brand-brown/40 hover:text-brand-brown"
               }`}
             >
-              {t === "queue" ? `Queue (${queue.length})` : "History"}
+              {t === "queue" ? `Queue (${queue.length})` : t === "history" ? "History" : "Profile"}
             </button>
           ))}
         </div>
@@ -478,6 +489,177 @@ export default function BakerDashboard() {
                 <p className="font-serif font-black text-brand-brown text-sm border-t border-brand-brown/6 pt-3">{fmt(order.total_paise)}</p>
               </div>
             ))}
+          </>
+        )}
+
+        {/* ── PROFILE TAB ─────────────────────────────────────────────────────── */}
+        {tab === "profile" && (
+          <>
+            {/* Identity card */}
+            <div className="bg-brand-brown rounded-3xl p-5 flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-white/15 border-2 border-white/20 flex items-center justify-center shrink-0">
+                <span className="font-black text-white text-2xl">{baker.name?.[0]?.toUpperCase() || "?"}</span>
+              </div>
+              <div>
+                <p className="font-black text-white text-lg leading-tight">{baker.name}</p>
+                <p className="text-white/50 text-[10px] font-black tracking-widest uppercase mt-1">Baker</p>
+              </div>
+            </div>
+
+            {/* Address card — most important for Borzo */}
+            <div className="bg-white rounded-3xl border border-brand-brown/8 p-5 shadow-sm flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-brand-orange" />
+                  <p className="text-[9px] font-black tracking-widest uppercase text-brand-brown">Pickup Address</p>
+                </div>
+                {!editingAddress && (
+                  <button
+                    onClick={() => { setAddressEdit(baker.address || ""); setEditingAddress(true); setProfileSaved(false); }}
+                    className="p-1.5 rounded-xl hover:bg-brand-oat text-brand-brown/30 hover:text-brand-orange transition-all cursor-pointer"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {!baker.address && !editingAddress && (
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3">
+                  <p className="text-xs font-bold text-amber-800">No address saved — Borzo deliveries will be skipped until you add one.</p>
+                </div>
+              )}
+
+              {!editingAddress ? (
+                <p className="text-sm font-bold text-brand-brown/70 leading-relaxed">
+                  {baker.address || <span className="italic text-brand-brown/30">Not set</span>}
+                </p>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <textarea
+                    value={addressEdit}
+                    onChange={(e) => setAddressEdit(e.target.value)}
+                    rows={3}
+                    placeholder="e.g. Shop 4, Building Name, Street, City — 400001"
+                    className="w-full rounded-2xl border border-brand-brown/15 bg-brand-oat/50 px-4 py-3 text-sm font-bold text-brand-brown placeholder:text-brand-brown/25 resize-none focus:outline-none focus:ring-2 focus:ring-brand-orange/30"
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={async () => {
+                        if (!addressEdit.trim()) return;
+                        setAddressSaving(true);
+                        const res = await fetch("/api/baker/update-profile", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ token, address: addressEdit.trim() }),
+                        });
+                        if (res.ok) {
+                          setBaker((b) => b ? { ...b, address: addressEdit.trim() } : b);
+                          setEditingAddress(false);
+                          setProfileSaved(true);
+                        }
+                        setAddressSaving(false);
+                      }}
+                      disabled={addressSaving || !addressEdit.trim()}
+                      className="flex-1 flex items-center justify-center gap-2 bg-brand-orange hover:bg-amber-500 text-white font-black text-[10px] tracking-widest uppercase py-2.5 rounded-2xl transition-all disabled:opacity-50 cursor-pointer shadow-sm"
+                    >
+                      {addressSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                      Save Address
+                    </button>
+                    <button
+                      onClick={() => setEditingAddress(false)}
+                      className="p-2.5 rounded-2xl bg-brand-oat hover:bg-brand-brown/8 text-brand-brown/40 hover:text-brand-brown transition-all cursor-pointer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Phone card */}
+            <div className="bg-white rounded-3xl border border-brand-brown/8 p-5 shadow-sm flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-brand-brown/40" />
+                  <p className="text-[9px] font-black tracking-widest uppercase text-brand-brown">Phone Number</p>
+                </div>
+                {!editingPhone && (
+                  <button
+                    onClick={() => { setPhoneEdit(baker.phone || ""); setEditingPhone(true); setProfileSaved(false); }}
+                    className="p-1.5 rounded-xl hover:bg-brand-oat text-brand-brown/30 hover:text-brand-orange transition-all cursor-pointer"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {!editingPhone ? (
+                <p className="text-sm font-bold text-brand-brown/70">
+                  {baker.phone ? `+91 ${baker.phone}` : <span className="italic text-brand-brown/30">Not set</span>}
+                </p>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-2 bg-brand-oat/50 border border-brand-brown/15 rounded-2xl px-4 py-3">
+                    <span className="text-sm font-black text-brand-brown/40">+91</span>
+                    <input
+                      type="tel"
+                      value={phoneEdit}
+                      onChange={(e) => setPhoneEdit(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                      placeholder="9876543210"
+                      maxLength={10}
+                      className="flex-1 bg-transparent text-sm font-bold text-brand-brown placeholder:text-brand-brown/25 focus:outline-none"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={async () => {
+                        const cleaned = phoneEdit.replace(/\D/g, "").slice(-10);
+                        if (cleaned.length < 10) return;
+                        setPhoneSaving(true);
+                        const res = await fetch("/api/baker/update-profile", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ token, phone: cleaned }),
+                        });
+                        if (res.ok) {
+                          setBaker((b) => b ? { ...b, phone: cleaned } : b);
+                          setEditingPhone(false);
+                          setProfileSaved(true);
+                        }
+                        setPhoneSaving(false);
+                      }}
+                      disabled={phoneSaving || phoneEdit.replace(/\D/g, "").length < 10}
+                      className="flex-1 flex items-center justify-center gap-2 bg-brand-brown hover:bg-brand-orange text-white font-black text-[10px] tracking-widest uppercase py-2.5 rounded-2xl transition-all disabled:opacity-50 cursor-pointer shadow-sm"
+                    >
+                      {phoneSaving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                      Save Phone
+                    </button>
+                    <button
+                      onClick={() => setEditingPhone(false)}
+                      className="p-2.5 rounded-2xl bg-brand-oat hover:bg-brand-brown/8 text-brand-brown/40 hover:text-brand-brown transition-all cursor-pointer"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Success flash */}
+            {profileSaved && (
+              <div className="flex items-center gap-2.5 bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-3">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <p className="text-xs font-bold text-emerald-800">Saved! Borzo will now use this address for pickups.</p>
+              </div>
+            )}
+
+            {/* Info note */}
+            <div className="bg-white rounded-3xl border border-brand-brown/8 p-5 shadow-sm flex gap-3">
+              <User className="w-4 h-4 text-brand-brown/20 shrink-0 mt-0.5" />
+              <p className="text-xs font-bold text-brand-brown/40 leading-relaxed">
+                Your address is used as the <strong className="text-brand-brown/60">pickup point</strong> when a Borzo delivery is dispatched. Enter the full street address including building name, area, and pincode.
+              </p>
+            </div>
           </>
         )}
 
