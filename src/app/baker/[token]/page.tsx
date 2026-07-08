@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import {
   ClipboardList, User, ChevronRight, Package, CheckCircle,
-  Loader2, MessageCircle, Palmtree, MapPin, Phone,
+  Loader2, MessageCircle, Palmtree, MapPin, Phone, Bell, X,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -15,6 +15,14 @@ import { supabase } from "@/lib/supabase";
 const fmt = (p: number) => `₹${(p / 100).toFixed(0)}`;
 const fmtDate = (d: string | null) =>
   d ? new Date(d).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) : "—";
+function timeAgo(iso: string): string {
+  const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
+  if (m < 1) return "Just now";
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  return `${Math.floor(h / 24)}d ago`;
+}
 
 // ── types ─────────────────────────────────────────────────────────────────────
 interface Baker {
@@ -97,6 +105,26 @@ export default function BakerDashboard() {
   const [holidayLoading, setHolidayLoading] = useState(false);
   const [deliveredCount, setDeliveredCount] = useState(0);
 
+  // notifications
+  interface Notif { id: string; title: string; body: string | null; read: boolean; created_at: string; }
+  const [notifs, setNotifs] = useState<Notif[]>([]);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifLoading, setNotifLoading] = useState(false);
+  const unreadCount = notifs.filter(n => !n.read).length;
+
+  const fetchNotifs = useCallback(async () => {
+    setNotifLoading(true);
+    try {
+      const res = await fetch(`/api/notifications/baker?token=${token}`);
+      if (res.ok) { const d = await res.json(); setNotifs(d.notifications || []); }
+    } finally { setNotifLoading(false); }
+  }, [token]);
+
+  const markAllRead = async () => {
+    await fetch("/api/notifications/baker", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ token }) });
+    setNotifs(p => p.map(n => ({ ...n, read: true })));
+  };
+
   // profile edit
   const [phoneEdit, setPhoneEdit] = useState("");
   const [editingPhone, setEditingPhone] = useState(false);
@@ -171,6 +199,12 @@ export default function BakerDashboard() {
     const iv = setInterval(() => { if (panel === "queue") fetchData(); }, 60000);
     return () => clearInterval(iv);
   }, [fetchData, panel]);
+  useEffect(() => {
+    if (!token) return;
+    fetchNotifs();
+    const iv = setInterval(fetchNotifs, 60000);
+    return () => clearInterval(iv);
+  }, [fetchNotifs, token]);
 
   // ── actions ──────────────────────────────────────────────────────────────────
   const advance = async (orderId: string, nextStatus: string) => {
@@ -266,13 +300,62 @@ export default function BakerDashboard() {
   return (
     <div className="min-h-screen bg-[#f7f4f0]">
 
+      {/* ── Notification panel ── */}
+      {notifOpen && (
+        <>
+          <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40" onClick={() => setNotifOpen(false)} />
+          <div className="fixed right-0 top-0 h-full w-80 bg-white shadow-2xl z-50 flex flex-col border-l border-gray-100">
+            <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between shrink-0">
+              <div className="flex items-center gap-2">
+                <Bell className="w-4 h-4 text-brand-brown/60" />
+                <p className="font-black text-brand-brown text-sm">Notifications</p>
+                {unreadCount > 0 && <span className="bg-brand-orange text-white text-[9px] font-black px-1.5 py-0.5 rounded-full leading-none">{unreadCount}</span>}
+              </div>
+              <div className="flex items-center gap-2">
+                {unreadCount > 0 && (
+                  <button onClick={markAllRead} className="text-[10px] font-black uppercase tracking-wider text-brand-brown/40 hover:text-brand-brown transition-colors">
+                    Mark all read
+                  </button>
+                )}
+                <button onClick={() => setNotifOpen(false)} className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"><X className="w-4 h-4 text-gray-400" /></button>
+              </div>
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              {notifLoading && notifs.length === 0 ? (
+                <p className="text-xs font-black text-gray-300 uppercase tracking-widest text-center py-12 animate-pulse">Loading…</p>
+              ) : notifs.length === 0 ? (
+                <div className="flex flex-col items-center gap-3 py-16">
+                  <Bell className="w-10 h-10 text-gray-200" />
+                  <p className="text-xs font-black text-gray-300">No notifications yet</p>
+                </div>
+              ) : notifs.map(n => (
+                <div key={n.id} className={`px-5 py-3.5 border-b border-gray-50 last:border-0 ${!n.read ? "bg-brand-oat/40" : ""}`}>
+                  <div className="flex items-start gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className={`text-sm leading-tight ${n.read ? "font-bold text-gray-500" : "font-black text-brand-brown"}`}>{n.title}</p>
+                      {n.body && <p className="text-xs text-gray-400 font-medium mt-0.5">{n.body}</p>}
+                      <p className="text-[10px] text-gray-300 font-bold mt-1">{timeAgo(n.created_at)}</p>
+                    </div>
+                    {!n.read && <div className="w-2 h-2 bg-brand-orange rounded-full shrink-0 mt-1" />}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
       {/* ── Header ── */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">
         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <span className="text-xs font-black tracking-wider uppercase text-gray-400">Baker Dashboard</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <button onClick={() => { setNotifOpen(true); fetchNotifs(); }} className="relative p-2 rounded-xl hover:bg-gray-100 transition-colors">
+              <Bell className="w-4 h-4 text-gray-400" />
+              {unreadCount > 0 && <span className="absolute top-1 right-1 w-4 h-4 bg-brand-orange text-white text-[9px] font-black rounded-full flex items-center justify-center leading-none">{unreadCount > 9 ? "9+" : unreadCount}</span>}
+            </button>
             <div className="bg-brand-oat p-1 rounded-lg">
               <Image src="/logo.png" alt="WWY" width={26} height={26} className="object-contain" />
             </div>

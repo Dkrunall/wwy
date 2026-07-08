@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { verifyWebhookSignature } from "@/lib/razorpay";
 import { sendPaymentConfirmedToCustomer, sendOwnerNotification, sendNewOrderToBaker } from "@/lib/email";
+import { createAdminNotification, createBakerNotification } from "@/lib/notifications";
 import { generateInvoicePDF } from "@/lib/invoice";
 import { findBestBaker } from "@/lib/baker";
 
@@ -51,13 +52,15 @@ export async function POST(req: NextRequest) {
     .single();
 
   // Auto-assign baker if not already assigned
-  if (!order.baker_id) {
-    const bakerId = await findBestBaker(supabase, customer?.pincode);
-    if (bakerId) {
-      await supabase.from("orders").update({ baker_id: bakerId }).eq("id", order.id);
-      const { data: baker } = await supabase.from("bakers").select("name, email, share_token").eq("id", bakerId).single();
-      if (baker?.email) {
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://wildwildyeast.com";
+  const assignedBakerId = order.baker_id ?? await findBestBaker(supabase, customer?.pincode);
+  if (!order.baker_id && assignedBakerId) {
+    await supabase.from("orders").update({ baker_id: assignedBakerId }).eq("id", order.id);
+  }
+  if (assignedBakerId) {
+    const { data: baker } = await supabase.from("bakers").select("name, email, share_token").eq("id", assignedBakerId).single();
+    if (baker) {
+      const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://wildwildyeast.com";
+      if (baker.email) {
         sendNewOrderToBaker(baker.email, baker.name, {
           orderNumber: order.order_number,
           customerName: order.customer_name,
@@ -68,8 +71,20 @@ export async function POST(req: NextRequest) {
           dashboardUrl: `${appUrl}/baker/${baker.share_token}`,
         }).catch(console.error);
       }
+      createBakerNotification(
+        supabase, assignedBakerId,
+        `New Order — ${order.order_number}`,
+        `${order.customer_name} · Flat ${order.flat_number}`
+      ).catch(console.error);
     }
   }
+
+  // Notify admin
+  createAdminNotification(
+    supabase,
+    `New Order — ${order.order_number}`,
+    `${order.customer_name} · Flat ${order.flat_number} · ₹${(order.total_paise / 100).toFixed(0)}`
+  ).catch(console.error);
 
   const itemsSubtotal = (order.order_items || []).reduce(
     (s: number, i: { quantity: number; unit_price_paise: number }) => s + i.quantity * i.unit_price_paise, 0
