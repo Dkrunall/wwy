@@ -1,5 +1,18 @@
 import { createServerSupabase } from "./supabase-server";
 
+export async function isPincodeServiceable(
+  supabase: ReturnType<typeof createServerSupabase>,
+  pincode?: string | null
+): Promise<boolean> {
+  if (!pincode) return false;
+  const { data } = await supabase
+    .from("bakers")
+    .select("id")
+    .contains("pincodes", [pincode])
+    .eq("is_active", true);
+  return (data || []).length > 0;
+}
+
 export async function findBestBaker(
   supabase: ReturnType<typeof createServerSupabase>,
   pincode?: string | null

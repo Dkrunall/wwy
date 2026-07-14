@@ -3,7 +3,7 @@ import { createServerSupabase } from "@/lib/supabase-server";
 import { calculateDeliveryDate, formatDeliveryDate, deliveryDateISO } from "@/lib/dateUtils";
 import { applyDiscounts } from "@/lib/discounts";
 import { getRazorpay } from "@/lib/razorpay";
-import { findBestBaker } from "@/lib/baker";
+import { findBestBaker, isPincodeServiceable } from "@/lib/baker";
 import Anthropic from "@anthropic-ai/sdk";
 
 import twilio from "twilio";
@@ -146,6 +146,12 @@ async function stepCollectPincode(
   supabase: ReturnType<typeof createServerSupabase>
 ) {
   const temp = (session.temp as Record<string, string>) || {};
+
+  if (!(await isPincodeServiceable(supabase, text))) {
+    await send(phone, "Sorry, we don't deliver to this pincode yet. We're expanding soon! Please enter a different pincode.");
+    return;
+  }
+
   await supabase.from("customers").insert({
     phone, name: temp.name, address: temp.address, pincode: text, flat_number: phone.slice(-6),
   });
@@ -345,6 +351,12 @@ async function stepConfirmOrder(
   if (cart.length === 0) { await send(phone, "Your cart is empty!"); return; }
 
   const { data: customer } = await supabase.from("customers").select("*").eq("phone", phone).single();
+
+  if (!(await isPincodeServiceable(supabase, customer?.pincode))) {
+    await send(phone, "Sorry, we don't currently deliver to your pincode. Please update your address to place an order.");
+    return;
+  }
+
   const subtotal = cart.reduce((s, i) => s + i.qty * i.price, 0);
   const { finalTotal, discountPercent } = await applyDiscounts(customer?.id || "", subtotal);
 

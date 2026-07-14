@@ -4,7 +4,7 @@ import { getRazorpay } from "@/lib/razorpay";
 import { applyDiscounts } from "@/lib/discounts";
 import { calculateDeliveryDate, deliveryDateISO, formatDeliveryDate, isValidDeliveryDate, parseDeliveryDays } from "@/lib/dateUtils";
 import { CartItem } from "@/lib/supabase";
-import { findBestBaker } from "@/lib/baker";
+import { findBestBaker, isPincodeServiceable } from "@/lib/baker";
 
 function generateOrderNumber(): string {
   const year = new Date().getFullYear();
@@ -50,6 +50,13 @@ export async function POST(req: NextRequest) {
       .eq("flat_number", flat)
       .single();
     const resolvedCustomerId = customer?.id ?? null;
+
+    if (!(await isPincodeServiceable(supabase, customer?.pincode))) {
+      return NextResponse.json(
+        { error: "Sorry, we don't currently deliver to your pincode. Please update your address in your account." },
+        { status: 400 }
+      );
+    }
 
     const baseTotalPaise = cart.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
     const { finalTotal, discountPercent } = await applyDiscounts(resolvedCustomerId ?? "", baseTotalPaise);

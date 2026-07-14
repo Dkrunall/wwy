@@ -2,7 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
@@ -18,6 +18,9 @@ export default function OrderLoginPage() {
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
   const [pincode, setPincode] = useState("");
+  const [pincodeLookup, setPincodeLookup] = useState<"idle" | "loading" | "found" | "notfound">("idle");
+  const [pincodeLocation, setPincodeLocation] = useState("");
+  const lastAutoFill = useRef("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [vacationMode, setVacationMode] = useState(false);
@@ -35,6 +38,39 @@ export default function OrderLoginPage() {
     const t = setTimeout(() => setResendTimer((r) => r - 1), 1000);
     return () => clearTimeout(t);
   }, [resendTimer]);
+
+  useEffect(() => {
+    if (pincode.length !== 6) {
+      setPincodeLookup("idle");
+      setPincodeLocation("");
+      return;
+    }
+    let cancelled = false;
+    setPincodeLookup("loading");
+    fetch(`/api/pincode/lookup?code=${pincode}`)
+      .then((r) => r.json())
+      .then((d) => {
+        if (cancelled) return;
+        if (!d.valid) {
+          setPincodeLookup("notfound");
+          setPincodeLocation("");
+          return;
+        }
+        const location = [d.area, d.district, d.state].filter(Boolean).join(", ");
+        setPincodeLookup("found");
+        setPincodeLocation(location);
+        setAddress((prev) => {
+          let base = prev;
+          if (lastAutoFill.current && base.endsWith(lastAutoFill.current)) {
+            base = base.slice(0, -lastAutoFill.current.length).replace(/,\s*$/, "");
+          }
+          lastAutoFill.current = location;
+          return base ? `${base}, ${location}` : location;
+        });
+      })
+      .catch(() => { if (!cancelled) setPincodeLookup("notfound"); });
+    return () => { cancelled = true; };
+  }, [pincode]);
 
   const sendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -302,7 +338,18 @@ export default function OrderLoginPage() {
                 onChange={(e) => { setPincode(e.target.value.replace(/\D/g,"")); setError(""); }}
                 className={inputCls}
               />
-              <p className="text-[11px] font-bold text-brand-charcoal/30">We check if we deliver to your area.</p>
+              {pincodeLookup === "loading" && (
+                <p className="text-[11px] font-bold text-brand-charcoal/30">Looking up area…</p>
+              )}
+              {pincodeLookup === "found" && (
+                <p className="text-[11px] font-bold text-emerald-600">✓ {pincodeLocation}</p>
+              )}
+              {pincodeLookup === "notfound" && (
+                <p className="text-[11px] font-bold text-brand-charcoal/30">Couldn&apos;t recognize this pincode — we&apos;ll still check delivery below.</p>
+              )}
+              {pincodeLookup === "idle" && (
+                <p className="text-[11px] font-bold text-brand-charcoal/30">We check if we deliver to your area.</p>
+              )}
             </div>
             {error && <p className="text-xs font-bold text-brand-terracotta">{error}</p>}
             <button type="submit" disabled={loading} className={btnCls}>
