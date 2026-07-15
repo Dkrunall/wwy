@@ -20,6 +20,7 @@ export default function OrderLoginPage() {
   const [pincode, setPincode] = useState("");
   const [pincodeLookup, setPincodeLookup] = useState<"idle" | "loading" | "found" | "notfound">("idle");
   const [pincodeLocation, setPincodeLocation] = useState("");
+  const [pincodeServiceable, setPincodeServiceable] = useState<"idle" | "checking" | "ok" | "blocked">("idle");
   const lastAutoFill = useRef("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -43,17 +44,20 @@ export default function OrderLoginPage() {
     if (pincode.length !== 6) {
       setPincodeLookup("idle");
       setPincodeLocation("");
+      setPincodeServiceable("idle");
       return;
     }
     let cancelled = false;
     setPincodeLookup("loading");
+    setPincodeServiceable("idle");
     fetch(`/api/pincode/lookup?code=${pincode}`)
       .then((r) => r.json())
-      .then((d) => {
+      .then(async (d) => {
         if (cancelled) return;
         if (!d.valid) {
           setPincodeLookup("notfound");
           setPincodeLocation("");
+          setPincodeServiceable("blocked");
           return;
         }
         const location = [d.area, d.district, d.state].filter(Boolean).join(", ");
@@ -67,8 +71,17 @@ export default function OrderLoginPage() {
           lastAutoFill.current = location;
           return base ? `${base}, ${location}` : location;
         });
+        // Check serviceability against active bakers
+        setPincodeServiceable("checking");
+        const { data: bakers } = await supabase
+          .from("bakers")
+          .select("pincodes")
+          .eq("is_active", true);
+        if (cancelled) return;
+        const serviceable = (bakers || []).flatMap((b: { pincodes?: string[] }) => b.pincodes || []);
+        setPincodeServiceable(serviceable.length > 0 && !serviceable.includes(pincode) ? "blocked" : "ok");
       })
-      .catch(() => { if (!cancelled) setPincodeLookup("notfound"); });
+      .catch(() => { if (!cancelled) { setPincodeLookup("notfound"); setPincodeServiceable("blocked"); } });
     return () => { cancelled = true; };
   }, [pincode]);
 
@@ -335,25 +348,47 @@ export default function OrderLoginPage() {
                 maxLength={6}
                 placeholder="400001"
                 value={pincode}
-                onChange={(e) => { setPincode(e.target.value.replace(/\D/g,"")); setError(""); }}
-                className={inputCls}
+                onChange={(e) => { setPincode(e.target.value.replace(/\D/g,"")); setError(""); setPincodeServiceable("idle"); }}
+                className={`${inputCls} ${
+                  pincodeServiceable === "ok" ? "border-emerald-400 focus:border-emerald-500" :
+                  pincodeServiceable === "blocked" ? "border-brand-terracotta focus:border-brand-terracotta" : ""
+                }`}
               />
               {pincodeLookup === "loading" && (
-                <p className="text-[11px] font-bold text-brand-charcoal/30">Looking up area…</p>
+                <p className="text-[11px] font-bold text-brand-charcoal/30 animate-pulse">Looking up area…</p>
               )}
-              {pincodeLookup === "found" && (
-                <p className="text-[11px] font-bold text-emerald-600">✓ {pincodeLocation}</p>
+              {pincodeServiceable === "checking" && (
+                <p className="text-[11px] font-bold text-brand-charcoal/30 animate-pulse">Checking delivery availability…</p>
               )}
-              {pincodeLookup === "notfound" && (
-                <p className="text-[11px] font-bold text-brand-charcoal/30">Couldn&apos;t recognize this pincode — we&apos;ll still check delivery below.</p>
+              {pincodeServiceable === "ok" && (
+                <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2">
+                  <span className="text-emerald-600 text-base leading-none">✓</span>
+                  <div>
+                    <p className="text-[11px] font-black text-emerald-700">{pincodeLocation}</p>
+                    <p className="text-[10px] font-bold text-emerald-600">We deliver to your area!</p>
+                  </div>
+                </div>
               )}
-              {pincodeLookup === "idle" && (
-                <p className="text-[11px] font-bold text-brand-charcoal/30">We check if we deliver to your area.</p>
+              {pincodeServiceable === "blocked" && (
+                <div className="flex items-center gap-2 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
+                  <span className="text-rose-500 text-base leading-none">✗</span>
+                  <p className="text-[11px] font-black text-rose-600">Sorry, we don&apos;t deliver to this pincode yet. We&apos;re expanding soon!</p>
+                </div>
+              )}
+              {pincodeServiceable === "idle" && pincodeLookup === "idle" && (
+                <p className="text-[11px] font-bold text-brand-charcoal/30">Enter your 6-digit pincode to check delivery availability.</p>
               )}
             </div>
             {error && <p className="text-xs font-bold text-brand-terracotta">{error}</p>}
-            <button type="submit" disabled={loading} className={btnCls}>
-              {loading ? "Saving..." : "Start ordering →"}
+            <button
+              type="submit"
+              disabled={loading || pincodeServiceable !== "ok"}
+              className={btnCls}
+            >
+              {loading ? "Saving…" :
+               pincodeServiceable === "idle" || pincodeServiceable === "checking" ? "Enter a valid pincode to continue" :
+               pincodeServiceable === "blocked" ? "Delivery not available in your area" :
+               "Start ordering →"}
             </button>
           </form>
         )}
