@@ -35,8 +35,8 @@ export async function POST(req: NextRequest) {
     const { data: customer } = await supabase
       .from("customers").select("*").eq("flat_number", order.flat_number).single();
 
-    if (!order.baker_id && customer?.pincode) {
-      const bakerId = await findBestBaker(supabase, customer.pincode);
+    if (!order.baker_id) {
+      const bakerId = await findBestBaker(supabase, customer?.pincode);
       if (bakerId) await supabase.from("orders").update({ baker_id: bakerId }).eq("id", orderId);
     }
 

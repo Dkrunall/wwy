@@ -7,8 +7,6 @@ function createTransporter() {
   });
 }
 
-function fmt(paise: number) { return `₹${(paise / 100).toFixed(0)}`; }
-
 export async function sendPaymentConfirmedToCustomer(
   email: string,
   name: string,

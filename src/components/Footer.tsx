@@ -50,9 +50,15 @@ export default function Footer() {
         {/* Bottom Legal */}
         <div className="w-full max-w-6xl flex flex-col sm:flex-row justify-between items-center text-[10px] sm:text-xs uppercase tracking-[0.2em] font-bold text-brand-oat/40 mb-8 sm:mb-12 gap-4 sm:gap-6">
           <div className="flex gap-6 sm:gap-8 border border-white/10 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full">
-            <Link href="#" className="hover:text-brand-orange transition-colors">IG</Link>
-            <Link href="#" className="hover:text-brand-orange transition-colors">TT</Link>
-            <Link href="#" className="hover:text-brand-orange transition-colors">PIN</Link>
+            <Link 
+              href="https://instagram.com/wildwildyeast.wwy" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="hover:text-brand-orange transition-colors flex items-center gap-1.5"
+            >
+              <span>Instagram</span>
+              <span className="opacity-55 lowercase">@wildwildyeast.wwy</span>
+            </Link>
           </div>
           <div className="flex justify-center flex-1 text-center">
             <span className="opacity-50">© 2026 WILD WILD YEAST. All Rights Reserved.</span>

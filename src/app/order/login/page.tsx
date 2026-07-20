@@ -6,6 +6,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
+import AnnouncementBar from "@/components/AnnouncementBar";
 
 export default function OrderLoginPage() {
   const router = useRouter();
@@ -168,7 +169,14 @@ export default function OrderLoginPage() {
       .single();
 
     setLoading(false);
-    if (err || !data) { setError(err?.message || "Something went wrong. Try again."); return; }
+    if (err || !data) {
+      if (err?.code === "23505") {
+        setError("That email is already registered. Try logging in with it instead.");
+      } else {
+        setError(err?.message || "Something went wrong. Try again.");
+      }
+      return;
+    }
     localStorage.setItem("wwy_flat", data.flat_number);
     localStorage.setItem("wwy_name", data.name);
     localStorage.setItem("wwy_customer_id", data.id);
@@ -188,12 +196,13 @@ export default function OrderLoginPage() {
     router.push("/order");
   };
 
-  const inputCls = "w-full bg-white border-2 border-brand-charcoal/10 focus:border-brand-terracotta rounded-2xl px-5 py-4 font-black text-brand-charcoal text-xl placeholder:text-brand-charcoal/20 outline-none transition-colors";
-  const btnCls = "w-full bg-brand-charcoal text-white hover:bg-brand-terracotta disabled:opacity-50 rounded-2xl py-5 font-black text-sm tracking-[0.15em] uppercase transition-all duration-300 active:scale-[0.98] min-h-[56px]";
+  const inputCls = "w-full bg-white border-2 border-brand-charcoal/10 focus:border-brand-orange focus:ring-4 focus:ring-brand-orange/10 rounded-2xl px-5 py-4 font-black text-brand-charcoal text-xl placeholder:text-brand-charcoal/25 outline-none transition-all duration-300 shadow-sm focus:shadow-md";
+  const btnCls = "w-full bg-brand-charcoal text-white hover:bg-brand-orange disabled:opacity-50 disabled:pointer-events-none rounded-2xl py-5 font-black text-sm tracking-[0.15em] uppercase transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] min-h-[56px] flex items-center justify-center";
 
   if (vacationMode) {
     return (
       <main className="min-h-screen bg-brand-oat flex flex-col items-center justify-center px-5">
+        <AnnouncementBar />
         <div className="w-full max-w-sm flex flex-col items-center gap-6 text-center">
           <Image src="/WWY-LOGO_White.png" alt="Wild Wild Yeast" width={80} height={80} className="object-contain" />
           <h1 className="font-black text-brand-charcoal tracking-tighter leading-tight"
@@ -210,6 +219,7 @@ export default function OrderLoginPage() {
 
   return (
     <main className="min-h-screen bg-brand-oat flex flex-col items-center justify-center px-5">
+      <AnnouncementBar />
       <div className="w-full max-w-sm flex flex-col items-center gap-8">
 
         <Image src="/WWY-LOGO_White.png" alt="Wild Wild Yeast" width={80} height={80} className="object-contain" />
@@ -256,6 +266,12 @@ export default function OrderLoginPage() {
         {/* ── Step 2: OTP ── */}
         {step === "otp" && (
           <form onSubmit={verifyOtp} className="w-full flex flex-col gap-4">
+            <div className="flex items-start gap-2 bg-brand-gold/15 border border-brand-gold/30 rounded-xl px-3 py-2.5">
+              <span className="text-sm leading-none">📩</span>
+              <p className="text-[11px] font-bold text-brand-charcoal/70 leading-snug">
+                Don&apos;t see it in your inbox? Check your <span className="font-black">spam / junk</span> folder — the code can land there.
+              </p>
+            </div>
             <div className="flex flex-col gap-2">
               <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">
                 Login Code

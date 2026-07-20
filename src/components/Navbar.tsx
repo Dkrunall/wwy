@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import WhatsAppIcon from "./WhatsAppIcon";
+import AnnouncementBar from "./AnnouncementBar";
 
 export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -36,14 +37,7 @@ export default function Navbar() {
   return (
     <>
       {/* ── Announcement Bar ── */}
-      <div
-        className={`fixed top-0 left-1/2 -translate-x-1/2 z-[60] bg-brand-terracotta text-white px-4 sm:px-6 py-1.5 rounded-b-[1rem] shadow-lg transition-all duration-500 origin-top w-[95%] sm:w-auto max-w-[90vw] text-center ${scrolled ? "scale-y-0 opacity-0 pointer-events-none" : "scale-y-100 opacity-100"
-          }`}
-      >
-        <p className="text-[7px] xs:text-[8px] sm:text-[9px] font-black tracking-[0.1em] sm:tracking-[0.15em] md:tracking-[0.2em] uppercase leading-snug">
-          Made to order. Nothing baked in advance. Fixed delivery days only.
-        </p>
-      </div>
+      <AnnouncementBar />
 
       {/* ════════════ THREE-PILL DESKTOP NAVBAR ════════════ */}
       <div

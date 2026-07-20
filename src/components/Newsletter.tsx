@@ -69,10 +69,11 @@ export default function Newsletter() {
           <input
             type="email"
             placeholder="your@email.com"
-            className="w-full bg-transparent border-b border-brand-charcoal/20 py-4 sm:py-6 md:py-8 font-serif italic text-brand-charcoal placeholder:text-brand-charcoal/30 focus:border-brand-terracotta outline-none transition-all duration-500 pr-16 sm:pr-20"
+            className="w-full bg-transparent border-b border-brand-charcoal/20 py-4 sm:py-6 md:py-8 font-serif italic text-brand-charcoal placeholder:text-brand-charcoal/30 focus:outline-none transition-all duration-500 pr-16 sm:pr-20 peer"
             style={{ fontSize: "clamp(1rem, 4vw, 1.5rem)" }}
           />
-          <button className="absolute right-0 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-brand-charcoal text-brand-oat flex items-center justify-center hover:bg-brand-terracotta hover:scale-105 transition-all duration-300">
+          <span className="absolute bottom-0 left-0 w-full h-[2px] bg-brand-orange scale-x-0 peer-focus:scale-x-100 transition-transform duration-500 origin-center" />
+          <button className="absolute right-0 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full bg-brand-charcoal text-brand-oat flex items-center justify-center hover:bg-brand-orange hover:scale-105 transition-all duration-300">
             <ArrowRight size={20} className="sm:w-6 sm:h-6" strokeWidth={1.5} />
           </button>
         </div>

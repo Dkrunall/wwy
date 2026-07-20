@@ -14,9 +14,8 @@ function generateOrderNumber(): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const { cart, customerId, flat, customerName, notes, deliveryDate: chosenDate } = (await req.json()) as {
+    const { cart, flat, customerName, notes, deliveryDate: chosenDate } = (await req.json()) as {
       cart: CartItem[];
-      customerId: string;
       flat: string;
       customerName: string;
       notes?: string;

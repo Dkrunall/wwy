@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import Image from "next/image";
 import { supabase, Product, CartItem } from "@/lib/supabase";
+import AnnouncementBar from "@/components/AnnouncementBar";
 
 const PRODUCT_IMAGES: Record<string, string> = {
   "Wild Botanicals": "/p1.png",
@@ -131,6 +132,7 @@ export default function ProductPage() {
 
   return (
     <main className="min-h-screen bg-brand-oat pb-36">
+      <AnnouncementBar />
       {/* Header */}
       <header className="sticky top-0 z-40 bg-brand-oat/95 backdrop-blur-sm border-b border-brand-charcoal/5">
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between gap-3">

@@ -5,6 +5,7 @@ export const dynamic = "force-dynamic";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CartItem } from "@/lib/supabase";
+import AnnouncementBar from "@/components/AnnouncementBar";
 
 function fmt(paise: number) {
   return `₹${(paise / 100).toFixed(0)}`;
@@ -175,6 +176,7 @@ export default function CartPage() {
 
   return (
       <main className="min-h-screen bg-brand-oat pb-40">
+        <AnnouncementBar />
         {/* Header */}
         <header className="sticky top-0 z-40 bg-brand-oat/95 backdrop-blur-sm border-b border-brand-charcoal/5">
           <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
@@ -229,10 +231,10 @@ export default function CartPage() {
               placeholder="Allergies, special requests, anything for the baker..."
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full bg-white border-2 border-brand-charcoal/10 focus:border-brand-terracotta rounded-2xl px-4 py-3 font-medium text-brand-charcoal text-sm placeholder:text-brand-charcoal/20 outline-none transition-colors resize-none"
+              className="w-full bg-white border-2 border-brand-charcoal/10 focus:border-brand-orange focus:ring-4 focus:ring-brand-orange/10 rounded-2xl px-4 py-3 font-medium text-brand-charcoal text-sm placeholder:text-brand-charcoal/20 outline-none transition-all duration-300 shadow-sm focus:shadow-md resize-none"
             />
           </div>
-
+ 
           {/* Delivery date selector */}
           <div className="flex flex-col gap-2 mt-2">
             <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/40">
@@ -248,10 +250,10 @@ export default function CartPage() {
                     key={slot.iso}
                     type="button"
                     onClick={() => setSelectedDeliveryDate(slot.iso)}
-                    className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl border-2 text-left transition-all ${
+                    className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl border-2 text-left transition-all duration-300 hover:scale-[1.01] active:scale-95 ${
                       selectedDeliveryDate === slot.iso
-                        ? "border-brand-charcoal bg-brand-charcoal text-white"
-                        : "border-brand-charcoal/10 bg-white text-brand-charcoal hover:border-brand-charcoal/30"
+                        ? "border-brand-orange bg-brand-charcoal text-white shadow-md"
+                        : "border-brand-charcoal/10 bg-white text-brand-charcoal hover:border-brand-charcoal/30 shadow-sm"
                     }`}
                   >
                     <span className="font-black text-sm">{slot.label}</span>
@@ -268,9 +270,9 @@ export default function CartPage() {
               </p>
             )}
           </div>
-
+ 
           {/* Price summary */}
-          <div className="bg-white rounded-2xl px-4 py-4 border border-brand-charcoal/5">
+          <div className="bg-white rounded-2xl px-4 py-4 border border-brand-charcoal/5 shadow-sm">
             <div className="flex justify-between items-center mb-1">
               <span className="text-xs font-bold text-brand-charcoal/50">{itemCount} item{itemCount !== 1 ? "s" : ""}</span>
               <span className="text-xs font-bold text-brand-charcoal/50">{fmt(baseTotalPaise)}</span>
@@ -286,10 +288,10 @@ export default function CartPage() {
               <span className="font-black text-brand-charcoal text-lg">{fmt(displayTotal)}</span>
             </div>
           </div>
-
+ 
           {error && <p className="text-xs font-bold text-brand-terracotta text-center">{error}</p>}
         </div>
-
+ 
         {/* Pay button */}
         <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-brand-oat/80 backdrop-blur-md border-t border-brand-charcoal/5">
           <div className="max-w-2xl mx-auto flex flex-col gap-2">
@@ -299,7 +301,7 @@ export default function CartPage() {
             <button
               onClick={handlePay}
               disabled={loading || cart.length === 0 || !selectedDeliveryDate}
-              className="w-full bg-brand-charcoal hover:bg-brand-terracotta disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl py-5 font-black text-sm tracking-[0.15em] uppercase transition-all duration-300 active:scale-[0.98] min-h-[56px]"
+              className="w-full bg-brand-charcoal hover:bg-brand-orange disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl py-5 font-black text-sm tracking-[0.15em] uppercase transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] min-h-[56px]"
             >
               {loading ? "Opening payment..." : `Pay · ${fmt(displayTotal)}`}
             </button>

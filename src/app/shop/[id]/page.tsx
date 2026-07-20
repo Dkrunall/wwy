@@ -206,9 +206,14 @@ export default function ProductDetailPage() {
             </p>
           </div>
           {restDesc && (
-            <p className="text-sm sm:text-base font-bold text-brand-charcoal/50 leading-relaxed pl-5 sm:pl-10 max-w-2xl">
+            <p className="text-sm sm:text-base font-bold text-brand-charcoal/50 leading-relaxed pl-5 sm:pl-10 max-w-2xl mb-10 sm:mb-12">
               {restDesc}
             </p>
+          )}
+          {product.detailImage && (
+            <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] rounded-[2rem] overflow-hidden shadow-lg">
+              <Image src={product.detailImage.src} alt={product.detailImage.alt} fill className="object-cover" />
+            </div>
           )}
         </div>
       </section>

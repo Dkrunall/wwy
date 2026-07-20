@@ -10,6 +10,7 @@ import {
   Loader2, MessageCircle, Palmtree, MapPin, Phone, Bell, X,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import AnnouncementBar from "@/components/AnnouncementBar";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 const fmt = (p: number) => `₹${(p / 100).toFixed(0)}`;
@@ -299,6 +300,7 @@ export default function BakerDashboard() {
   // ── render ───────────────────────────────────────────────────────────────────
   return (
     <div className="min-h-screen bg-[#f7f4f0]">
+      <AnnouncementBar />
 
       {/* ── Notification panel ── */}
       {notifOpen && (

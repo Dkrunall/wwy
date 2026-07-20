@@ -21,6 +21,8 @@
   --color-brand-brown: var(--brand-brown);
   --color-brand-gold: var(--brand-gold);
   
+  --color-brand-accent: var(--brand-orange);
+  
   /* Legacy Tailwind classes */
   --color-brand-terracotta: var(--brand-terracotta);
   --color-brand-charcoal: var(--brand-charcoal);
@@ -36,7 +38,12 @@ body {
   font-family: var(--font-sans);
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  letter-spacing: -0.03em;
+}
+
+h5, h6 {
   font-family: var(--font-sans);
 }
 

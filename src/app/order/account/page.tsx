@@ -10,6 +10,7 @@ import {
   Clock, Package, Flame, Truck, CheckCircle, User, Home,
 } from "lucide-react";
 import { supabase, Order } from "@/lib/supabase";
+import AnnouncementBar from "@/components/AnnouncementBar";
 
 function fmt(paise: number) { return `₹${(paise / 100).toFixed(0)}`; }
 function fmtDate(iso: string) {
@@ -184,6 +185,7 @@ export default function AccountPage() {
 
   return (
     <div className="min-h-screen bg-[#f7f4f0]">
+      <AnnouncementBar />
 
       {/* ── Top header ── */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40 shadow-sm">

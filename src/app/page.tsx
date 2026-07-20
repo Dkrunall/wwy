@@ -5,9 +5,11 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
+import ProcessStory from "@/components/ProcessStory";
 import ProductSection from "@/components/ProductSection";
 import StorySection from "@/components/StorySection";
 import EnergyBanner from "@/components/EnergyBanner";
+import Testimonials from "@/components/Testimonials";
 import SocialGallery from "@/components/SocialGallery";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
@@ -29,9 +31,11 @@ export default function Home() {
     <main className="relative bg-brand-cream">
       <Navbar />
       <Hero />
+      <ProcessStory />
       <ProductSection />
       <StorySection />
       <EnergyBanner />
+      <Testimonials />
       <SocialGallery />
       <Newsletter />
       <Footer />

@@ -6,11 +6,14 @@ export type Product = {
   price: string;
   priceNum: number;
   image: string;
+  /** Real photography for contexts that render plain (no mix-blend-multiply) — e.g. the homepage grid. Falls back to `image` when absent. */
+  photo?: string;
   bgColor: string;
   desc: string;
   longDesc: string;
   details: string[];
   leadTime: string;
+  detailImage?: { src: string; alt: string };
 };
 
 export const products: Product[] = [
@@ -120,6 +123,7 @@ export const products: Product[] = [
     price: "₹280",
     priceNum: 280,
     image: "/p2.png",
+    photo: "/product_img/6-top-shot.jpg",
     bgColor: "bg-[#F5EDD7]",
     desc: "Open crumb. Thick crust. Slow-fermented with our century-old wild culture. Baked when you order.",
     longDesc:
@@ -131,6 +135,7 @@ export const products: Product[] = [
       "Best eaten within 2 days · Freeze well",
     ],
     leadTime: "Baked to order · Delivery Wed & Sat",
+    detailImage: { src: "/product_img/5-crumb.jpg", alt: "The crumb, sliced open — airy, open-holed, alive." },
   },
   {
     id: 7,

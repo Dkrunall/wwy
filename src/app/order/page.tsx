@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { supabase, Product, CartItem } from "@/lib/supabase";
+import AnnouncementBar from "@/components/AnnouncementBar";
 
 const CATEGORIES = ["All", "Sodas", "Starters", "Breads", "Bundles", "Storage"];
 
@@ -136,6 +137,7 @@ export default function OrderPage() {
 
   return (
     <main className="min-h-screen bg-brand-oat pb-36">
+      <AnnouncementBar />
 
       {/* ── Sticky Header ── */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-brand-brown/10 shadow-sm">

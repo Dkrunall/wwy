@@ -81,3 +81,9 @@ ALTER TABLE bakers ADD COLUMN IF NOT EXISTS lng     FLOAT8;
 
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS borzo_order_id     TEXT;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS borzo_tracking_url TEXT;
+
+-- ─── Customers: flat number is not globally unique ──────────────────────────
+-- Multiple customers can legitimately share a flat number (roommates/family
+-- using the same OMS, or the same flat number existing in a different
+-- building). Email (via OTP login) is the real identity now.
+ALTER TABLE customers DROP CONSTRAINT IF EXISTS customers_flat_number_key;

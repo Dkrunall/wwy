@@ -14,17 +14,6 @@ export default function StorySection() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.to(".parallax-bg", {
-        yPercent: 20,
-        ease: "none",
-        scrollTrigger: {
-          trigger: ".story-images",
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1,
-        },
-      });
-
       gsap.fromTo(".story-text",
         { y: 80, opacity: 0, rotation: 2 },
         {
@@ -55,18 +44,18 @@ export default function StorySection() {
         <div className="flex flex-col lg:flex-row gap-10 sm:gap-16 md:gap-24 items-center">
 
           {/* Left: Images */}
-          <div className="w-full lg:w-1/2 flex gap-3 sm:gap-4 md:gap-8 story-images h-[65vw] sm:h-[55vh] md:h-[75vh] min-h-[240px] max-h-[500px] relative overflow-hidden rounded-[2rem] sm:rounded-[3rem]">
-            <div className="w-1/2 h-[120%] -top-[10%] relative overflow-hidden rounded-[2rem] sm:rounded-[3rem] shadow-2xl border-4 border-brand-brown">
-              <Image src="/f1.png" alt="Wheat field" fill className="parallax-bg object-cover transition-transform duration-700 hover:scale-105" />
+          <div className="w-full lg:w-1/2 flex gap-4 sm:gap-6 md:gap-10 story-images h-[65vw] sm:h-[55vh] md:h-[75vh] min-h-[240px] max-h-[500px] relative px-4">
+            <div className="w-1/2 h-[95%] relative overflow-hidden rounded-[2rem] sm:rounded-[3rem] shadow-2xl border border-white/15">
+              <Image src="/f1.png" alt="Wheat field" fill className="object-cover transition-transform duration-700 hover:scale-105" />
             </div>
-            <div className="w-1/2 h-[120%] -top-[10%] relative overflow-hidden rounded-[2rem] sm:rounded-[3rem] shadow-2xl border-4 border-brand-brown mt-12 sm:mt-16 md:mt-32">
-              <Image src="/f2.png" alt="Process" fill className="parallax-bg object-cover transition-transform duration-700 hover:scale-105" />
+            <div className="w-1/2 h-[95%] relative overflow-hidden rounded-[2rem] sm:rounded-[3rem] shadow-2xl border border-white/15 mt-10 sm:mt-12 md:mt-20">
+              <Image src="/f2.png" alt="Process" fill className="object-cover transition-transform duration-700 hover:scale-105" />
             </div>
 
             {/* Floating Badge */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#FFDDC1] text-brand-brown w-24 sm:w-32 h-24 sm:h-32 rounded-full flex flex-col justify-center items-center shadow-[inset_0_10px_20px_rgba(0,0,0,0.1),0_25px_50px_-12px_rgba(0,0,0,0.25)] z-20 hover:scale-110 transition-transform cursor-pointer border-4 border-brand-brown">
-              <span className="font-black text-2xl sm:text-3xl leading-none">ZERO</span>
-              <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-widest text-center leading-tight">Artificial<br />Additives</span>
+            <div className="absolute top-[45%] left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#FFDDC1] text-brand-brown w-24 sm:w-32 h-24 sm:h-32 rounded-full flex flex-col justify-center items-center shadow-2xl z-20 hover:scale-110 transition-transform cursor-pointer border-4 border-brand-brown">
+              <span className="font-serif italic font-normal text-2xl sm:text-3xl leading-none">Zero</span>
+              <span className="text-[7px] sm:text-[9px] font-black uppercase tracking-[0.18em] text-center leading-tight mt-1">Artificial<br />Additives</span>
             </div>
           </div>
 
@@ -77,18 +66,18 @@ export default function StorySection() {
             </span>
 
             <h2
-              className="story-text font-black tracking-tight leading-none mb-6 sm:mb-10 text-white"
-              style={{ fontSize: "clamp(2.5rem, 8vw, 5.5rem)" }}
+              className="story-text font-serif font-normal tracking-tight leading-[1.05] mb-6 sm:mb-10 text-white"
+              style={{ fontSize: "clamp(2.5rem, 7.5vw, 5.2rem)" }}
             >
-              NOTHING MADE <br className="hidden sm:block" />
-              <span className="text-brand-gold">BEFORE YOU ORDER.</span>
+              Nothing made <br className="hidden sm:block" />
+              <span className="text-brand-gold italic">before you order.</span>
             </h2>
 
-            <p className="story-text text-sm sm:text-base md:text-xl text-brand-oat/80 font-bold leading-relaxed max-w-xl mb-6 sm:mb-8">
+            <p className="story-text text-sm sm:text-base md:text-lg text-brand-oat/75 font-bold leading-relaxed max-w-xl mb-6 sm:mb-8">
               Every loaf and every bottle begins with an order. There is no shelf, no display counter, no excess waiting to be cleared.
             </p>
 
-            <p className="story-text text-sm sm:text-base md:text-xl text-brand-oat/80 font-bold leading-relaxed max-w-xl mb-10 sm:mb-16">
+            <p className="story-text text-sm sm:text-base md:text-lg text-brand-oat/75 font-bold leading-relaxed max-w-xl mb-10 sm:mb-16">
               Fermentation resists urgency. We work with that resistance — not against it. Time does the work. Honest ingredients do the rest.
             </p>
 

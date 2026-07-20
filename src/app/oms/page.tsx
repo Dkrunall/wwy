@@ -12,6 +12,7 @@ import {
   Loader2, BarChart2, Edit2, Trash2, Plus, XCircle, CalendarDays, MessageCircle,
   Download, Send, StickyNote, ChevronLeft, ChevronRight, Settings, Star, Bell, Zap,
 } from "lucide-react";
+import AnnouncementBar from "@/components/AnnouncementBar";
 
 interface OrderItem { id: string; product_name: string; quantity: number; unit_price_paise: number; }
 interface Order {
@@ -54,10 +55,6 @@ const D_LABELS: Record<string,string> = {
   resting:"Bulk Rest", cold_proof:"Cold Proof", baking:"Baking",
   out_for_delivery:"Out for Delivery", delivered:"Delivered", cancelled:"Cancelled",
 };
-const D_NEXT: Record<string,string> = {
-  placed:"mixing", mixing:"stretching", stretching:"resting",
-  resting:"cold_proof", cold_proof:"baking", baking:"out_for_delivery", out_for_delivery:"delivered",
-};
 const D_THEME: Record<string,{bg:string;text:string;border:string;pulse:string}> = {
   placed:           {bg:"bg-zinc-50",        text:"text-zinc-600",   border:"border-zinc-200/60",   pulse:"bg-zinc-400"},
   mixing:           {bg:"bg-yellow-50/60",   text:"text-yellow-800", border:"border-yellow-200/50", pulse:"bg-yellow-500"},
@@ -88,7 +85,6 @@ export default function OmsDashboard() {
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState("all");
   const [orderSort, setOrderSort] = useState<"newest"|"oldest"|"amount"|"delivery">("newest");
-  const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [vacationMode, setVacationMode] = useState(false);
   const [vacationLoading, setVacationLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -213,21 +209,6 @@ export default function OmsDashboard() {
     const nv = !vacationMode;
     await fetch("/api/oms/vacation",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({enabled:nv})});
     setVacationMode(nv); setVacationLoading(false);
-  };
-  const advanceDelivery = async (orderId: string, cur: string) => {
-    const next = D_NEXT[cur]; if(!next) return;
-    setUpdatingId(orderId);
-    const r = await fetch("/api/oms/orders/advance",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({orderId,nextStatus:next})});
-    const d = await r.json();
-    if(d.ok) {
-      setOrders(p=>p.map(o=>o.id===orderId?{
-        ...o,
-        delivery_status:next,
-        borzo_order_id: d.updatePayload?.borzo_order_id ?? o.borzo_order_id,
-        borzo_tracking_url: d.updatePayload?.borzo_tracking_url ?? o.borzo_tracking_url,
-      }:o));
-    }
-    setUpdatingId(null);
   };
   const assignBaker = async (orderId: string, bakerId: string|null) => {
     await supabase.from("orders").update({baker_id:bakerId||null}).eq("id",orderId);
@@ -546,6 +527,7 @@ export default function OmsDashboard() {
 
   return (
     <div className="min-h-screen bg-brand-oat text-brand-brown font-sans flex flex-col md:flex-row antialiased">
+      <AnnouncementBar />
 
       {/* ── MODALS ── */}
       {(modal || deleteConfirmId || deletingBakerId) && (
@@ -813,7 +795,7 @@ export default function OmsDashboard() {
             {label:"Paid & Confirmed",value:confirmed,unit:"ready",icon:CheckCircle,color:"text-emerald-700",bg:"bg-emerald-50/70 border-emerald-200/50",bar:"bg-emerald-500",pct:orders.length>0?confirmed/orders.length:0},
             {label:"Today Revenue",value:fmt(todayRevenue),unit:"paid",icon:TrendingUp,color:"text-brand-brown",bg:"bg-brand-orange/10 border-brand-orange/15",bar:"bg-brand-orange",pct:1},
             {label:"Customers",value:customers.length,unit:"total",icon:Users,color:"text-brand-brown",bg:"bg-brand-brown/5 border-brand-brown/10",bar:"bg-brand-brown/40",pct:1},
-          ].map(({label,value,unit,icon:Icon,color,bg,bar,pct})=>(
+          ].map(({label,value,unit,icon:Icon,bg,bar,pct})=>(
             <div key={label} className="relative overflow-hidden bg-white rounded-[2rem] p-5 border border-brand-brown/10 shadow-sm hover:shadow-lg hover:scale-[1.01] transition-all duration-300 flex flex-col justify-between min-h-[135px]">
               <div>
                 <div className="flex items-center justify-between mb-2">
@@ -951,7 +933,6 @@ export default function OmsDashboard() {
               const payTheme = PAY_THEME[order.payment_status||"pending"]||PAY_THEME.pending;
               const delStatus = order.delivery_status||"placed";
               const delTheme = D_THEME[delStatus]||D_THEME.placed;
-              const delNext = D_NEXT[delStatus];
               const assignedBaker = bakers.find(b=>b.id===order.baker_id);
               const isCancelled = order.status==="cancelled";
               const customerPhone = customers.find(c=>c.flat_number===order.flat_number)?.phone;
@@ -1004,11 +985,6 @@ export default function OmsDashboard() {
                       )}
                     </div>
                     <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto" onClick={e=>e.stopPropagation()}>
-                      {!isCancelled&&order.payment_status==="paid"&&delNext&&(
-                        <button onClick={()=>advanceDelivery(order.id,delStatus)} disabled={updatingId===order.id} className="bg-brand-brown hover:bg-brand-orange disabled:opacity-50 text-white text-[10px] font-black uppercase px-3 py-2 rounded-xl transition-all flex items-center gap-1 cursor-pointer shadow-sm hover:scale-[1.02] active:scale-[0.98]">
-                          {updatingId===order.id?<Loader2 className="w-3 h-3 animate-spin"/>:<span>→ {D_LABELS[delNext]}</span>}
-                        </button>
-                      )}
                       {order.payment_status==="pending"&&!isCancelled&&(
                         <button onClick={()=>markAsPaid(order.id)} disabled={markingPaidId===order.id} className="bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-[10px] font-black uppercase px-3 py-2 rounded-xl transition-all flex items-center gap-1 cursor-pointer shadow-sm hover:scale-[1.02] active:scale-[0.98]">
                           {markingPaidId===order.id?<Loader2 className="w-3 h-3 animate-spin"/>:<><Check className="w-3 h-3"/>Mark Paid</>}

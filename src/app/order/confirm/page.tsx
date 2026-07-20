@@ -6,6 +6,7 @@ import React, { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
+import AnnouncementBar from "@/components/AnnouncementBar";
 
 interface OrderWithItems {
   id: string;
@@ -78,6 +79,7 @@ function ConfirmContent() {
 
   return (
     <main className="min-h-screen bg-brand-oat flex flex-col items-center justify-center px-5 py-12">
+      <AnnouncementBar />
       <div className="w-full max-w-sm flex flex-col items-center gap-8">
 
         <Image src="/WWY-LOGO_White.png" alt="WWY" width={56} height={56} className="object-contain opacity-80" />

@@ -5,6 +5,7 @@ export const dynamic = "force-dynamic";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase, Order } from "@/lib/supabase";
+import AnnouncementBar from "@/components/AnnouncementBar";
 
 
 function fmt(paise: number) {
@@ -155,6 +156,7 @@ export default function HistoryPage() {
 
   return (
     <main className="min-h-screen bg-brand-oat pb-20">
+      <AnnouncementBar />
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-brand-brown/10 shadow-sm">
         <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between gap-3">

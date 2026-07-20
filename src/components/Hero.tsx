@@ -76,17 +76,12 @@ export default function Hero() {
           </div>
 
           <h1 className="hero-text font-black tracking-tighter text-brand-brown mb-3 leading-[0.85]"
-            style={{ fontSize: "clamp(3rem, 14vw, 7.5rem)" }}>
-            WILD <br /> <span className="text-brand-orange">YEAST.</span>
+            style={{ fontSize: "clamp(2.6rem, 11vw, 6.5rem)" }}>
+            WILD BY NATURE.<br /><span className="text-brand-orange">CRAFTED BY TIME.</span>
           </h1>
 
-          <p className="hero-text font-black text-brand-brown/30 tracking-[0.18em] uppercase mb-6 sm:mb-8"
-            style={{ fontSize: "clamp(0.65rem, 1.5vw, 0.85rem)" }}>
-            Wild by nature. Crafted by time.
-          </p>
-
           <p className="hero-text text-sm sm:text-base md:text-xl font-bold text-brand-brown/70 max-w-sm sm:max-w-md mb-6 sm:mb-10">
-            Fermented bread and living beverages. Nothing made until you order it. Nothing added that doesn't belong.
+            Bake-to-order sourdough. Brew-to-order ferments. Mumbai only.
           </p>
 
           <div className="hero-text flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
@@ -95,7 +90,7 @@ export default function Hero() {
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-brand-brown text-brand-oat hover:bg-brand-orange hover:text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-xl active:scale-95"
             >
               <WhatsAppIcon size={14} />
-              Order Now
+              Order here
             </Link>
             <button className="w-full sm:w-auto bg-white text-brand-brown hover:bg-brand-oat px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-sm border border-brand-brown/5 active:scale-95">
               How It Works
@@ -108,7 +103,7 @@ export default function Hero() {
           <div className="hero-card hero-float relative rounded-[2.5rem] sm:rounded-[3rem] bg-white p-3 sm:p-4 shadow-[0_30px_60px_rgba(0,0,0,0.15)] border-4 border-white rotate-3 group z-20"
             style={{ width: "min(300px, 86vw)", height: "min(360px, 100vw)", maxWidth: "440px", maxHeight: "520px" }}>
             <div className="relative w-full h-full rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden bg-brand-oat/50 shadow-[inset_0_10px_30px_rgba(0,0,0,0.08)] mask-image-rounded">
-              <Image src="/p1.png" alt="Sourdough Soda" fill className="object-cover group-hover:scale-105 transition-transform duration-700" priority />
+              <Image src="/product_img/4-dutch-oven.jpg" alt="Sourdough loaf, straight out of the Dutch oven" fill className="object-cover group-hover:scale-105 transition-transform duration-700" priority />
             </div>
 
             {/* Decorative floating badge */}

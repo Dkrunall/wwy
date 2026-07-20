@@ -99,12 +99,12 @@ export default function SocialGallery() {
         <div className="testimonial-box w-full md:w-auto max-w-sm bg-white p-6 sm:p-8 rounded-[2rem] shadow-xl border-4 border-brand-charcoal/5 relative">
           <div className="absolute -top-4 -right-4 bg-brand-terracotta text-white w-10 sm:w-12 h-10 sm:h-12 flex items-center justify-center rounded-full text-2xl sm:text-3xl font-serif leading-none shadow-lg">"</div>
           <p className="text-brand-charcoal/80 text-sm leading-relaxed font-bold">
-            Finding a natural soda that isn't packed with processed sugar is impossible. The Wild Ale soda has completely replaced my evening drink. The sourdough tin is just a gorgeous bonus.
+            Fizzy perfection! Tried the Hibiscus, Jamun, and Blueberry flavors from Wild Wild Yeast, and they are honestly so good. Packed with actual flavor and light enough to have anytime.
           </p>
           <div className="mt-5 sm:mt-6 flex items-center gap-3 sm:gap-4">
-            <div className="w-10 sm:w-12 h-10 sm:h-12 bg-[#FFDDC1] rounded-full flex items-center justify-center text-brand-charcoal font-black text-lg sm:text-xl shadow-inner shrink-0">M</div>
+            <div className="w-10 sm:w-12 h-10 sm:h-12 bg-[#FFDDC1] rounded-full flex items-center justify-center text-brand-charcoal font-black text-lg sm:text-xl shadow-inner shrink-0">S</div>
             <div>
-              <p className="text-brand-charcoal font-black text-xs uppercase tracking-widest">Mira S.</p>
+              <p className="text-brand-charcoal font-black text-xs uppercase tracking-widest">S.P.</p>
               <p className="text-brand-terracotta font-black text-[10px] uppercase tracking-widest mt-1">Verified Buyer</p>
             </div>
           </div>

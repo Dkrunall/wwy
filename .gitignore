@@ -55,4 +55,9 @@ doc_extract.txt
 prompt_dump.txt
 *.log
 
+# ...but real site assets under public/ should always be tracked
+!public/**/*.png
+!public/**/*.jpg
+!public/**/*.jpeg
+
 

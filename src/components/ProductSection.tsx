@@ -6,59 +6,9 @@ import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { ArrowUpRight } from "lucide-react";
+import { products, type Product } from "@/lib/products";
 
 gsap.registerPlugin(ScrollTrigger);
-
-const products = [
-  {
-    id: 1,
-    name: "Wild Botanicals",
-    category: "Signature Series",
-    badge: "BEST SELLER",
-    price: "₹180",
-    priceNum: 180,
-    image: "/p1.png",
-    bgColor: "bg-[#FFDDC1]",
-  },
-  {
-    id: 2,
-    name: "Wild Starter",
-    category: "Baking Core",
-    price: "₹450",
-    priceNum: 450,
-    image: "/p2.png",
-    bgColor: "bg-[#D1E8E2]",
-  },
-  {
-    id: 3,
-    name: "Golden Fizz",
-    category: "Probiotic Soda",
-    price: "₹180",
-    priceNum: 180,
-    image: "/p3.png",
-    bgColor: "bg-[#FCEEA7]",
-  },
-  {
-    id: 4,
-    name: "The Iron Tin",
-    category: "Storage Tech",
-    badge: "NEW",
-    price: "₹850",
-    priceNum: 850,
-    image: "/p4.png",
-    bgColor: "bg-[#E2D4E0]",
-  },
-  {
-    id: 5,
-    name: "Sampler Kit",
-    category: "Bundle Drop",
-    badge: "LIMITED",
-    price: "₹1200",
-    priceNum: 1200,
-    image: "/p5.png",
-    bgColor: "bg-[#FFDDC1]",
-  },
-];
 
 export default function ProductSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -129,16 +79,14 @@ export default function ProductSection() {
             <span className="text-brand-orange text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
               Shop The Range
             </span>
-            <h2 className="font-black text-brand-brown tracking-tight leading-none"
-              style={{ fontSize: "clamp(2.5rem, 8vw, 5.5rem)" }}>
-              FERMENTED{" "}
-              <br className="hidden sm:block" />
-              WITH{" "}
-              <span className="text-brand-orange">WILD ENERGY.</span>
+            <h2 className="font-serif font-normal text-brand-brown tracking-tight leading-[1.05]"
+              style={{ fontSize: "clamp(2.5rem, 7.5vw, 5.2rem)" }}>
+              Fermented <br className="hidden sm:block" />
+              with <span className="text-brand-orange italic font-light">wild energy.</span>
             </h2>
           </div>
           <div className="flex flex-col items-center lg:items-end gap-4 lg:pb-2 max-w-xs lg:max-w-sm lg:ml-auto">
-            <p className="text-sm font-bold text-brand-brown/40 leading-relaxed text-center lg:text-right">
+            <p className="text-sm sm:text-base md:text-lg font-bold text-brand-brown/60 leading-relaxed text-center lg:text-right">
               Small-batch ferments made when you order — never before. Slow time, honest ingredients.
             </p>
             <Link
@@ -152,7 +100,7 @@ export default function ProductSection() {
           </div>
         </div>
       </div>
-
+ 
       {/* Desktop: GSAP Horizontal Scroll */}
       {isDesktop && (
         <div
@@ -165,7 +113,7 @@ export default function ProductSection() {
           <BrowseAllCard />
         </div>
       )}
-
+ 
       {/* Mobile / Tablet: Native horizontal scroll */}
       {!isDesktop && (
         <div className="w-full overflow-x-auto pb-6 scrollbar-hide">
@@ -193,8 +141,8 @@ export default function ProductSection() {
     </section>
   );
 }
-
-function ProductCard({ product }: { product: typeof products[0] }) {
+ 
+function ProductCard({ product }: { product: Product }) {
   return (
     <div className="product-card group flex flex-col h-full shrink-0 w-full lg:w-[22vw]">
       {/* Image Container — clickable */}
@@ -207,10 +155,10 @@ function ProductCard({ product }: { product: typeof products[0] }) {
               </span>
             </div>
           )}
-
+ 
           <div className="relative w-full h-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden transition-transform duration-700 ease-out group-hover:scale-105 group-hover:-translate-y-2 shadow-xl border-4 border-white/20">
             <Image
-              src={product.image}
+              src={product.photo ?? product.image}
               alt={product.name}
               fill
               className="object-cover object-center"
@@ -218,16 +166,16 @@ function ProductCard({ product }: { product: typeof products[0] }) {
           </div>
         </div>
       </Link>
-
+ 
       {/* Text Info — clickable */}
       <Link href={`/shop/${product.id}`} className="flex flex-col items-center text-center px-2 sm:px-4 group/text">
         <span className="text-[10px] font-bold tracking-[0.2em] text-brand-brown/60 uppercase mb-1 sm:mb-2">
           {product.category}
         </span>
-        <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-brand-brown tracking-tight mb-1 sm:mb-2 group-hover/text:text-brand-orange transition-colors duration-200">
+        <h3 className="text-xl sm:text-2xl font-serif font-normal text-brand-brown tracking-tight mb-1 sm:mb-2 group-hover/text:text-brand-orange transition-colors duration-200">
           {product.name}
         </h3>
-        <span className="font-black text-brand-orange text-base sm:text-lg">
+        <span className="font-bold text-brand-orange text-base sm:text-lg">
           {product.price}
         </span>
       </Link>

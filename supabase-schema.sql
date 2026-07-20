@@ -11,11 +11,11 @@ create table if not exists products (
   created_at timestamptz default now()
 );
 
--- Customers (flat number = identity, no password)
+-- Customers (email = identity via OTP login, no password)
 create table if not exists customers (
   id uuid primary key default gen_random_uuid(),
   name text not null,
-  flat_number text not null unique,
+  flat_number text not null,
   phone text,
   created_at timestamptz default now()
 );
