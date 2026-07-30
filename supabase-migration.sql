@@ -87,3 +87,11 @@ ALTER TABLE orders ADD COLUMN IF NOT EXISTS borzo_tracking_url TEXT;
 -- using the same OMS, or the same flat number existing in a different
 -- building). Email (via OTP login) is the real identity now.
 ALTER TABLE customers DROP CONSTRAINT IF EXISTS customers_flat_number_key;
+
+-- ─── Products: image upload from OMS product form ───────────────────────────
+ALTER TABLE products ADD COLUMN IF NOT EXISTS image_url TEXT;
+
+-- NOTE: also create a Storage bucket named "product-images" in the Supabase
+-- dashboard (Storage → New bucket → Public), same as the existing "invoices"
+-- bucket. The OMS upload route uses the service-role key server-side, so no
+-- extra storage policy is required.

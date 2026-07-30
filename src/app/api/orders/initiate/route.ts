@@ -4,7 +4,7 @@ import { getRazorpay } from "@/lib/razorpay";
 import { applyDiscounts } from "@/lib/discounts";
 import { calculateDeliveryDate, deliveryDateISO, formatDeliveryDate, isValidDeliveryDate, parseDeliveryDays } from "@/lib/dateUtils";
 import { CartItem } from "@/lib/supabase";
-import { findBestBaker, isPincodeServiceable } from "@/lib/baker";
+import { isPincodeServiceable } from "@/lib/baker";
 
 function generateOrderNumber(): string {
   const year = new Date().getFullYear();
@@ -110,11 +110,7 @@ export async function POST(req: NextRequest) {
     }));
     await supabase.from("order_items").insert(items);
 
-    // Auto-assign baker
-    const bakerId = await findBestBaker(supabase, customer?.pincode);
-    if (bakerId) {
-      await supabase.from("orders").update({ baker_id: bakerId }).eq("id", order.id);
-    }
+    // Baker assignment now happens from OMS after payment — see admin bulk-assign flow.
 
     return NextResponse.json({
       orderId: order.id,

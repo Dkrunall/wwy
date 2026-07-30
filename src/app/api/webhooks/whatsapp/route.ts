@@ -3,7 +3,7 @@ import { createServerSupabase } from "@/lib/supabase-server";
 import { calculateDeliveryDate, formatDeliveryDate, deliveryDateISO } from "@/lib/dateUtils";
 import { applyDiscounts } from "@/lib/discounts";
 import { getRazorpay } from "@/lib/razorpay";
-import { findBestBaker, isPincodeServiceable } from "@/lib/baker";
+import { isPincodeServiceable } from "@/lib/baker";
 import Anthropic from "@anthropic-ai/sdk";
 
 import twilio from "twilio";
@@ -401,11 +401,7 @@ async function stepConfirmOrder(
           unit_price_paise: i.price,
         }))
       );
-
-      const bakerId = await findBestBaker(supabase, customer?.pincode);
-      if (bakerId) {
-        await supabase.from("orders").update({ baker_id: bakerId }).eq("id", order.id);
-      }
+      // Baker assignment now happens from OMS after payment — see admin bulk-assign flow.
     }
 
     rzpLink = `${process.env.BASE_URL || ""}/pay/${rzpOrder.id}`;

@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { WHATSAPP_CONTACT_URL } from "@/lib/contact";
 
 export default function Footer() {
   return (
@@ -33,15 +34,14 @@ export default function Footer() {
           <div className="flex gap-10 sm:gap-16 text-xs sm:text-sm font-black tracking-[0.2em] uppercase text-brand-oat/60">
             <div className="flex flex-col gap-4 sm:gap-6">
               <span className="text-brand-orange mb-1">Shop</span>
-              <Link href="/shop" className="hover:text-white transition-colors">All Products</Link>
-              <Link href="/shop" className="hover:text-white transition-colors">Botanical Sodas</Link>
-              <Link href="/shop" className="hover:text-white transition-colors">Wild Starter</Link>
+              <Link href="/order" className="hover:text-white transition-colors">All Products</Link>
+              <Link href="/order?category=Sodas" className="hover:text-white transition-colors">Botanical Sodas</Link>
+              <Link href="/order?category=Starters" className="hover:text-white transition-colors">Wild Starter</Link>
             </div>
             <div className="flex flex-col gap-4 sm:gap-6">
               <span className="text-brand-orange mb-1">Company</span>
               <Link href="/story" className="hover:text-white transition-colors">Our Story</Link>
-              <Link href="/journal" className="hover:text-white transition-colors">Journal</Link>
-              <Link href="#" className="hover:text-white transition-colors">Contact</Link>
+              <Link href={WHATSAPP_CONTACT_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Contact</Link>
             </div>
           </div>
 

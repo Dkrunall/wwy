@@ -2,10 +2,11 @@
 
 export const dynamic = "force-dynamic";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { Search, X } from "lucide-react";
 import { supabase, Product, CartItem } from "@/lib/supabase";
 import AnnouncementBar from "@/components/AnnouncementBar";
 
@@ -32,15 +33,28 @@ function saveCart(cart: CartItem[]) {
 }
 
 export default function OrderPage() {
+  return (
+    <Suspense fallback={null}>
+      <OrderPageInner />
+    </Suspense>
+  );
+}
+
+function OrderPageInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [customerName, setCustomerName] = useState("");
   const [flat, setFlat] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
-  const [category, setCategory] = useState("All");
+  const [category, setCategory] = useState(() => {
+    const c = searchParams.get("category");
+    return c && CATEGORIES.includes(c) ? c : "All";
+  });
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
 
   const handleLogout = async () => {
     ["wwy_flat","wwy_name","wwy_customer_id","wwy_pincode","wwy_cart"].forEach((k) => localStorage.removeItem(k));
@@ -94,7 +108,11 @@ export default function OrderPage() {
 
   const cartTotal = cart.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
   const cartCount = cart.reduce((s, i) => s + i.quantity, 0);
-  const filtered = category === "All" ? products : products.filter((p) => p.category === category);
+  const byCategory = category === "All" ? products : products.filter((p) => p.category === category);
+  const q = searchQuery.trim().toLowerCase();
+  const filtered = q
+    ? byCategory.filter((p) => p.name.toLowerCase().includes(q) || (p.description || "").toLowerCase().includes(q))
+    : byCategory;
   const firstName = customerName.split(" ")[0];
 
   if (loading) {
@@ -223,6 +241,29 @@ export default function OrderPage() {
         </p>
       </div>
 
+      {/* ── Search ── */}
+      <div className="max-w-2xl mx-auto px-4 pb-1">
+        <div className="relative">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-brown/30" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search products…"
+            className="w-full bg-white border border-brand-brown/10 rounded-2xl pl-10 pr-9 py-2.5 text-sm font-bold text-brand-brown placeholder:text-brand-brown/30 outline-none focus:border-brand-orange transition-colors shadow-sm"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              aria-label="Clear search"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-brand-brown/30 hover:text-brand-brown transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* ── Category pills ── */}
       <div className="sticky top-14 z-30 bg-brand-oat/95 backdrop-blur-sm border-b border-brand-brown/10">
         <div className="max-w-2xl mx-auto">
@@ -254,9 +295,18 @@ export default function OrderPage() {
         {filtered.length === 0 && (
           <div className="flex flex-col items-center gap-4 py-12">
             <p className="text-sm font-bold text-brand-brown/30 text-center">
-              {category === "All" ? "Nothing available this week. Check back soon." : `No ${category} available right now.`}
+              {q
+                ? `No products match "${searchQuery.trim()}".`
+                : category === "All" ? "Nothing available this week. Check back soon." : `No ${category} available right now.`}
             </p>
-            {category !== "All" && (
+            {q ? (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="text-xs font-black tracking-wider uppercase text-brand-brown/50 hover:text-brand-brown border border-brand-brown/20 hover:border-brand-brown/40 px-5 py-2 rounded-xl transition-colors"
+              >
+                Clear search
+              </button>
+            ) : category !== "All" && (
               <button
                 onClick={() => setCategory("All")}
                 className="text-xs font-black tracking-wider uppercase text-brand-brown/50 hover:text-brand-brown border border-brand-brown/20 hover:border-brand-brown/40 px-5 py-2 rounded-xl transition-colors"

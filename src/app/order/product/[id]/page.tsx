@@ -125,7 +125,7 @@ export default function ProductPage() {
     );
   }
 
-  const imageSrc = PRODUCT_IMAGES[product.name];
+  const imageSrc = product.image_url || PRODUCT_IMAGES[product.name];
   const leadTime = LEAD_TIMES[product.category] ?? "Delivery Wed & Sat only";
   const cartTotal = getCart().reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
   const cartCount = getCart().reduce((s, i) => s + i.quantity, 0);

@@ -24,6 +24,7 @@ export type Product = {
   description: string;
   price_paise: number;
   available: boolean;
+  image_url: string | null;
   created_at: string;
 };
 

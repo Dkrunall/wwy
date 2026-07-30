@@ -85,6 +85,12 @@ const STEPS = [
 
 const ORDER_SELECT = "id, order_number, flat_number, customer_name, total_paise, delivery_date, delivery_status, payment_status, notes, created_at, order_items(product_name, quantity)";
 
+const BULK_STATUS_OPTIONS: { key: string; label: string }[] = [
+  { key: "baking", label: "Baked" },
+  { key: "out_for_delivery", label: "In Transit" },
+  { key: "delivered", label: "Completed" },
+];
+
 type Panel = "queue" | "history" | "profile";
 
 // ── component ─────────────────────────────────────────────────────────────────
@@ -105,6 +111,8 @@ export default function BakerDashboard() {
   const [isHoliday, setIsHoliday] = useState(false);
   const [holidayLoading, setHolidayLoading] = useState(false);
   const [deliveredCount, setDeliveredCount] = useState(0);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkUpdating, setBulkUpdating] = useState(false);
 
   // notifications
   interface Notif { id: string; title: string; body: string | null; read: boolean; created_at: string; }
@@ -223,6 +231,35 @@ export default function BakerDashboard() {
       }
     }
     setAdvancingId(null);
+  };
+
+  const toggleSelected = (orderId: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(orderId)) next.delete(orderId);
+      else next.add(orderId);
+      return next;
+    });
+  };
+
+  const bulkUpdateStatus = async (nextStatus: string) => {
+    if (selectedIds.size === 0) return;
+    setBulkUpdating(true);
+    const orderIds = Array.from(selectedIds);
+    const res = await fetch("/api/baker/bulk-update-status", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderIds, token, nextStatus }),
+    });
+    if (res.ok) {
+      if (nextStatus === "delivered") {
+        setQueue((p) => p.filter((o) => !selectedIds.has(o.id)));
+      } else {
+        setQueue((p) => p.map((o) => selectedIds.has(o.id) ? { ...o, delivery_status: nextStatus } : o));
+      }
+      setSelectedIds(new Set());
+    }
+    setBulkUpdating(false);
   };
 
   const toggleHoliday = async () => {
@@ -496,6 +533,29 @@ export default function BakerDashboard() {
                   <p className="text-[11px] font-bold text-gray-400">{queue.length} orders</p>
                 </div>
 
+                {selectedIds.size > 0 && (
+                  <div className="mx-5 mt-4 bg-brand-oat/70 border border-brand-brown/10 rounded-xl px-4 py-3 flex flex-wrap items-center gap-3">
+                    <p className="text-xs font-black text-brand-brown mr-1">{selectedIds.size} selected</p>
+                    {BULK_STATUS_OPTIONS.map(({ key, label }) => (
+                      <button
+                        key={key}
+                        onClick={() => bulkUpdateStatus(key)}
+                        disabled={bulkUpdating}
+                        className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg bg-brand-brown hover:bg-brand-orange text-white transition-colors disabled:opacity-50 cursor-pointer"
+                      >
+                        {bulkUpdating ? <Loader2 className="w-3 h-3 animate-spin" /> : `Mark ${label}`}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => setSelectedIds(new Set())}
+                      disabled={bulkUpdating}
+                      className="ml-auto text-[11px] font-black uppercase tracking-wider text-brand-brown/40 hover:text-brand-brown transition-colors cursor-pointer"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                )}
+
                 {baker.daily_capacity && queue.length >= baker.daily_capacity && (
                   <div className="mx-5 mt-4 bg-rose-50 border border-rose-200 rounded-xl px-4 py-3">
                     <p className="text-xs font-black text-rose-700">
@@ -524,10 +584,17 @@ export default function BakerDashboard() {
                   return (
                     <div key={order.id} className="border-b border-gray-50 last:border-0">
                       {/* Row header — tap to expand */}
-                      <button
-                        onClick={() => setExpandedId(isExpanded ? null : order.id)}
-                        className="w-full px-5 py-4 flex items-center gap-4 text-left hover:bg-gray-50/50 transition-colors cursor-pointer"
-                      >
+                      <div className="w-full pl-5 pr-2 flex items-center gap-3 hover:bg-gray-50/50 transition-colors">
+                        <input
+                          type="checkbox"
+                          checked={selectedIds.has(order.id)}
+                          onChange={() => toggleSelected(order.id)}
+                          className="w-4 h-4 accent-brand-orange rounded shrink-0 cursor-pointer"
+                        />
+                        <button
+                          onClick={() => setExpandedId(isExpanded ? null : order.id)}
+                          className="flex-1 min-w-0 py-4 pr-3 flex items-center gap-4 text-left cursor-pointer"
+                        >
                         <div className="w-10 h-10 rounded-xl bg-brand-oat flex items-center justify-center shrink-0">
                           <span className="font-black text-brand-brown text-xs">{order.flat_number}</span>
                         </div>
@@ -547,7 +614,8 @@ export default function BakerDashboard() {
                           )}
                         </div>
                         <ChevronRight className={`w-4 h-4 text-gray-300 shrink-0 transition-transform ${isExpanded ? "rotate-90" : ""}`} />
-                      </button>
+                        </button>
+                      </div>
 
                       {/* Expanded detail */}
                       {isExpanded && (

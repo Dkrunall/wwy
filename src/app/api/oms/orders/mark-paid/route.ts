@@ -3,7 +3,6 @@ import { cookies } from "next/headers";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { generateInvoicePDF } from "@/lib/invoice";
 import { sendPaymentConfirmedToCustomer, sendOwnerNotification } from "@/lib/email";
-import { findBestBaker } from "@/lib/baker";
 
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
@@ -35,10 +34,7 @@ export async function POST(req: NextRequest) {
     const { data: customer } = await supabase
       .from("customers").select("*").eq("flat_number", order.flat_number).single();
 
-    if (!order.baker_id) {
-      const bakerId = await findBestBaker(supabase, customer?.pincode);
-      if (bakerId) await supabase.from("orders").update({ baker_id: bakerId }).eq("id", orderId);
-    }
+    // Baker assignment now happens from OMS after payment — see admin bulk-assign flow.
 
     const itemsSubtotal = (order.order_items || []).reduce(
       (s: number, i: { quantity: number; unit_price_paise: number }) => s + i.quantity * i.unit_price_paise, 0

@@ -4,7 +4,6 @@ import { verifyPaymentSignature } from "@/lib/razorpay";
 import { sendPaymentConfirmedToCustomer, sendOwnerNotification, sendNewOrderToBaker } from "@/lib/email";
 import { createAdminNotification, createBakerNotification } from "@/lib/notifications";
 import { generateInvoicePDF } from "@/lib/invoice";
-import { findBestBaker } from "@/lib/baker";
 
 export async function POST(req: NextRequest) {
   try {
@@ -45,11 +44,8 @@ export async function POST(req: NextRequest) {
       .eq("flat_number", order.flat_number)
       .single();
 
-    // Auto-assign baker if not already assigned (pincode match preferred, any active baker as fallback)
-    const assignedBakerId = order.baker_id ?? await findBestBaker(supabase, customer?.pincode);
-    if (!order.baker_id && assignedBakerId) {
-      await supabase.from("orders").update({ baker_id: assignedBakerId }).eq("id", orderId);
-    }
+    // Baker assignment now happens from OMS after payment — see admin bulk-assign flow.
+    const assignedBakerId = order.baker_id;
     if (assignedBakerId) {
       const { data: baker } = await supabase.from("bakers").select("name, email, share_token").eq("id", assignedBakerId).single();
       if (baker) {

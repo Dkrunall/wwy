@@ -29,7 +29,7 @@ declare global {
 export default function CartPage() {
   const router = useRouter();
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [notes, setNotes] = useState("");
+  const [notes] = useState("");
   const [loading, setLoading] = useState(false);
   const [flat, setFlat] = useState("");
   const [customerId, setCustomerId] = useState("");
@@ -221,20 +221,6 @@ export default function CartPage() {
             ))}
           </div>
 
-          {/* Notes */}
-          <div className="flex flex-col gap-2 mt-2">
-            <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/40">
-              Any notes?
-            </label>
-            <textarea
-              rows={2}
-              placeholder="Allergies, special requests, anything for the baker..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="w-full bg-white border-2 border-brand-charcoal/10 focus:border-brand-orange focus:ring-4 focus:ring-brand-orange/10 rounded-2xl px-4 py-3 font-medium text-brand-charcoal text-sm placeholder:text-brand-charcoal/20 outline-none transition-all duration-300 shadow-sm focus:shadow-md resize-none"
-            />
-          </div>
- 
           {/* Delivery date selector */}
           <div className="flex flex-col gap-2 mt-2">
             <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/40">

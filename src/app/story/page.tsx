@@ -35,22 +35,18 @@ const timeline = [
   },
 ];
  
-const principles = [
+const howWeThink = [
   {
-    label: "Time",
-    body: "Fermentation cannot be rushed. Every product we make is given the hours and days it needs — nothing less.",
+    label: "Time is the ingredient",
+    body: "Not speed, not shortcuts. Dough that needs resting. Flavours that change quietly. Drinks that continue to live after they leave us.",
   },
   {
-    label: "Honesty",
-    body: "What goes in is exactly what's on the label. Honest ingredients. No fillers. No compromises.",
+    label: "Honesty over claims",
+    body: "Some days the loaf is different. Some days the bubbles are louder. That's not inconsistency — that's life.",
   },
   {
-    label: "Process",
-    body: "The method is the product. Wild fermentation is layered, unpredictable, and alive — and that's precisely the point.",
-  },
-  {
-    label: "Character",
-    body: "Every batch carries the character of its season, its source, and its culture. No two are identical. That's not a flaw.",
+    label: "Made for someone",
+    body: "Every loaf and every bottle is made with a recipient in mind. Not mass-produced. Not sitting idle. Not waiting to be sold.",
   },
 ];
  
@@ -68,10 +64,10 @@ export default function StoryPage() {
         { x: 0, opacity: 1, stagger: 0.15, duration: 1, ease: "power2.out",
           scrollTrigger: { trigger: ".timeline-container", start: "top 80%" } }
       );
-      gsap.fromTo(".principle-card",
+      gsap.fromTo(".think-card",
         { y: 50, opacity: 0 },
         { y: 0, opacity: 1, stagger: 0.12, duration: 1, ease: "back.out(1.2)",
-          scrollTrigger: { trigger: ".principles-container", start: "top 80%" } }
+          scrollTrigger: { trigger: ".think-container", start: "top 80%" } }
       );
     }, heroRef);
     return () => ctx.revert();
@@ -207,19 +203,27 @@ export default function StoryPage() {
         </div>
       </section>
  
-      {/* ── PRINCIPLES ── */}
+      {/* ── HOW WE THINK ── */}
       <section className="w-full bg-brand-oat px-4 sm:px-8 xl:px-16 py-20 sm:py-32">
         <div className="max-w-6xl mx-auto">
           <span className="text-brand-orange text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block text-center">
-            What We Stand For
+            Fermentation Is Our Operating System
           </span>
-          <h2 className="font-serif font-normal text-brand-brown tracking-tight leading-none mb-16 text-center"
+          <h2 className="font-serif font-normal text-brand-brown tracking-tight leading-none mb-8 text-center"
             style={{ fontSize: "clamp(2.5rem, 8vw, 5.2rem)" }}>
-            Four <span className="text-brand-orange italic font-light">principles.</span>
+            How we <span className="text-brand-orange italic font-light">think.</span>
           </h2>
-          <div className="principles-container grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {principles.map((v, i) => (
-              <div key={i} className="principle-card bg-white rounded-[2rem] p-8 sm:p-10 border border-brand-brown/5 shadow-sm hover:shadow-xl transition-all duration-500 hover:scale-[1.01]">
+          <div className="max-w-2xl mx-auto text-center flex flex-col gap-4 mb-16">
+            <p className="text-sm sm:text-base font-bold text-brand-brown/60 leading-relaxed">
+              At Wild Wild Yeast, fermentation isn&apos;t a feature. It&apos;s the organising principle. Everything we make uses time, microbes, and natural transformation — not preservatives, additives, stabilisers, or chemical shortcuts.
+            </p>
+            <p className="text-sm sm:text-base font-bold text-brand-brown/60 leading-relaxed">
+              Because fermented food is alive, it cannot be treated like inventory. We produce only against orders. High-quality ingredients are not a choice. They are the only way this system works.
+            </p>
+          </div>
+          <div className="think-container grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {howWeThink.map((v, i) => (
+              <div key={i} className="think-card bg-white rounded-[2rem] p-8 sm:p-10 border border-brand-brown/5 shadow-sm hover:shadow-xl transition-all duration-500 hover:scale-[1.01]">
                 <span className="font-serif italic font-normal text-3xl sm:text-4xl text-brand-orange mb-4 block">{String(i + 1).padStart(2, "0")}</span>
                 <h3 className="font-serif font-normal text-2xl sm:text-3xl text-brand-brown mb-4">{v.label}</h3>
                 <p className="text-sm font-bold text-brand-brown/50 leading-relaxed">{v.body}</p>

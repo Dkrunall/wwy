@@ -23,7 +23,7 @@ interface Order {
   borzo_order_id: string | null; borzo_tracking_url: string | null;
   source: string | null; created_at: string; order_items?: OrderItem[];
 }
-interface Product { id: string; name: string; category: string; description?: string | null; price_paise: number; available: boolean; }
+interface Product { id: string; name: string; category: string; description?: string | null; price_paise: number; available: boolean; image_url?: string | null; }
 interface Customer { id: string; name: string; flat_number: string; phone: string | null; address?: string | null; pincode?: string | null; created_at: string; }
 interface Baker { id: string; name: string; email?: string | null; phone: string; is_active: boolean; share_token: string; pincodes?: string[]; daily_capacity?: number; address?: string | null; lat?: number | null; lng?: number | null; }
 interface Setting { key: string; value: string; }
@@ -117,7 +117,9 @@ export default function OmsDashboard() {
   const [editingBaker, setEditingBaker] = useState<Baker | null>(null);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [actionOrder, setActionOrder] = useState<Order | null>(null);
-  const [productForm, setProductForm] = useState({name:"",category:"",description:"",price:"",available:true});
+  const [productForm, setProductForm] = useState({name:"",category:"",description:"",price:"",available:true,image_url:""});
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imageUploadError, setImageUploadError] = useState("");
   const [bakerForm, setBakerForm] = useState({name:"",email:"",phone:"",pincodes:"",daily_capacity:"20",is_active:true,address:"",lat:"",lng:""});
   const [customerForm, setCustomerForm] = useState({name:"",phone:"",address:"",pincode:""});
   const [deliveryDateInput, setDeliveryDateInput] = useState("");
@@ -214,6 +216,14 @@ export default function OmsDashboard() {
     await supabase.from("orders").update({baker_id:bakerId||null}).eq("id",orderId);
     setOrders(p=>p.map(o=>o.id===orderId?{...o,baker_id:bakerId}:o));
   };
+  const suggestedBakerFor = (pincode?: string | null) =>
+    pincode ? bakers.find(b=>b.is_active && b.pincodes?.includes(pincode)) || null : null;
+  const sortByPincodeMatch = (pincode?: string | null) =>
+    [...bakers.filter(b=>b.is_active)].sort((a,b)=>{
+      const aMatch = pincode && a.pincodes?.includes(pincode) ? 0 : 1;
+      const bMatch = pincode && b.pincodes?.includes(pincode) ? 0 : 1;
+      return aMatch - bMatch;
+    });
   const toggleAvailability = async (pid: string, cur: boolean) => {
     await supabase.from("products").update({available:!cur}).eq("id",pid);
     setProducts(p=>p.map(x=>x.id===pid?{...x,available:!cur}:x));
@@ -294,15 +304,31 @@ export default function OmsDashboard() {
   };
 
   // ── Product CRUD ──
-  const openAddProduct = () => { setEditingProduct(null); setProductForm({name:"",category:"",description:"",price:"",available:true}); setFormError(""); setModal("add-product"); };
-  const openEditProduct = (p: Product) => { setEditingProduct(p); setProductForm({name:p.name,category:p.category,description:p.description||"",price:(p.price_paise/100).toString(),available:p.available}); setFormError(""); setModal("edit-product"); };
+  const openAddProduct = () => { setEditingProduct(null); setProductForm({name:"",category:"",description:"",price:"",available:true,image_url:""}); setFormError(""); setImageUploadError(""); setModal("add-product"); };
+  const openEditProduct = (p: Product) => { setEditingProduct(p); setProductForm({name:p.name,category:p.category,description:p.description||"",price:(p.price_paise/100).toString(),available:p.available,image_url:p.image_url||""}); setFormError(""); setImageUploadError(""); setModal("edit-product"); };
+  const uploadProductImage = async (file: File) => {
+    setImageUploadError("");
+    setImageUploading(true);
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      const res = await fetch("/api/oms/products/upload-image", { method: "POST", body });
+      const data = await res.json();
+      if (!res.ok) { setImageUploadError(data.error || "Upload failed."); return; }
+      setProductForm(f=>({...f,image_url:data.url}));
+    } catch {
+      setImageUploadError("Upload failed.");
+    } finally {
+      setImageUploading(false);
+    }
+  };
   const saveProduct = async () => {
     const price_paise = Math.round(parseFloat(productForm.price)*100);
     if(!productForm.name.trim()){setFormError("Name required.");return;}
     if(!productForm.category.trim()){setFormError("Category required.");return;}
     if(isNaN(price_paise)||price_paise<=0){setFormError("Valid price required.");return;}
     setFormSaving(true);
-    const payload = {name:productForm.name.trim(),category:productForm.category.trim(),description:productForm.description.trim()||null,price_paise,available:productForm.available};
+    const payload = {name:productForm.name.trim(),category:productForm.category.trim(),description:productForm.description.trim()||null,price_paise,available:productForm.available,image_url:productForm.image_url.trim()||null};
     if(editingProduct) {
       const {error} = await supabase.from("products").update(payload).eq("id",editingProduct.id);
       if(error){setFormError("Save failed: "+error.message);setFormSaving(false);return;}
@@ -486,6 +512,14 @@ export default function OmsDashboard() {
   const pagedOrders = filteredOrders.slice((orderPage-1)*ORDERS_PER_PAGE, orderPage*ORDERS_PER_PAGE);
   const totalPages = Math.max(1,Math.ceil(filteredOrders.length/ORDERS_PER_PAGE));
 
+  const selectedPincodes = useMemo(()=>{
+    const selected = orders.filter(o=>selectedIds.has(o.id));
+    const pincodes = selected.map(o=>customers.find(c=>c.flat_number===o.flat_number)?.pincode).filter(Boolean) as string[];
+    return [...new Set(pincodes)];
+  },[orders,customers,selectedIds]);
+  const bulkSuggestedBaker = selectedPincodes.length===1 ? suggestedBakerFor(selectedPincodes[0]) : null;
+  const bulkSortedBakers = sortByPincodeMatch(selectedPincodes.length===1 ? selectedPincodes[0] : null);
+
   const filteredProducts = products.filter(p=>{
     if(categoryFilter!=="all"&&p.category!==categoryFilter) return false;
     if(!searchQuery) return true;
@@ -546,6 +580,31 @@ export default function OmsDashboard() {
                 <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Category</label><input className={inputCls} list="cat-list" placeholder="Bread" value={productForm.category} onChange={e=>setProductForm(f=>({...f,category:e.target.value}))}/><datalist id="cat-list">{existingCategories.map(c=><option key={c} value={c}/>)}</datalist></div>
                 <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Description <span className="normal-case font-bold text-brand-brown/30">(optional)</span></label><textarea className={inputCls+" resize-none"} rows={2} placeholder="e.g. Naturally leavened, 700g" value={productForm.description} onChange={e=>setProductForm(f=>({...f,description:e.target.value}))}/></div>
                 <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Price (₹)</label><input className={inputCls} type="number" min="0" placeholder="450" value={productForm.price} onChange={e=>setProductForm(f=>({...f,price:e.target.value}))}/></div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Product Image</label>
+                  <div className="flex items-center gap-3">
+                    {productForm.image_url ? (
+                      <div className="relative w-16 h-16 rounded-xl overflow-hidden border border-brand-brown/10 shrink-0 bg-brand-oat/30">
+                        <Image src={productForm.image_url} alt="Product" fill className="object-cover"/>
+                      </div>
+                    ) : (
+                      <div className="w-16 h-16 rounded-xl border border-dashed border-brand-brown/20 shrink-0 flex items-center justify-center text-brand-brown/20">
+                        <span className="text-[9px] font-black uppercase">No image</span>
+                      </div>
+                    )}
+                    <label className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2.5 rounded-xl border border-brand-brown/15 hover:bg-brand-brown/5 text-xs font-black uppercase tracking-wider text-brand-brown/60 cursor-pointer transition-all">
+                      {imageUploading ? <Loader2 className="w-3.5 h-3.5 animate-spin"/> : (productForm.image_url ? "Replace" : "Upload")}
+                      <input
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/avif"
+                        className="hidden"
+                        disabled={imageUploading}
+                        onChange={e=>{ const f=e.target.files?.[0]; if(f) uploadProductImage(f); e.target.value=""; }}
+                      />
+                    </label>
+                  </div>
+                  {imageUploadError && <p className="text-[10px] font-bold text-rose-600">{imageUploadError}</p>}
+                </div>
                 <div className="flex items-center justify-between bg-brand-oat/40 border border-brand-brown/10 rounded-2xl px-4 py-3">
                   <span className="text-sm font-bold text-brand-brown/70">Available on storefront</span>
                   <button onClick={()=>setProductForm(f=>({...f,available:!f.available}))} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${productForm.available?"bg-brand-orange":"bg-brand-brown/20"}`}><span className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${productForm.available?"translate-x-4.5":"translate-x-0.5"}`}/></button>
@@ -866,10 +925,17 @@ export default function OmsDashboard() {
             <div className="relative flex-1 max-w-[200px]">
               <select value={bulkBakerId} onChange={e=>setBulkBakerId(e.target.value)} className="w-full appearance-none text-xs font-bold bg-white/10 border border-white/20 rounded-xl pl-3 pr-7 py-1.5 text-white outline-none focus:border-white/50 cursor-pointer">
                 <option value="">— Pick baker —</option>
-                {bakers.filter(b=>b.is_active).map(b=><option key={b.id} value={b.id}>{b.name}</option>)}
+                {bulkSortedBakers.map(b=>(
+                  <option key={b.id} value={b.id}>{b.name}{selectedPincodes.length===1 && b.pincodes?.includes(selectedPincodes[0]) ? " ✓ covers pincode" : ""}</option>
+                ))}
               </select>
               <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-white/50 pointer-events-none"/>
             </div>
+            {bulkSuggestedBaker && bulkBakerId!==bulkSuggestedBaker.id && (
+              <button onClick={()=>setBulkBakerId(bulkSuggestedBaker.id)} className="text-[10px] font-black uppercase tracking-wider text-emerald-300 hover:text-emerald-200 underline decoration-dotted cursor-pointer whitespace-nowrap">
+                Suggested: {bulkSuggestedBaker.name}
+              </button>
+            )}
             <button onClick={bulkAssign} disabled={!bulkBakerId||bulkAssigning} className="px-4 py-1.5 rounded-xl bg-brand-orange hover:bg-brand-gold text-brand-brown text-xs font-black uppercase disabled:opacity-50 flex items-center gap-1.5 transition-all">
               {bulkAssigning?<Loader2 className="w-3 h-3 animate-spin"/>:null}Assign
             </button>
@@ -936,6 +1002,8 @@ export default function OmsDashboard() {
               const assignedBaker = bakers.find(b=>b.id===order.baker_id);
               const isCancelled = order.status==="cancelled";
               const customerPhone = customers.find(c=>c.flat_number===order.flat_number)?.phone;
+              const customerPincode = customers.find(c=>c.flat_number===order.flat_number)?.pincode;
+              const suggestedBaker = suggestedBakerFor(customerPincode);
               const noteVal = pendingNotes[order.id]??order.admin_notes??"";
               const isSelected = selectedIds.has(order.id);
 
@@ -1031,11 +1099,18 @@ export default function OmsDashboard() {
                           <div className="relative">
                             <select value={order.baker_id||""} onChange={e=>assignBaker(order.id,e.target.value||null)} className="appearance-none text-xs font-bold text-brand-brown bg-white border border-brand-brown/15 rounded-xl pl-3 pr-7 py-1.5 outline-none focus:border-brand-orange cursor-pointer shadow-sm">
                               <option value="">Unassigned</option>
-                              {bakers.filter(b=>b.is_active).map(b=><option key={b.id} value={b.id}>{b.name}</option>)}
+                              {sortByPincodeMatch(customerPincode).map(b=>(
+                                <option key={b.id} value={b.id}>{b.name}{customerPincode && b.pincodes?.includes(customerPincode) ? " ✓ covers pincode" : ""}</option>
+                              ))}
                             </select>
                             <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-brand-brown/40 pointer-events-none"/>
                           </div>
                           {assignedBaker&&<a href={`tel:${assignedBaker.phone}`} className="inline-flex items-center gap-1.5 text-xs text-brand-orange font-bold hover:underline"><Phone className="w-3.5 h-3.5 text-brand-orange"/>{assignedBaker.phone}</a>}
+                          {!order.baker_id && suggestedBaker && (
+                            <button onClick={()=>assignBaker(order.id, suggestedBaker.id)} className="text-[10px] font-black uppercase tracking-wider text-emerald-600 hover:text-emerald-700 underline decoration-dotted cursor-pointer">
+                              Suggested: {suggestedBaker.name}
+                            </button>
+                          )}
                         </div>
                         <div className="flex items-center gap-2 flex-wrap">
                           {order.payment_status==="paid"&&(
@@ -1074,7 +1149,12 @@ export default function OmsDashboard() {
             {filteredProducts.map(p=>(
               <div key={p.id} className="bg-white rounded-[2rem] border border-brand-brown/10 p-5 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all flex flex-col justify-between gap-4">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
+                  {p.image_url && (
+                    <div className="relative w-14 h-14 rounded-xl overflow-hidden border border-brand-brown/10 shrink-0 bg-brand-oat/30">
+                      <Image src={p.image_url} alt={p.name} fill className="object-cover"/>
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
                     <span className="text-[9px] font-black text-brand-orange uppercase tracking-widest bg-brand-orange/10 px-2.5 py-0.5 rounded-md">{p.category}</span>
                     <h3 className="font-serif text-lg font-black text-brand-brown mt-2 leading-tight">{p.name}</h3>
                     {p.description&&<p className="text-xs text-brand-brown/50 font-medium mt-1 leading-snug">{p.description}</p>}

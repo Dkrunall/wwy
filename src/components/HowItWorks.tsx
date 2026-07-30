@@ -11,44 +11,23 @@ const steps = [
   {
     number: "01",
     day: "Browse",
-    title: "Add what you want to your cart.",
-    body: "New here? Share your name, delivery address, and pincode once — we check it against our delivery area. Returning customers skip straight to checkout.",
+    title: "Browse the current menu.",
+    body: "Check what's available for the upcoming window. Some products need more lead time — croissants need 48 hours — so check each item before ordering.",
     tag: "wildwildyeast.com",
   },
   {
     number: "02",
-    day: "Checkout",
-    title: "Pay securely, right in the cart.",
-    body: "Card, UPI, or netbanking — checkout runs through Razorpay in one step. No separate invoice, no waiting for a payment link.",
+    day: "Order",
+    title: "Order right on our website.",
+    body: "Add what you want to your cart and check out securely with Razorpay — card, UPI, or netbanking. Your order is confirmed instantly, no waiting on a reply.",
     tag: "Razorpay checkout",
   },
   {
     number: "03",
-    day: "Confirm",
-    title: "Your delivery date is set automatically.",
-    body: "Order before the weekly cutoff and your delivery date — Wednesday or Saturday — is assigned the moment payment clears. You'll see it on your confirmation page.",
+    day: "Receive",
+    title: "Receive on Wednesday or Saturday.",
+    body: "Your order is made fresh and delivered on your chosen window day. Not before. Not after. The schedule is the schedule.",
     tag: "Wed · Sat delivery",
-  },
-  {
-    number: "04",
-    day: "Ferment",
-    title: "Your order enters fermentation.",
-    body: "Payment confirmed — fermentation begins. Your order has a date, a batch, a destination. Nothing is made speculatively. Nothing sits waiting.",
-    tag: "Bake to order",
-  },
-  {
-    number: "05",
-    day: "Track",
-    title: "Follow it through the process.",
-    body: "Mixing, resting, baking, out for delivery — track every stage from your account page, and get an email as each milestone hits.",
-    tag: "Live order status",
-  },
-  {
-    number: "06",
-    day: "Deliver",
-    title: "Delivered on your fixed day.",
-    body: "Your order arrives fresh on its assigned day — never early, never stored.",
-    tag: "Fresh on delivery day",
   },
 ];
 
@@ -165,7 +144,7 @@ export default function HowItWorks() {
               style={{ fontSize: "clamp(2.5rem, 7.5vw, 5.2rem)" }}
             >
               Made to order.<br className="hidden sm:block" />
-              <span className="text-brand-orange italic font-light">Via WhatsApp.</span>
+              <span className="text-brand-orange italic font-light">Right on our website.</span>
             </h2>
           </div>
           <div className="max-w-sm lg:pb-2 flex flex-col gap-2">
@@ -192,8 +171,8 @@ export default function HowItWorks() {
           ))}
         </div>
  
-        {/* ── 6-step flow ── */}
-        <div className="hiw-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 mb-16 sm:mb-24">
+        {/* ── 3-step flow ── */}
+        <div className="hiw-grid grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5 mb-16 sm:mb-24">
           {steps.map((step, i) => (
             <div
               key={i}
