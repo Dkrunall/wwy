@@ -12,7 +12,6 @@ import {
   Loader2, BarChart2, Edit2, Trash2, Plus, XCircle, CalendarDays, MessageCircle,
   Download, Send, StickyNote, ChevronLeft, ChevronRight, Settings, Star, Bell, Zap,
 } from "lucide-react";
-import AnnouncementBar from "@/components/AnnouncementBar";
 
 interface OrderItem { id: string; product_name: string; quantity: number; unit_price_paise: number; }
 interface Order {
@@ -561,7 +560,6 @@ export default function OmsDashboard() {
 
   return (
     <div className="min-h-screen bg-brand-oat text-brand-brown font-sans flex flex-col md:flex-row antialiased">
-      <AnnouncementBar />
 
       {/* ── MODALS ── */}
       {(modal || deleteConfirmId || deletingBakerId) && (
