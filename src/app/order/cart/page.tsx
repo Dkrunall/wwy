@@ -4,19 +4,45 @@ export const dynamic = "force-dynamic";
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import {
+  ArrowLeft,
+  ShoppingBag,
+  Calendar,
+  Truck,
+  Sparkles,
+  CheckCircle2,
+  Lock,
+  Minus,
+  Plus,
+} from "lucide-react";
 import { CartItem } from "@/lib/supabase";
-import AnnouncementBar from "@/components/AnnouncementBar";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 function fmt(paise: number) {
   return `₹${(paise / 100).toFixed(0)}`;
 }
 
 function getCart(): CartItem[] {
-  try { return JSON.parse(localStorage.getItem("wwy_cart") || "[]"); }
-  catch { return []; }
+  try {
+    return JSON.parse(localStorage.getItem("wwy_cart") || "[]");
+  } catch {
+    return [];
+  }
 }
 function saveCart(cart: CartItem[]) {
   localStorage.setItem("wwy_cart", JSON.stringify(cart));
+}
+
+function getProductFallbackImage(name: string): string {
+  const n = name.toLowerCase();
+  if (n.includes("botanical") || n.includes("hibiscus")) return "/p1.png";
+  if (n.includes("starter")) return "/p2.png";
+  if (n.includes("fizz") || n.includes("turmeric") || n.includes("ginger")) return "/p3.png";
+  if (n.includes("tin") || n.includes("iron")) return "/p4.png";
+  if (n.includes("bundle") || n.includes("sampler") || n.includes("kit")) return "/p5.png";
+  return "/product_img/7-from-the-oven.jpg";
 }
 
 declare global {
@@ -35,14 +61,20 @@ export default function CartPage() {
   const [customerId, setCustomerId] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [error, setError] = useState("");
-  const [discountInfo, setDiscountInfo] = useState<{ discountPercent: number; finalTotal: number } | null>(null);
+  const [discountInfo, setDiscountInfo] = useState<{
+    discountPercent: number;
+    finalTotal: number;
+  } | null>(null);
   const [deliveryLabel, setDeliveryLabel] = useState<string>("");
   const [deliverySlots, setDeliverySlots] = useState<{ iso: string; label: string }[]>([]);
   const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<string>("");
 
   useEffect(() => {
     const storedFlat = localStorage.getItem("wwy_flat");
-    if (!storedFlat) { router.replace("/order/login"); return; }
+    if (!storedFlat) {
+      router.replace("/order/login");
+      return;
+    }
     setFlat(storedFlat);
     setCustomerId(localStorage.getItem("wwy_customer_id") || "");
     setCustomerName(localStorage.getItem("wwy_name") || "");
@@ -66,7 +98,6 @@ export default function CartPage() {
     }
   }, [router]);
 
-  // Auto-dismiss the "Payment cancelled" error after 5 seconds
   useEffect(() => {
     if (!error) return;
     const t = setTimeout(() => setError(""), 5000);
@@ -76,7 +107,7 @@ export default function CartPage() {
   const updateQty = (productId: string, delta: number) => {
     setCart((prev) => {
       const next = prev
-        .map((i) => i.product_id === productId ? { ...i, quantity: i.quantity + delta } : i)
+        .map((i) => (i.product_id === productId ? { ...i, quantity: i.quantity + delta } : i))
         .filter((i) => i.quantity > 0);
       saveCart(next);
       return next;
@@ -90,16 +121,25 @@ export default function CartPage() {
 
   const handlePay = async () => {
     if (cart.length === 0) return;
-    if (!customerId) { setError("Session error — please sign out and sign in again."); return; }
+    if (!customerId) {
+      setError("Session error — please sign out and sign in again.");
+      return;
+    }
     setError("");
     setLoading(true);
 
     try {
-      // 1. Create Razorpay order + save pending order
       const res = await fetch("/api/orders/initiate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cart, customerId, flat, customerName, notes, deliveryDate: selectedDeliveryDate }),
+        body: JSON.stringify({
+          cart,
+          customerId,
+          flat,
+          customerName,
+          notes,
+          deliveryDate: selectedDeliveryDate,
+        }),
       });
 
       if (!res.ok) {
@@ -109,11 +149,18 @@ export default function CartPage() {
         return;
       }
 
-      const { orderId, orderNumber, razorpayOrderId, amount, keyId, discountPercent, deliveryLabel: dl } = await res.json();
+      const {
+        orderId,
+        orderNumber,
+        razorpayOrderId,
+        amount,
+        keyId,
+        discountPercent,
+        deliveryLabel: dl,
+      } = await res.json();
       setDiscountInfo({ discountPercent, finalTotal: amount });
       setDeliveryLabel(dl);
 
-      // 2. Open Razorpay checkout
       const razorpay = new window.Razorpay({
         key: keyId,
         amount,
@@ -123,8 +170,11 @@ export default function CartPage() {
         description: `Order ${orderNumber}`,
         image: "/logo.png",
         theme: { color: "#2C1A0E" },
-        handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
-          // 3. Verify payment
+        handler: async (response: {
+          razorpay_order_id: string;
+          razorpay_payment_id: string;
+          razorpay_signature: string;
+        }) => {
           const verifyRes = await fetch("/api/orders/verify", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -163,139 +213,250 @@ export default function CartPage() {
   if (cart.length === 0 && !loading) {
     return (
       <main className="min-h-screen bg-brand-oat flex flex-col items-center justify-center px-5 gap-6">
-        <p className="font-black text-brand-charcoal/30 text-2xl tracking-tight">Nothing here yet.</p>
-        <button
-          onClick={() => router.push("/order")}
-          className="bg-brand-charcoal text-white font-black text-sm tracking-wider uppercase px-8 py-4 rounded-2xl hover:bg-brand-terracotta transition-colors"
-        >
-          ← Back to shop
-        </button>
+        <Navbar />
+        <div className="bg-white rounded-3xl p-10 sm:p-14 border border-brand-brown/10 shadow-xl max-w-md w-full text-center flex flex-col items-center gap-5">
+          <div className="w-16 h-16 rounded-full bg-brand-terracotta/10 text-brand-terracotta flex items-center justify-center">
+            <ShoppingBag className="w-8 h-8" />
+          </div>
+          <div>
+            <h2 className="font-serif text-2xl font-bold text-brand-brown">Your Cart is Empty</h2>
+            <p className="text-xs sm:text-sm font-medium text-brand-brown/60 mt-1">
+              Add fresh sourdoughs or live ginger sodas to set your bake in motion.
+            </p>
+          </div>
+          <button
+            onClick={() => router.push("/order")}
+            className="bg-brand-brown text-white font-black text-xs tracking-widest uppercase px-8 py-4 rounded-2xl hover:bg-brand-terracotta transition-colors shadow-md cursor-pointer"
+          >
+            ← Explore Menu &amp; Order
+          </button>
+        </div>
       </main>
     );
   }
 
   return (
-      <main className="min-h-screen bg-brand-oat pb-40">
-        <AnnouncementBar />
-        {/* Header */}
-        <header className="sticky top-0 z-40 bg-brand-oat/95 backdrop-blur-sm border-b border-brand-charcoal/5">
-          <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
-            <button onClick={() => router.back()}
-              className="text-brand-charcoal/40 hover:text-brand-charcoal transition-colors font-black text-xl leading-none">
-              ←
-            </button>
-            <h1 className="font-black text-brand-charcoal text-base tracking-tight">Your Order</h1>
-          </div>
-        </header>
+    <main className="min-h-screen bg-gradient-to-b from-brand-oat/40 via-white to-brand-oat/20 pb-0">
+      <Navbar />
 
-        <div className="max-w-2xl mx-auto px-4 pt-6 flex flex-col gap-3">
-
-          <p className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/30">
-            Flat {flat} · {customerName}
-          </p>
-
-          {/* Cart items */}
-          <div className="flex flex-col gap-2">
-            {cart.map((item) => (
-              <div key={item.product_id}
-                className="bg-white rounded-2xl px-4 py-3 flex items-center gap-3 border border-brand-charcoal/5">
-                <div className="flex-1 min-w-0">
-                  <p className="font-black text-brand-charcoal text-sm leading-tight">{item.product_name}</p>
-                  <p className="text-xs font-bold text-brand-charcoal/40">{fmt(item.unit_price_paise)} each</p>
-                </div>
-                <div className="flex items-center gap-2 bg-brand-oat rounded-xl overflow-hidden shrink-0">
-                  <button onClick={() => updateQty(item.product_id, -1)}
-                    className="w-9 h-9 flex items-center justify-center font-black text-brand-charcoal hover:bg-brand-charcoal/10 transition-colors">
-                    −
-                  </button>
-                  <span className="font-black text-brand-charcoal text-sm w-4 text-center">{item.quantity}</span>
-                  <button onClick={() => updateQty(item.product_id, 1)}
-                    className="w-9 h-9 flex items-center justify-center font-black text-brand-terracotta hover:bg-brand-terracotta/10 transition-colors">
-                    +
-                  </button>
-                </div>
-                <span className="font-black text-brand-charcoal text-sm shrink-0 w-14 text-right">
-                  {fmt(item.quantity * item.unit_price_paise)}
-                </span>
-              </div>
-            ))}
-          </div>
-
-          {/* Delivery date selector */}
-          <div className="flex flex-col gap-2 mt-2">
-            <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/40">
-              Choose Delivery Date
-            </label>
-            <div className="flex flex-col gap-2">
-              {deliverySlots.length === 0
-                ? [1,2,3].map((n) => (
-                    <div key={n} className="h-12 rounded-2xl bg-brand-charcoal/5 animate-pulse" />
-                  ))
-                : deliverySlots.map((slot) => (
-                  <button
-                    key={slot.iso}
-                    type="button"
-                    onClick={() => setSelectedDeliveryDate(slot.iso)}
-                    className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl border-2 text-left transition-all duration-300 hover:scale-[1.01] active:scale-95 ${
-                      selectedDeliveryDate === slot.iso
-                        ? "border-brand-orange bg-brand-charcoal text-white shadow-md"
-                        : "border-brand-charcoal/10 bg-white text-brand-charcoal hover:border-brand-charcoal/30 shadow-sm"
-                    }`}
-                  >
-                    <span className="font-black text-sm">{slot.label}</span>
-                    {selectedDeliveryDate === slot.iso && (
-                      <span className="text-white text-xs font-black tracking-wider uppercase">Selected ✓</span>
-                    )}
-                  </button>
-                ))
-              }
-            </div>
-            {deliveryLabel && (
-              <p className="text-[10px] font-bold text-green-700 px-1">
-                ✓ Locked in: {deliveryLabel}
-              </p>
-            )}
-          </div>
- 
-          {/* Price summary */}
-          <div className="bg-white rounded-2xl px-4 py-4 border border-brand-charcoal/5 shadow-sm">
-            <div className="flex justify-between items-center mb-1">
-              <span className="text-xs font-bold text-brand-charcoal/50">{itemCount} item{itemCount !== 1 ? "s" : ""}</span>
-              <span className="text-xs font-bold text-brand-charcoal/50">{fmt(baseTotalPaise)}</span>
-            </div>
-            {discountInfo && discountInfo.discountPercent > 0 && (
-              <div className="flex justify-between items-center mb-1">
-                <span className="text-xs font-black text-green-700">Loyalty discount ({discountInfo.discountPercent}% off)</span>
-                <span className="text-xs font-black text-green-700">−{fmt(baseTotalPaise - discountInfo.finalTotal)}</span>
-              </div>
-            )}
-            <div className="flex justify-between items-center pt-2 border-t border-brand-charcoal/5">
-              <span className="font-black text-brand-charcoal text-sm">Total</span>
-              <span className="font-black text-brand-charcoal text-lg">{fmt(displayTotal)}</span>
-            </div>
-          </div>
- 
-          {error && <p className="text-xs font-bold text-brand-terracotta text-center">{error}</p>}
-        </div>
- 
-        {/* Pay button */}
-        <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-brand-oat/80 backdrop-blur-md border-t border-brand-charcoal/5">
-          <div className="max-w-2xl mx-auto flex flex-col gap-2">
-            {deliverySlots.length > 0 && !selectedDeliveryDate && !loading && (
-              <p className="text-[11px] font-bold text-brand-charcoal/40 text-center">Choose a delivery date above to continue.</p>
-            )}
+      <div className="max-w-5xl mx-auto px-4 sm:px-8 pt-32 sm:pt-40 mb-20 sm:mb-28 flex flex-col gap-6">
+        {/* Navigation & Header Banner */}
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between gap-4">
             <button
-              onClick={handlePay}
-              disabled={loading || cart.length === 0 || !selectedDeliveryDate}
-              className="w-full bg-brand-charcoal hover:bg-brand-orange disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-2xl py-5 font-black text-sm tracking-[0.15em] uppercase transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] min-h-[56px]"
+              onClick={() => router.back()}
+              className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-brand-brown/60 hover:text-brand-brown transition-colors cursor-pointer"
             >
-              {loading ? "Opening payment..." : `Pay · ${fmt(displayTotal)}`}
+              <ArrowLeft className="w-4 h-4" /> Continue Shopping
             </button>
-            <p className="text-[10px] font-bold text-brand-charcoal/30 text-center">
-              Secure payment via Razorpay · UPI, Cards, Net Banking
-            </p>
+            <span className="text-xs font-bold bg-brand-terracotta/10 text-brand-terracotta px-3.5 py-1.5 rounded-full border border-brand-terracotta/20 uppercase tracking-wider">
+              Flat {flat}
+            </span>
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-brand-brown/10 pb-4">
+            <div>
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-black tracking-widest uppercase text-brand-terracotta mb-1">
+                <Sparkles className="w-3 h-3 text-amber-500" />
+                Artisanal Order Summary
+              </span>
+              <h1 className="font-serif text-brand-brown font-bold text-2xl sm:text-3xl tracking-tight">
+                YOUR ORDER <span className="italic font-light text-brand-terracotta">CART</span>
+              </h1>
+            </div>
+            <span className="text-xs font-bold text-brand-brown/50">
+              {itemCount} {itemCount === 1 ? "item" : "items"} selected
+            </span>
           </div>
         </div>
-      </main>
+
+        {/* Error notification */}
+        {error && (
+          <div className="bg-rose-50 border border-rose-200/80 rounded-2xl p-4 text-xs font-bold text-rose-700 shadow-sm flex items-center justify-between">
+            <span>{error}</span>
+            <button
+              onClick={() => setError("")}
+              className="text-rose-500 hover:text-rose-800 font-black cursor-pointer"
+            >
+              ✕
+            </button>
+          </div>
+        )}
+
+        {/* 2-Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Left Column: Cart Items & Delivery Slots (7 Cols) */}
+          <div className="lg:col-span-7 flex flex-col gap-6">
+            {/* Cart Items Card */}
+            <div className="bg-white rounded-3xl p-5 sm:p-6 border border-brand-brown/10 shadow-sm flex flex-col gap-4">
+              <div className="flex items-center justify-between border-b border-brand-brown/10 pb-3">
+                <span className="text-xs font-black uppercase tracking-widest text-brand-brown/40">
+                  Itemized Order
+                </span>
+                <span className="text-xs font-bold text-brand-brown/50">{itemCount} items</span>
+              </div>
+
+              <div className="flex flex-col divide-y divide-brand-brown/5">
+                {cart.map((item) => {
+                  const fallbackImg = getProductFallbackImage(item.product_name);
+                  return (
+                    <div key={item.product_id} className="flex justify-between items-center py-4 gap-4">
+                      {/* Product Thumbnail */}
+                      <div className="relative w-14 h-14 rounded-2xl bg-brand-oat/40 border border-brand-brown/10 overflow-hidden shrink-0">
+                        <Image
+                          src={fallbackImg}
+                          alt={item.product_name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+
+                      {/* Product Details */}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-black text-brand-brown text-base tracking-tight truncate">
+                          {item.product_name}
+                        </p>
+                        <p className="text-xs text-brand-brown/50 font-medium">
+                          {fmt(item.unit_price_paise)} each
+                        </p>
+                      </div>
+
+                      {/* Quantity Controls & Line Price */}
+                      <div className="flex items-center gap-3 shrink-0">
+                        <div className="flex items-center gap-1 bg-brand-oat/60 rounded-2xl p-1 border border-brand-brown/10">
+                          <button
+                            onClick={() => updateQty(item.product_id, -1)}
+                            aria-label="Decrease quantity"
+                            className="w-8 h-8 flex items-center justify-center font-black text-brand-brown text-sm bg-white rounded-xl shadow-xs hover:bg-rose-50 hover:text-rose-600 transition-colors cursor-pointer"
+                          >
+                            <Minus className="w-3.5 h-3.5" />
+                          </button>
+                          <span className="font-black text-brand-brown text-sm w-7 text-center">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() => updateQty(item.product_id, 1)}
+                            aria-label="Increase quantity"
+                            className="w-8 h-8 flex items-center justify-center font-black text-white bg-brand-terracotta rounded-xl shadow-xs hover:bg-brand-brown transition-colors cursor-pointer"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        <span className="font-black text-brand-brown text-sm min-w-[55px] text-right">
+                          {fmt(item.quantity * item.unit_price_paise)}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Delivery Slots Selection */}
+            {deliverySlots.length > 0 && (
+              <div className="bg-white rounded-3xl p-5 sm:p-6 border border-brand-brown/10 shadow-sm flex flex-col gap-3">
+                <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-brand-brown/40">
+                  <Calendar className="w-3.5 h-3.5 text-brand-terracotta" />
+                  <span>Select Delivery Day</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+                  {deliverySlots.map((slot) => {
+                    const isSelected = selectedDeliveryDate === slot.iso;
+                    return (
+                      <button
+                        key={slot.iso}
+                        onClick={() => setSelectedDeliveryDate(slot.iso)}
+                        className={`p-4 rounded-2xl border text-left transition-all cursor-pointer ${
+                          isSelected
+                            ? "bg-brand-terracotta/10 border-brand-terracotta text-brand-brown shadow-sm ring-2 ring-brand-terracotta/20"
+                            : "bg-white border-brand-brown/10 text-brand-brown/60 hover:border-brand-brown/30 hover:bg-brand-oat/30"
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-[10px] font-black uppercase tracking-wider text-brand-terracotta">
+                            {isSelected ? "Selected Slot" : "Available Slot"}
+                          </span>
+                          {isSelected && <CheckCircle2 className="w-4 h-4 text-brand-terracotta" />}
+                        </div>
+                        <p className="text-sm font-bold text-brand-brown">{slot.label}</p>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Right Column: Summary Card & Checkout Action (5 Cols) */}
+          <div className="lg:col-span-5 flex flex-col gap-6">
+            <div className="bg-white rounded-3xl p-6 border border-brand-brown/10 shadow-sm flex flex-col justify-between h-full">
+              <div>
+                <span className="text-xs font-black uppercase tracking-widest text-brand-brown/40 block border-b border-brand-brown/10 pb-3 mb-4">
+                  Payment Summary
+                </span>
+
+                <div className="flex flex-col gap-3.5 text-xs sm:text-sm">
+                  <div className="flex justify-between text-brand-brown/70 font-medium">
+                    <span>Subtotal ({itemCount} items)</span>
+                    <span className="font-bold text-brand-brown">{fmt(baseTotalPaise)}</span>
+                  </div>
+
+                  {discountInfo && (
+                    <div className="flex justify-between text-emerald-700 font-bold bg-emerald-50 p-3 rounded-2xl border border-emerald-200/60">
+                      <span>Loyalty Discount ({discountInfo.discountPercent}%)</span>
+                      <span>−{fmt(baseTotalPaise - discountInfo.finalTotal)}</span>
+                    </div>
+                  )}
+
+                  <div className="flex justify-between text-brand-brown/70 font-medium">
+                    <span className="flex items-center gap-1.5">
+                      <Truck className="w-3.5 h-3.5 text-emerald-600" /> Delivery
+                    </span>
+                    <span className="font-bold text-emerald-600 uppercase">FREE</span>
+                  </div>
+
+                  {deliveryLabel && (
+                    <div className="text-[11px] font-bold text-brand-brown/50 italic bg-brand-oat/40 p-2.5 rounded-xl border border-brand-brown/8">
+                      Schedule: {deliveryLabel}
+                    </div>
+                  )}
+
+                  <div className="border-t border-brand-brown/10 pt-4 mt-2 flex justify-between items-center">
+                    <span className="font-black text-base uppercase text-brand-brown">Total</span>
+                    <span className="font-serif font-black text-2xl text-brand-terracotta">
+                      {fmt(displayTotal)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Checkout Action Button */}
+              <div className="mt-8 flex flex-col gap-3">
+                <button
+                  onClick={handlePay}
+                  disabled={loading || cart.length === 0 || !selectedDeliveryDate}
+                  className="w-full bg-brand-brown hover:bg-brand-terracotta text-white rounded-2xl py-4 px-6 font-black text-xs sm:text-sm tracking-widest uppercase shadow-xl transition-all duration-300 disabled:opacity-50 cursor-pointer active:scale-98 flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <span>Opening Payment...</span>
+                  ) : (
+                    <span>Pay {fmt(displayTotal)} →</span>
+                  )}
+                </button>
+
+                <div className="flex items-center justify-center gap-1.5 text-[10px] font-bold text-brand-brown/40 uppercase tracking-wider pt-1">
+                  <Lock className="w-3 h-3 text-emerald-600" />
+                  <span>Secure Payment via Razorpay</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <Footer />
+    </main>
   );
 }
+
+

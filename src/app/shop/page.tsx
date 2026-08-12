@@ -120,33 +120,31 @@ export default function ShopPage() {
 function ProductCard({ product }: { product: typeof products[0] }) {
   return (
     <div className="group flex flex-col bg-white rounded-[2rem] overflow-hidden border border-brand-brown/5 shadow-sm hover:shadow-xl transition-all duration-500">
-      {/* Image — clickable */}
-      <Link href={`/shop/${product.id}`} className="block">
-        <div className={`relative w-full aspect-square ${product.bgColor} p-5 sm:p-8 flex items-center justify-center`}>
-          {product.badge && (
-            <span className="absolute top-4 left-4 z-10 text-[9px] font-black bg-brand-brown text-white px-3 py-1.5 rounded-full uppercase tracking-widest">
-              {product.badge}
-            </span>
-          )}
-          <div className="relative w-full h-full transition-transform duration-700 group-hover:scale-110">
-            <Image src={product.image} alt={product.name} fill className="object-contain mix-blend-multiply drop-shadow-xl" />
-          </div>
+      {/* Image */}
+      <div className={`relative w-full aspect-square ${product.bgColor} p-5 sm:p-8 flex items-center justify-center`}>
+        {product.badge && (
+          <span className="absolute top-4 left-4 z-10 text-[9px] font-black bg-brand-brown text-white px-3 py-1.5 rounded-full uppercase tracking-widest">
+            {product.badge}
+          </span>
+        )}
+        <div className="relative w-full h-full transition-transform duration-700 group-hover:scale-110">
+          <Image src={product.image} alt={product.name} fill className="object-contain mix-blend-multiply drop-shadow-xl" />
         </div>
-      </Link>
- 
+      </div>
+
       {/* Info */}
       <div className="flex flex-col flex-1 p-5 sm:p-6 gap-3">
-        <Link href={`/shop/${product.id}`} className="block">
+        <div>
           <span className="text-[9px] font-black tracking-[0.2em] uppercase text-brand-brown/40 mb-1 block">
             {product.category}
           </span>
-          <h3 className="font-serif font-normal text-xl tracking-tight text-brand-brown group-hover:text-brand-orange transition-colors duration-200">
+          <h3 className="font-serif font-normal text-xl tracking-tight text-brand-brown transition-colors duration-200">
             {product.name}
           </h3>
           <p className="text-xs font-bold text-brand-brown/40 mt-2 leading-relaxed line-clamp-2">
             {product.desc}
           </p>
-        </Link>
+        </div>
  
         <div className="flex items-center justify-between mt-auto pt-3 border-t border-brand-brown/5">
           <span className="font-black text-brand-orange text-lg">{product.price}</span>

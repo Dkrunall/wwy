@@ -7,6 +7,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { Search, User, ShoppingBag, X } from "lucide-react";
 import AnnouncementBar from "./AnnouncementBar";
 import { WHATSAPP_CONTACT_URL } from "@/lib/contact";
+import { supabase } from "@/lib/supabase";
 
 const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: "Shop", href: "/order" },
@@ -29,9 +30,12 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [flat, setFlat] = useState("");
+  const [customerName, setCustomerName] = useState("");
   const [cartCount, setCartCount] = useState(0);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -41,8 +45,12 @@ export default function Navbar() {
 
   useEffect(() => {
     const refresh = () => {
-      setLoggedIn(!!localStorage.getItem("wwy_flat"));
+      const storedFlat = localStorage.getItem("wwy_flat");
+      setLoggedIn(!!storedFlat);
+      setFlat(storedFlat || "");
+      setCustomerName(localStorage.getItem("wwy_name") || "");
       setCartCount(getCartCount());
+      setAccountMenuOpen(false);
     };
     refresh();
     window.addEventListener("focus", refresh);
@@ -56,11 +64,20 @@ export default function Navbar() {
     router.push(query ? `/order?q=${encodeURIComponent(query)}` : "/order");
   };
 
-  const profileHref = loggedIn ? "/order/account" : "/order/login";
+  const handleLogout = async () => {
+    ["wwy_flat", "wwy_name", "wwy_customer_id", "wwy_pincode", "wwy_cart"].forEach((k) => localStorage.removeItem(k));
+    await supabase.auth.signOut();
+    setAccountMenuOpen(false);
+    setLoggedIn(false);
+    router.replace("/order/login");
+  };
+
+  const profileHref = "/order/login";
 
   const pillBase =
     "bg-white/85 backdrop-blur-2xl border border-white/50 shadow-lg transition-all duration-500";
   const topPos = scrolled ? "top-3" : "top-10 md:top-12";
+  const dropdownTop = scrolled ? "top-16 sm:top-16" : "top-24 md:top-28";
 
   return (
     <>
@@ -121,14 +138,25 @@ export default function Navbar() {
           >
             {searchOpen ? <X className="w-4 h-4" onClick={(e) => { e.stopPropagation(); setSearchOpen(false); }} /> : <Search className="w-4 h-4" />}
           </button>
-          <Link
-            href={profileHref}
-            aria-label="Profile"
-            title={loggedIn ? "My Account" : "Sign in"}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-brand-charcoal/60 hover:text-brand-terracotta hover:bg-brand-charcoal/5 transition-colors duration-300"
-          >
-            <User className="w-4 h-4" />
-          </Link>
+          {loggedIn ? (
+            <button
+              onClick={() => setAccountMenuOpen((o) => !o)}
+              aria-label="Account"
+              title="My Account"
+              className="w-10 h-10 rounded-full flex items-center justify-center text-brand-charcoal/60 hover:text-brand-terracotta hover:bg-brand-charcoal/5 transition-colors duration-300"
+            >
+              <User className="w-4 h-4" />
+            </button>
+          ) : (
+            <Link
+              href={profileHref}
+              aria-label="Profile"
+              title="Sign in"
+              className="w-10 h-10 rounded-full flex items-center justify-center text-brand-charcoal/60 hover:text-brand-terracotta hover:bg-brand-charcoal/5 transition-colors duration-300"
+            >
+              <User className="w-4 h-4" />
+            </Link>
+          )}
           <Link
             href="/order/cart"
             aria-label="Cart"
@@ -182,13 +210,23 @@ export default function Navbar() {
           >
             <Search className="w-4 h-4" />
           </button>
-          <Link
-            href={profileHref}
-            aria-label="Profile"
-            className={`${pillBase} rounded-full w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center text-brand-charcoal hover:bg-brand-terracotta hover:text-white hover:border-brand-terracotta/40 transition-all duration-300 active:scale-95`}
-          >
-            <User className="w-4 h-4" />
-          </Link>
+          {loggedIn ? (
+            <button
+              onClick={() => setAccountMenuOpen((o) => !o)}
+              aria-label="Account"
+              className={`${pillBase} rounded-full w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center text-brand-charcoal hover:bg-brand-terracotta hover:text-white hover:border-brand-terracotta/40 transition-all duration-300 active:scale-95`}
+            >
+              <User className="w-4 h-4" />
+            </button>
+          ) : (
+            <Link
+              href={profileHref}
+              aria-label="Profile"
+              className={`${pillBase} rounded-full w-11 h-11 sm:w-12 sm:h-12 flex items-center justify-center text-brand-charcoal hover:bg-brand-terracotta hover:text-white hover:border-brand-terracotta/40 transition-all duration-300 active:scale-95`}
+            >
+              <User className="w-4 h-4" />
+            </Link>
+          )}
           <Link
             href="/order/cart"
             aria-label="Cart"
@@ -203,6 +241,42 @@ export default function Navbar() {
           </Link>
         </div>
       </div>
+
+      {/* ════════════ ACCOUNT DROPDOWN ════════════ */}
+      {loggedIn && accountMenuOpen && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setAccountMenuOpen(false)} />
+          <div
+            className={`fixed right-4 sm:right-8 xl:right-16 ${dropdownTop} bg-white rounded-3xl shadow-2xl border border-brand-charcoal/10 overflow-hidden min-w-[200px] z-50 p-1 transition-all duration-500`}
+          >
+            <div className="px-4 py-3 bg-brand-oat/60 rounded-2xl mb-1 border border-brand-charcoal/5">
+              <p className="font-black text-brand-charcoal text-sm leading-none truncate">{customerName || "My Account"}</p>
+              {flat && <p className="text-xs font-bold text-brand-charcoal/40 mt-1">Flat {flat}</p>}
+            </div>
+            <Link
+              href="/order/account"
+              onClick={() => setAccountMenuOpen(false)}
+              className="block w-full px-4 py-2.5 text-left text-xs font-black uppercase tracking-wider text-brand-charcoal hover:bg-brand-oat rounded-xl transition-colors"
+            >
+              My Account
+            </Link>
+            <Link
+              href="/order/history"
+              onClick={() => setAccountMenuOpen(false)}
+              className="block w-full px-4 py-2.5 text-left text-xs font-black uppercase tracking-wider text-brand-charcoal hover:bg-brand-oat rounded-xl transition-colors"
+            >
+              My Orders
+            </Link>
+            <div className="my-1 border-t border-brand-charcoal/10" />
+            <button
+              onClick={handleLogout}
+              className="w-full px-4 py-2.5 text-left text-xs font-black uppercase tracking-wider text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer"
+            >
+              Sign Out
+            </button>
+          </div>
+        </>
+      )}
 
       {/* ════════════ FULLSCREEN MOBILE MENU ════════════ */}
       <div

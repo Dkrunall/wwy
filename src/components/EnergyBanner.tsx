@@ -7,7 +7,7 @@ import Link from "next/link";
 export default function EnergyBanner() {
   return (
     <section
-      className="w-full bg-brand-brown py-20 sm:py-32 relative overflow-hidden flex flex-col items-center justify-center -mt-px shadow-inner z-10"
+      className="w-full bg-brand-brown py-20 sm:py-32 relative overflow-hidden flex flex-col items-center justify-center rounded-t-[2rem] sm:rounded-t-[3rem] md:rounded-t-[5rem] -mt-8 sm:-mt-12 shadow-[0_-20px_50px_rgba(0,0,0,0.1)] z-10"
     >
       {/* Noise Texture */}
       <div className="absolute inset-0 opacity-[0.25] mix-blend-overlay pointer-events-none z-0" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}></div>

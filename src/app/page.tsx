@@ -6,8 +6,8 @@ import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import ProcessStory from "@/components/ProcessStory";
-import ProductSection from "@/components/ProductSection";
 import StorySection from "@/components/StorySection";
+import MenuSection from "@/components/MenuSection";
 import EnergyBanner from "@/components/EnergyBanner";
 import Testimonials from "@/components/Testimonials";
 import SocialGallery from "@/components/SocialGallery";
@@ -32,8 +32,8 @@ export default function Home() {
       <Navbar />
       <Hero />
       <ProcessStory />
-      <ProductSection />
       <StorySection />
+      <MenuSection />
       <EnergyBanner />
       <Testimonials />
       <SocialGallery />

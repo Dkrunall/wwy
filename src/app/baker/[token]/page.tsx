@@ -7,7 +7,7 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import {
   ClipboardList, User, ChevronRight, Package, CheckCircle,
-  Loader2, MessageCircle, Palmtree, MapPin, Phone, Bell, X,
+  Loader2, MessageCircle, Palmtree, MapPin, Phone, Bell, X, Settings,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -90,7 +90,7 @@ const BULK_STATUS_OPTIONS: { key: string; label: string }[] = [
   { key: "delivered", label: "Completed" },
 ];
 
-type Panel = "queue" | "history" | "profile";
+type Panel = "queue" | "history" | "profile" | "settings";
 
 // ── component ─────────────────────────────────────────────────────────────────
 export default function BakerDashboard() {
@@ -140,6 +140,9 @@ export default function BakerDashboard() {
   const [addressEdit, setAddressEdit] = useState("");
   const [editingAddress, setEditingAddress] = useState(false);
   const [addressSaving, setAddressSaving] = useState(false);
+  const [capacityEdit, setCapacityEdit] = useState("");
+  const [editingCapacity, setEditingCapacity] = useState(false);
+  const [capacitySaving, setCapacitySaving] = useState(false);
 
   // ── data fetching ────────────────────────────────────────────────────────────
   const enrichPhones = async (rows: BakerOrder[]): Promise<BakerOrder[]> => {
@@ -298,6 +301,19 @@ export default function BakerDashboard() {
     setAddressSaving(false);
   };
 
+  const saveCapacity = async () => {
+    const parsed = parseInt(capacityEdit, 10);
+    if (!parsed || parsed < 1) return;
+    setCapacitySaving(true);
+    const res = await fetch("/api/baker/update-profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, daily_capacity: parsed }),
+    });
+    if (res.ok) { setBaker((b) => b ? { ...b, daily_capacity: parsed } : b); setEditingCapacity(false); }
+    setCapacitySaving(false);
+  };
+
   // ── derived ──────────────────────────────────────────────────────────────────
   const totalBaked = deliveredCount;
   const bakeList: Record<string, number> = {};
@@ -306,9 +322,10 @@ export default function BakerDashboard() {
       bakeList[item.product_name] = (bakeList[item.product_name] || 0) + item.quantity;
 
   const NAV: { key: Panel; Icon: React.ElementType; label: string }[] = [
-    { key: "queue",   Icon: ClipboardList, label: `Queue (${queue.length})` },
-    { key: "history", Icon: Package,       label: "History" },
-    { key: "profile", Icon: User,          label: "Profile" },
+    { key: "queue",    Icon: ClipboardList, label: `Queue (${queue.length})` },
+    { key: "history",  Icon: Package,       label: "History" },
+    { key: "profile",  Icon: User,          label: "Profile" },
+    { key: "settings", Icon: Settings,      label: "Settings" },
   ];
 
   // ── loading / error ──────────────────────────────────────────────────────────
@@ -900,6 +917,85 @@ export default function BakerDashboard() {
                     <p className="text-[11px] font-bold text-gray-400">This address is used as the courier pickup point for Borzo deliveries.</p>
                   </div>
                 </div>
+
+              </div>
+            </div>
+          )}
+
+          {/* ══ SETTINGS PANEL ══ */}
+          {panel === "settings" && (
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="px-5 py-4 border-b border-gray-100">
+                <p className="font-black text-brand-brown text-sm">Order Limits</p>
+              </div>
+              <div className="p-5 flex flex-col gap-4">
+
+                {/* Daily capacity — editable */}
+                <div className="flex flex-col gap-1">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Daily Order Capacity</p>
+                    {!editingCapacity && (
+                      <button
+                        onClick={() => { setCapacityEdit(baker.daily_capacity ? String(baker.daily_capacity) : ""); setEditingCapacity(true); }}
+                        className="text-[10px] font-black uppercase tracking-wider text-brand-brown/40 hover:text-brand-orange transition-colors cursor-pointer"
+                      >
+                        {baker.daily_capacity ? "Edit" : "+ Set"}
+                      </button>
+                    )}
+                  </div>
+                  {editingCapacity ? (
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        min={1}
+                        autoFocus
+                        placeholder="20"
+                        value={capacityEdit}
+                        onChange={(e) => setCapacityEdit(e.target.value.replace(/\D/g, ""))}
+                        className="flex-1 font-black text-brand-brown text-sm bg-white rounded-xl border-2 border-brand-brown/20 focus:border-brand-brown outline-none px-4 py-3"
+                      />
+                      <button
+                        onClick={saveCapacity}
+                        disabled={capacitySaving || !capacityEdit || parseInt(capacityEdit, 10) < 1}
+                        className="bg-brand-brown text-white font-black text-xs tracking-wider uppercase px-4 rounded-xl hover:bg-brand-orange transition-colors disabled:opacity-40 cursor-pointer"
+                      >
+                        {capacitySaving ? "…" : "Save"}
+                      </button>
+                      <button
+                        onClick={() => setEditingCapacity(false)}
+                        className="text-gray-400 font-black text-xs px-3 hover:text-gray-600 transition-colors cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="font-black text-brand-brown text-sm bg-gray-50 rounded-xl px-4 py-3 border border-gray-100">
+                      {baker.daily_capacity ? `${baker.daily_capacity} orders / day` : <span className="text-gray-300 font-bold">Not set — unlimited</span>}
+                    </p>
+                  )}
+                  <p className="text-[11px] font-bold text-gray-400">
+                    Once your active queue hits this number, admin and the ordering site stop routing new orders to you until you clear some.
+                  </p>
+                </div>
+
+                {/* Today's usage */}
+                {baker.daily_capacity && (
+                  <div className="pt-1">
+                    <div className="flex items-center justify-between mb-1.5">
+                      <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">Current Queue</p>
+                      <p className={`text-[10px] font-black ${queue.length >= baker.daily_capacity ? "text-rose-500" : "text-gray-400"}`}>
+                        {queue.length} / {baker.daily_capacity}
+                      </p>
+                    </div>
+                    <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full rounded-full ${queue.length >= baker.daily_capacity ? "bg-rose-400" : "bg-brand-orange"}`}
+                        style={{ width: `${Math.min((queue.length / baker.daily_capacity) * 100, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
 
               </div>
             </div>
