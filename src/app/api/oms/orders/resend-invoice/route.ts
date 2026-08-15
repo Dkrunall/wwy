@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { generateInvoicePDF } from "@/lib/invoice";
+import { deriveLoyaltyDiscount } from "@/lib/coupons";
 import { sendPaymentConfirmedToCustomer } from "@/lib/email";
 
 export async function POST(req: NextRequest) {
@@ -27,9 +28,8 @@ export async function POST(req: NextRequest) {
       (s: number, i: { quantity: number; unit_price_paise: number }) => s + i.quantity * i.unit_price_paise, 0
     );
     const shippingFeePaise = order.shipping_fee_paise || 0;
-    const goodsTotal = order.total_paise - shippingFeePaise;
-    const discountPercent = itemsSubtotal > goodsTotal
-      ? Math.round((1 - goodsTotal / itemsSubtotal) * 100) : 0;
+    const couponDiscountPaise = order.coupon_discount_paise || 0;
+    const { discountPercent } = deriveLoyaltyDiscount(itemsSubtotal, order.total_paise, shippingFeePaise, couponDiscountPaise);
 
     const pdfBuffer = await generateInvoicePDF({
       order_number: order.order_number,
@@ -40,6 +40,8 @@ export async function POST(req: NextRequest) {
       items: order.order_items || [],
       total_paise: order.total_paise,
       shipping_fee_paise: shippingFeePaise,
+      coupon_code: order.coupon_code,
+      coupon_discount_paise: couponDiscountPaise,
       discount_percent: discountPercent,
       delivery_date: order.delivery_date,
       created_at: order.created_at,

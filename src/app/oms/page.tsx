@@ -15,6 +15,7 @@ import {
   Loader2, Edit2, Trash2, Plus, XCircle, MessageCircle, ArrowRight,
   Download, Send, ChevronLeft, ChevronRight, Star, Bell, Zap,
 } from "lucide-react";
+import { Coupon, computeCouponDiscount } from "@/lib/coupons";
 
 interface OrderItem { id: string; product_name: string; quantity: number; unit_price_paise: number; }
 interface Order {
@@ -33,7 +34,7 @@ interface Feedback { id: string; order_id: string | null; flat_number: string; r
 interface Session { phone: string; step: string; cart: unknown; temp: unknown; updated_at: string; }
 
 type Tab = OmsTab;
-type ModalType = "add-product" | "edit-product" | "add-baker" | "edit-baker" | "edit-customer" | "delete-baker" | "manage-categories" | null;
+type ModalType = "add-product" | "edit-product" | "add-baker" | "edit-baker" | "edit-customer" | "delete-baker" | "manage-categories" | "add-coupon" | "edit-coupon" | null;
 
 function timeAgo(iso: string): string {
   const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
@@ -63,6 +64,7 @@ function OmsDashboardInner() {
   });
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [bakers, setBakers] = useState<Baker[]>([]);
   const [loading, setLoading] = useState(true);
@@ -92,6 +94,12 @@ function OmsDashboardInner() {
   // Modal state
   const [modal, setModal] = useState<ModalType>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [editingCoupon, setEditingCoupon] = useState<Coupon | null>(null);
+  const [couponForm, setCouponForm] = useState({
+    code: "", description: "", discount_type: "percent" as "percent"|"fixed", discount_value: "",
+    min_order: "", auto_apply: false, new_customer_only: false, active: true, usage_limit: "", expires_at: "",
+  });
+  const [deletingCouponId, setDeletingCouponId] = useState<string | null>(null);
   const [editingBaker, setEditingBaker] = useState<Baker | null>(null);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
   const [productForm, setProductForm] = useState({name:"",category:"",description:"",price:"",available:true,image_url:""});
@@ -156,9 +164,10 @@ function OmsDashboardInner() {
 
   const fetchData = useCallback(async () => {
     setLoading(true);
-    const [oR, pR, cR, bR, vacR, sR, fR, sesR] = await Promise.all([
+    const [oR, pR, couR, cR, bR, vacR, sR, fR, sesR] = await Promise.all([
       supabase.from("orders").select("*, order_items(*)").order("created_at",{ascending:false}).limit(500),
       supabase.from("products").select("*").order("category"),
+      supabase.from("coupons").select("*").order("created_at",{ascending:false}),
       supabase.from("customers").select("*").order("created_at",{ascending:false}),
       supabase.from("bakers").select("*").order("name"),
       fetch("/api/oms/vacation").then(r=>r.json()).catch(()=>({vacation_mode:false})),
@@ -168,6 +177,7 @@ function OmsDashboardInner() {
     ]);
     setOrders((oR.data||[]) as Order[]);
     setProducts(pR.data||[]);
+    setCoupons(couR.data||[]);
     setCustomers(cR.data||[]);
     setBakers(bR.data||[]);
     setVacationMode(vacR.vacation_mode===true);
@@ -329,6 +339,64 @@ function OmsDashboardInner() {
     setProducts(p => p.filter(x => x.category !== name));
     setDeletingCategory(null);
     if (categoryFilter === name) setCategoryFilter("all");
+  };
+
+  // ── Coupon CRUD ──
+  const openAddCoupon = () => {
+    setEditingCoupon(null);
+    setCouponForm({ code:"", description:"", discount_type:"percent", discount_value:"", min_order:"", auto_apply:false, new_customer_only:false, active:true, usage_limit:"", expires_at:"" });
+    setFormError(""); setModal("add-coupon");
+  };
+  const openEditCoupon = (c: Coupon) => {
+    setEditingCoupon(c);
+    setCouponForm({
+      code: c.code, description: c.description || "", discount_type: c.discount_type,
+      discount_value: c.discount_type === "percent" ? String(c.discount_value) : String(c.discount_value / 100),
+      min_order: c.min_order_paise ? String(c.min_order_paise / 100) : "",
+      auto_apply: c.auto_apply, new_customer_only: c.new_customer_only, active: c.active,
+      usage_limit: c.usage_limit != null ? String(c.usage_limit) : "",
+      expires_at: c.expires_at ? c.expires_at.slice(0, 10) : "",
+    });
+    setFormError(""); setModal("edit-coupon");
+  };
+  const saveCoupon = async () => {
+    const code = couponForm.code.trim().toUpperCase();
+    if (!code) { setFormError("Code required."); return; }
+    const discountValueNum = parseFloat(couponForm.discount_value);
+    if (isNaN(discountValueNum) || discountValueNum <= 0) { setFormError("Valid discount value required."); return; }
+    if (couponForm.discount_type === "percent" && discountValueNum > 100) { setFormError("Percent discount can't exceed 100."); return; }
+    setFormSaving(true);
+    const payload = {
+      code,
+      description: couponForm.description.trim() || null,
+      discount_type: couponForm.discount_type,
+      discount_value: couponForm.discount_type === "percent" ? Math.round(discountValueNum) : Math.round(discountValueNum * 100),
+      min_order_paise: couponForm.min_order.trim() ? Math.round(parseFloat(couponForm.min_order) * 100) : 0,
+      auto_apply: couponForm.auto_apply,
+      new_customer_only: couponForm.new_customer_only,
+      active: couponForm.active,
+      usage_limit: couponForm.usage_limit.trim() ? Math.round(parseFloat(couponForm.usage_limit)) : null,
+      expires_at: couponForm.expires_at || null,
+    };
+    if (editingCoupon) {
+      const { error } = await supabase.from("coupons").update(payload).eq("id", editingCoupon.id);
+      if (error) { setFormError("Save failed: " + error.message); setFormSaving(false); return; }
+      setCoupons(cs => cs.map(x => x.id === editingCoupon.id ? { ...x, ...payload } : x));
+    } else {
+      const { data, error } = await supabase.from("coupons").insert(payload).select().single();
+      if (error) { setFormError("Save failed: " + error.message); setFormSaving(false); return; }
+      if (data) setCoupons(cs => [data, ...cs]);
+    }
+    setFormSaving(false); setModal(null);
+  };
+  const toggleCouponActive = async (id: string, cur: boolean) => {
+    await supabase.from("coupons").update({ active: !cur }).eq("id", id);
+    setCoupons(cs => cs.map(x => x.id === id ? { ...x, active: !cur } : x));
+  };
+  const deleteCoupon = async (id: string) => {
+    await supabase.from("coupons").delete().eq("id", id);
+    setCoupons(cs => cs.filter(x => x.id !== id));
+    setDeletingCouponId(null);
   };
 
   // ── Baker CRUD ──
@@ -498,6 +566,12 @@ function OmsDashboardInner() {
     return p.name.toLowerCase().includes(q)||p.category.toLowerCase().includes(q);
   });
 
+  const filteredCoupons = coupons.filter(c=>{
+    if(!searchQuery) return true;
+    const q=searchQuery.toLowerCase();
+    return c.code.toLowerCase().includes(q)||(c.description||"").toLowerCase().includes(q);
+  });
+
   const sortedCustomers = useMemo(()=>[...customers].filter(c=>{
     if(!searchQuery) return true;
     const q=searchQuery.toLowerCase();
@@ -516,7 +590,7 @@ function OmsDashboardInner() {
     return new Date(b.created_at).getTime()-new Date(a.created_at).getTime();
   }),[customers,orders,searchQuery,customerSort]);
 
-  const closeModal = () => { setModal(null); setEditingProduct(null); setEditingBaker(null); setEditingCustomer(null); setDeletingBakerId(null); setFormError(""); setDeletingCategory(null); setCategoryEdits({}); setCategoryError(""); };
+  const closeModal = () => { setModal(null); setEditingProduct(null); setEditingBaker(null); setEditingCustomer(null); setDeletingBakerId(null); setFormError(""); setDeletingCategory(null); setCategoryEdits({}); setCategoryError(""); setEditingCoupon(null); setDeletingCouponId(null); };
 
 
   const inputCls = "w-full bg-brand-oat/40 border border-brand-brown/15 rounded-2xl px-4 py-3 font-bold text-brand-brown text-sm outline-none focus:border-brand-orange transition-colors";
@@ -525,7 +599,7 @@ function OmsDashboardInner() {
     <div className="min-h-screen bg-brand-oat text-brand-brown font-sans flex flex-col md:flex-row antialiased">
 
       {/* ── MODALS ── */}
-      {(modal || deleteConfirmId || deletingBakerId) && (
+      {(modal || deleteConfirmId || deletingBakerId || deletingCouponId) && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center px-4" onClick={closeModal}>
           <div className="absolute inset-0 bg-brand-brown/50 backdrop-blur-sm" />
 
@@ -626,6 +700,61 @@ function OmsDashboardInner() {
             </div>
           )}
 
+
+          {/* Coupon Modal */}
+          {(modal==="add-coupon"||modal==="edit-coupon") && (
+            <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-md p-6 flex flex-col gap-5 overflow-y-auto max-h-[90vh]" onClick={e=>e.stopPropagation()}>
+              <div className="flex items-center justify-between">
+                <h2 className="font-serif text-xl font-black text-brand-brown">{modal==="add-coupon"?"Add Coupon":"Edit Coupon"}</h2>
+                <button onClick={closeModal} className="p-2 hover:bg-brand-brown/5 rounded-full"><X className="w-4 h-4 text-brand-brown/50"/></button>
+              </div>
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Code</label><input className={inputCls+" uppercase tracking-widest"} placeholder="WELCOME10" autoFocus value={couponForm.code} onChange={e=>setCouponForm(f=>({...f,code:e.target.value.toUpperCase()}))}/></div>
+                <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Description <span className="normal-case font-bold text-brand-brown/30">(optional, shown internally)</span></label><input className={inputCls} placeholder="10% off first order" value={couponForm.description} onChange={e=>setCouponForm(f=>({...f,description:e.target.value}))}/></div>
+                <div className="flex gap-3">
+                  <div className="flex flex-col gap-1.5 flex-1">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Discount Type</label>
+                    <select className={inputCls} value={couponForm.discount_type} onChange={e=>setCouponForm(f=>({...f,discount_type:e.target.value as "percent"|"fixed"}))}>
+                      <option value="percent">Percent (%)</option>
+                      <option value="fixed">Fixed (₹)</option>
+                    </select>
+                  </div>
+                  <div className="flex flex-col gap-1.5 flex-1">
+                    <label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">{couponForm.discount_type==="percent"?"Percent Off":"Amount Off (₹)"}</label>
+                    <input className={inputCls} type="number" min="0" max={couponForm.discount_type==="percent"?"100":undefined} placeholder={couponForm.discount_type==="percent"?"10":"100"} value={couponForm.discount_value} onChange={e=>setCouponForm(f=>({...f,discount_value:e.target.value}))}/>
+                  </div>
+                </div>
+                <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Minimum Order (₹) <span className="normal-case font-bold text-brand-brown/30">(0 = no minimum)</span></label><input className={inputCls} type="number" min="0" placeholder="899" value={couponForm.min_order} onChange={e=>setCouponForm(f=>({...f,min_order:e.target.value}))}/></div>
+                <div className="flex gap-3">
+                  <div className="flex flex-col gap-1.5 flex-1"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Usage Limit <span className="normal-case font-bold text-brand-brown/30">(optional)</span></label><input className={inputCls} type="number" min="0" placeholder="Unlimited" value={couponForm.usage_limit} onChange={e=>setCouponForm(f=>({...f,usage_limit:e.target.value}))}/></div>
+                  <div className="flex flex-col gap-1.5 flex-1"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Expires <span className="normal-case font-bold text-brand-brown/30">(optional)</span></label><input className={inputCls} type="date" value={couponForm.expires_at} onChange={e=>setCouponForm(f=>({...f,expires_at:e.target.value}))}/></div>
+                </div>
+                <div className="flex items-center justify-between bg-brand-oat/40 border border-brand-brown/10 rounded-2xl px-4 py-3">
+                  <div><span className="text-sm font-bold text-brand-brown/70 block">Auto-apply</span><span className="text-[10px] font-bold text-brand-brown/40">Applies in cart automatically once eligible — no code needed</span></div>
+                  <button onClick={()=>setCouponForm(f=>({...f,auto_apply:!f.auto_apply}))} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${couponForm.auto_apply?"bg-brand-orange":"bg-brand-brown/20"}`}><span className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${couponForm.auto_apply?"translate-x-4.5":"translate-x-0.5"}`}/></button>
+                </div>
+                <div className="flex items-center justify-between bg-brand-oat/40 border border-brand-brown/10 rounded-2xl px-4 py-3">
+                  <div><span className="text-sm font-bold text-brand-brown/70 block">New customers only</span><span className="text-[10px] font-bold text-brand-brown/40">Only usable by customers with zero paid orders (e.g. welcome offer)</span></div>
+                  <button onClick={()=>setCouponForm(f=>({...f,new_customer_only:!f.new_customer_only}))} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0 ${couponForm.new_customer_only?"bg-brand-orange":"bg-brand-brown/20"}`}><span className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${couponForm.new_customer_only?"translate-x-4.5":"translate-x-0.5"}`}/></button>
+                </div>
+                <div className="flex items-center justify-between bg-brand-oat/40 border border-brand-brown/10 rounded-2xl px-4 py-3">
+                  <span className="text-sm font-bold text-brand-brown/70">Active</span>
+                  <button onClick={()=>setCouponForm(f=>({...f,active:!f.active}))} className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${couponForm.active?"bg-brand-orange":"bg-brand-brown/20"}`}><span className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${couponForm.active?"translate-x-4.5":"translate-x-0.5"}`}/></button>
+                </div>
+              </div>
+              {formError && <p className="text-xs font-bold text-rose-600 -mt-2">{formError}</p>}
+              <div className="flex gap-3"><button onClick={closeModal} className="flex-1 py-3 rounded-2xl border border-brand-brown/15 text-xs font-black uppercase tracking-wider text-brand-brown/60 hover:bg-brand-brown/5">Cancel</button><button onClick={saveCoupon} disabled={formSaving} className="flex-1 py-3 rounded-2xl bg-brand-brown hover:bg-brand-orange text-white text-xs font-black uppercase tracking-wider disabled:opacity-50 flex items-center justify-center gap-2">{formSaving&&<Loader2 className="w-3.5 h-3.5 animate-spin"/>}{modal==="add-coupon"?"Add Coupon":"Save Changes"}</button></div>
+            </div>
+          )}
+
+          {/* Delete Coupon Confirm */}
+          {deletingCouponId && (
+            <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-sm p-6 flex flex-col gap-4" onClick={e=>e.stopPropagation()}>
+              <h2 className="font-serif text-xl font-black text-rose-700">Delete Coupon?</h2>
+              <p className="text-sm font-bold text-brand-brown/60">This cannot be undone. Orders that already used <span className="text-brand-brown">{coupons.find(c=>c.id===deletingCouponId)?.code}</span> keep their applied discount.</p>
+              <div className="flex gap-3"><button onClick={()=>setDeletingCouponId(null)} className="flex-1 py-3 rounded-2xl border border-brand-brown/15 text-xs font-black uppercase tracking-wider text-brand-brown/60 hover:bg-brand-brown/5">Keep</button><button onClick={()=>deleteCoupon(deletingCouponId)} className="flex-1 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black uppercase tracking-wider">Delete</button></div>
+            </div>
+          )}
 
           {/* Manage Categories */}
           {modal==="manage-categories" && (
@@ -837,6 +966,7 @@ function OmsDashboardInner() {
             {tab==="products" && <button onClick={()=>{setCategoryError("");setCategoryEdits({});setModal("manage-categories");}} className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white border border-brand-brown/10 text-[10px] font-black uppercase tracking-widest text-brand-brown/60 hover:text-brand-brown hover:border-brand-brown/25 shadow-sm transition-all duration-200 cursor-pointer">Manage Categories</button>}
             {tab==="products" && <button onClick={openAddProduct} className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-brand-brown hover:bg-brand-orange text-white text-xs font-black uppercase tracking-widest shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"><Plus className="w-3.5 h-3.5"/>Add Product</button>}
             {tab==="bakers"   && <button onClick={openAddBaker}   className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-brand-brown hover:bg-brand-orange text-white text-xs font-black uppercase tracking-widest shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"><Plus className="w-3.5 h-3.5"/>Add Baker</button>}
+            {tab==="coupons"  && <button onClick={openAddCoupon}  className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-brand-brown hover:bg-brand-orange text-white text-xs font-black uppercase tracking-widest shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"><Plus className="w-3.5 h-3.5"/>Add Coupon</button>}
           </div>
         </div>
 
@@ -1098,6 +1228,51 @@ function OmsDashboardInner() {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {/* ── COUPONS ── */}
+        {!loading&&tab==="coupons" && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 relative z-10">
+            {filteredCoupons.length===0&&<div className="col-span-full text-center py-16 bg-white border border-brand-brown/10 rounded-[2rem] shadow-sm"><span className="text-3xl block mb-2">🏷️</span><p className="text-sm font-bold text-brand-brown/40 mb-4">No coupons yet.</p><button onClick={openAddCoupon} className="inline-flex items-center gap-2 px-5 py-3 bg-brand-brown hover:bg-brand-orange text-white text-xs font-black uppercase rounded-2xl cursor-pointer"><Plus className="w-3.5 h-3.5"/>Add First Coupon</button></div>}
+            {filteredCoupons.map(c=>{
+              const exampleAmt = computeCouponDiscount(c, Math.max(c.min_order_paise, 100000));
+              return (
+                <div key={c.id} className="bg-white rounded-[2rem] border border-brand-brown/10 p-5 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all flex flex-col justify-between gap-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="font-mono text-sm font-black text-brand-brown bg-brand-oat/60 px-2.5 py-0.5 rounded-md tracking-widest">{c.code}</span>
+                        {c.auto_apply && <span className="text-[9px] font-black text-brand-orange uppercase tracking-widest bg-brand-orange/10 px-2 py-0.5 rounded-md">Auto</span>}
+                        {c.new_customer_only && <span className="text-[9px] font-black text-emerald-700 uppercase tracking-widest bg-emerald-500/10 px-2 py-0.5 rounded-md">New Only</span>}
+                      </div>
+                      {c.description&&<p className="text-xs text-brand-brown/50 font-medium mt-2 leading-snug">{c.description}</p>}
+                      <p className="text-[10px] font-bold text-brand-brown/35 mt-1.5">
+                        {c.min_order_paise>0?`Min order ₹${(c.min_order_paise/100).toFixed(0)}`:"No minimum"}
+                        {c.usage_limit!=null&&` · ${c.used_count}/${c.usage_limit} used`}
+                        {c.usage_limit==null&&c.used_count>0&&` · ${c.used_count} used`}
+                        {c.expires_at&&` · Expires ${new Date(c.expires_at).toLocaleDateString("en-IN")}`}
+                      </p>
+                    </div>
+                    <span className="font-serif text-lg font-black text-brand-brown shrink-0 bg-brand-oat/55 px-3 py-1 rounded-xl">
+                      {c.discount_type==="percent"?`${c.discount_value}%`:fmt(c.discount_value)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between border-t border-brand-brown/10 pt-3">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${c.active?"bg-emerald-500 animate-pulse":"bg-zinc-300"}`}/>
+                      <span className="text-xs font-bold text-brand-brown/50">{c.active?"Active":"Inactive"}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <button onClick={()=>toggleCouponActive(c.id,c.active)} className={`text-[9px] font-black uppercase px-3 py-1.5 rounded-xl border transition-all cursor-pointer ${c.active?"bg-zinc-50 border-zinc-200 text-zinc-500 hover:bg-rose-50 hover:text-rose-600":"bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100"}`}>{c.active?"Deactivate":"Activate"}</button>
+                      <button onClick={()=>openEditCoupon(c)} className="p-1.5 rounded-xl border border-brand-brown/10 hover:bg-brand-brown/5 text-brand-brown/40 hover:text-brand-brown cursor-pointer"><Edit2 className="w-3 h-3"/></button>
+                      <button onClick={()=>setDeletingCouponId(c.id)} className="p-1.5 rounded-xl border border-rose-100 hover:bg-rose-50 text-rose-300 hover:text-rose-600 cursor-pointer"><Trash2 className="w-3 h-3"/></button>
+                    </div>
+                  </div>
+                  {exampleAmt>0 && <p className="text-[10px] font-bold text-brand-brown/30 -mt-1">e.g. −{fmt(exampleAmt)} on a ₹{(Math.max(c.min_order_paise,100000)/100).toFixed(0)} order</p>}
+                </div>
+              );
+            })}
           </div>
         )}
 

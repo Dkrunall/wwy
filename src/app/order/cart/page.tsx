@@ -15,6 +15,9 @@ import {
   Lock,
   Minus,
   Plus,
+  Tag,
+  X,
+  Loader2,
 } from "lucide-react";
 import { CartItem } from "@/lib/supabase";
 import Navbar from "@/components/Navbar";
@@ -66,10 +69,27 @@ export default function CartPage() {
     discountPercent: number;
     finalTotal: number;
     shippingFeePaise: number;
+    couponCode: string | null;
+    couponDiscountPaise: number;
   } | null>(null);
   const [deliveryLabel, setDeliveryLabel] = useState<string>("");
   const [deliverySlots, setDeliverySlots] = useState<{ iso: string; label: string }[]>([]);
   const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<string>("");
+
+  // Coupons — auto-applied (welcome / min-order) or manually entered
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    code: string;
+    description: string | null;
+    discount_type: "percent" | "fixed";
+    discount_value: number;
+    discountPaise: number;
+    auto: boolean;
+  } | null>(null);
+  const [couponInput, setCouponInput] = useState("");
+  const [couponBoxOpen, setCouponBoxOpen] = useState(false);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState("");
+  const [dismissedCouponCode, setDismissedCouponCode] = useState<string | null>(null);
 
   useEffect(() => {
     const storedFlat = localStorage.getItem("wwy_flat");
@@ -118,9 +138,65 @@ export default function CartPage() {
   };
 
   const baseTotalPaise = cart.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
+
+  // Auto-detect eligible coupon (new-user 10%, min-order threshold, etc.) whenever
+  // the cart total changes — but never override a coupon the customer typed in.
+  useEffect(() => {
+    if (appliedCoupon && !appliedCoupon.auto) return; // manual code takes priority
+    if (!customerId || baseTotalPaise <= 0) { setAppliedCoupon(null); return; }
+    let cancelled = false;
+    fetch("/api/coupons/preview", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ customerId, subtotalPaise: baseTotalPaise }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (cancelled) return;
+        const shouldApply = data.coupon && data.coupon.code !== dismissedCouponCode;
+        setAppliedCoupon(shouldApply ? { ...data.coupon, discountPaise: data.discountPaise, auto: true } : null);
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [baseTotalPaise, customerId, dismissedCouponCode]);
+
+  const applyCouponCode = async () => {
+    if (!couponInput.trim()) return;
+    setCouponLoading(true);
+    setCouponError("");
+    try {
+      const res = await fetch("/api/coupons/preview", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ customerId, subtotalPaise: baseTotalPaise, code: couponInput.trim() }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.coupon) {
+        setCouponError(data.error || "Invalid coupon code.");
+        setCouponLoading(false);
+        return;
+      }
+      setAppliedCoupon({ ...data.coupon, discountPaise: data.discountPaise, auto: false });
+      setCouponInput("");
+      setCouponBoxOpen(false);
+    } catch {
+      setCouponError("Failed to apply coupon. Try again.");
+    }
+    setCouponLoading(false);
+  };
+
+  const removeCoupon = () => {
+    if (appliedCoupon?.auto) setDismissedCouponCode(appliedCoupon.code);
+    setAppliedCoupon(null);
+    setCouponError("");
+  };
   const previewShippingFeePaise = calculateShippingFee(baseTotalPaise);
   const shippingFeePaise = discountInfo ? discountInfo.shippingFeePaise : previewShippingFeePaise;
-  const displayTotal = discountInfo ? discountInfo.finalTotal : baseTotalPaise + previewShippingFeePaise;
+  const previewCouponDiscountPaise = appliedCoupon?.discountPaise ?? 0;
+  const displayTotal = discountInfo
+    ? discountInfo.finalTotal
+    : Math.max(0, baseTotalPaise - previewCouponDiscountPaise) + previewShippingFeePaise;
   const amountToFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD_PAISE - baseTotalPaise);
   const itemCount = cart.reduce((s, i) => s + i.quantity, 0);
 
@@ -144,6 +220,8 @@ export default function CartPage() {
           customerName,
           notes,
           deliveryDate: selectedDeliveryDate,
+          couponCode: appliedCoupon?.code,
+          skipAutoCoupon: !appliedCoupon && !!dismissedCouponCode,
         }),
       });
 
@@ -162,9 +240,11 @@ export default function CartPage() {
         keyId,
         discountPercent,
         shippingFeePaise: sf,
+        couponCode: appliedCode,
+        couponDiscountPaise: cdp,
         deliveryLabel: dl,
       } = await res.json();
-      setDiscountInfo({ discountPercent, finalTotal: amount, shippingFeePaise: sf });
+      setDiscountInfo({ discountPercent, finalTotal: amount, shippingFeePaise: sf, couponCode: appliedCode, couponDiscountPaise: cdp });
       setDeliveryLabel(dl);
 
       const razorpay = new window.Razorpay({
@@ -407,10 +487,60 @@ export default function CartPage() {
                     <span className="font-bold text-brand-brown">{fmt(baseTotalPaise)}</span>
                   </div>
 
-                  {discountInfo && (
+                  {discountInfo && discountInfo.discountPercent > 0 && (
                     <div className="flex justify-between text-emerald-700 font-bold bg-emerald-50 p-3 rounded-2xl border border-emerald-200/60">
                       <span>Loyalty Discount ({discountInfo.discountPercent}%)</span>
-                      <span>−{fmt(baseTotalPaise - (discountInfo.finalTotal - discountInfo.shippingFeePaise))}</span>
+                      <span>
+                        −{fmt(Math.max(0, baseTotalPaise - discountInfo.couponDiscountPaise - (discountInfo.finalTotal - discountInfo.shippingFeePaise)))}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Coupon */}
+                  {appliedCoupon ? (
+                    <div className="flex justify-between items-center text-brand-terracotta font-bold bg-brand-terracotta/5 p-3 rounded-2xl border border-brand-terracotta/20">
+                      <span className="flex items-center gap-1.5">
+                        <Tag className="w-3.5 h-3.5" /> {appliedCoupon.code}
+                        {appliedCoupon.auto && <span className="text-[9px] font-black uppercase tracking-wider bg-brand-terracotta/15 px-1.5 py-0.5 rounded-md">Auto</span>}
+                      </span>
+                      <span className="flex items-center gap-2">
+                        −{fmt(discountInfo ? discountInfo.couponDiscountPaise : appliedCoupon.discountPaise)}
+                        {!discountInfo && (
+                          <button onClick={removeCoupon} aria-label="Remove coupon" className="text-brand-terracotta/50 hover:text-rose-600 cursor-pointer">
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </span>
+                    </div>
+                  ) : !discountInfo && (
+                    <div className="flex flex-col gap-2">
+                      {couponBoxOpen ? (
+                        <div className="flex gap-2">
+                          <input
+                            autoFocus
+                            value={couponInput}
+                            onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                            onKeyDown={(e) => e.key === "Enter" && applyCouponCode()}
+                            placeholder="COUPON CODE"
+                            className="flex-1 bg-brand-oat/40 border border-brand-brown/15 rounded-xl px-3 py-2 font-bold text-brand-brown text-xs tracking-widest uppercase outline-none focus:border-brand-orange transition-colors"
+                          />
+                          <button
+                            onClick={applyCouponCode}
+                            disabled={couponLoading || !couponInput.trim()}
+                            className="px-4 py-2 rounded-xl bg-brand-brown hover:bg-brand-orange text-white text-[10px] font-black uppercase tracking-wider disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
+                          >
+                            {couponLoading && <Loader2 className="w-3 h-3 animate-spin" />}Apply
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setCouponBoxOpen(true)}
+                          className="flex items-center gap-1.5 text-xs font-bold text-brand-terracotta hover:text-brand-brown transition-colors cursor-pointer self-start"
+                        >
+                          <Tag className="w-3.5 h-3.5" /> Have a coupon code?
+                        </button>
+                      )}
+                      {couponError && <p className="text-[11px] font-bold text-rose-600">{couponError}</p>}
                     </div>
                   )}
 

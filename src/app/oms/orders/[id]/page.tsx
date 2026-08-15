@@ -16,7 +16,7 @@ import {
 interface OrderItem { id: string; product_name: string; quantity: number; unit_price_paise: number; }
 interface OrderDetail {
   id: string; order_number: string | null; flat_number: string; customer_name: string;
-  total_paise: number; shipping_fee_paise: number | null; status: string; payment_status: string | null;
+  total_paise: number; shipping_fee_paise: number | null; coupon_code: string | null; coupon_discount_paise: number | null; status: string; payment_status: string | null;
   delivery_status: string | null; delivery_date: string | null; invoice_url: string | null;
   baker_id: string | null; notes: string | null; admin_notes: string | null;
   borzo_tracking_url: string | null; source: string | null; created_at: string;
@@ -337,6 +337,12 @@ export default function OrderDetailsPage() {
               </div>
 
               <div className="pt-4 border-t border-brand-brown/10 flex flex-col gap-2 bg-brand-oat/30 -mx-6 -mb-6 sm:-mx-8 sm:-mb-8 p-6 sm:p-8 rounded-b-3xl">
+                {!!order.coupon_discount_paise && (
+                  <div className="flex justify-between items-center text-xs font-bold text-emerald-700">
+                    <span>Coupon ({order.coupon_code})</span>
+                    <span>−{fmt(order.coupon_discount_paise)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center text-xs font-bold text-brand-brown/50">
                   <span>Shipping</span>
                   <span>{order.shipping_fee_paise ? fmt(order.shipping_fee_paise) : "FREE"}</span>

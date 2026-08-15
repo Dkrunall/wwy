@@ -5,14 +5,15 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   ShoppingBag, Coffee, Users, Flame, BarChart2, Star, Settings,
-  Bell, Activity, RefreshCw, LogOut, Menu, X,
+  Bell, Activity, RefreshCw, LogOut, Menu, X, Tag,
 } from "lucide-react";
 
-export type OmsTab = "orders" | "products" | "customers" | "bakers" | "analytics" | "feedback" | "settings";
+export type OmsTab = "orders" | "products" | "coupons" | "customers" | "bakers" | "analytics" | "feedback" | "settings";
 
 export const OMS_NAV: { key: OmsTab; icon: React.ElementType; label: string }[] = [
   { key: "orders", icon: ShoppingBag, label: "Orders" },
   { key: "products", icon: Coffee, label: "Products" },
+  { key: "coupons", icon: Tag, label: "Coupons" },
   { key: "customers", icon: Users, label: "Customers" },
   { key: "bakers", icon: Flame, label: "Bakers" },
   { key: "analytics", icon: BarChart2, label: "Analytics" },
