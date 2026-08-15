@@ -19,6 +19,7 @@ import {
 import { CartItem } from "@/lib/supabase";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { FREE_SHIPPING_THRESHOLD_PAISE, calculateShippingFee } from "@/lib/shipping";
 
 function fmt(paise: number) {
   return `₹${(paise / 100).toFixed(0)}`;
@@ -64,6 +65,7 @@ export default function CartPage() {
   const [discountInfo, setDiscountInfo] = useState<{
     discountPercent: number;
     finalTotal: number;
+    shippingFeePaise: number;
   } | null>(null);
   const [deliveryLabel, setDeliveryLabel] = useState<string>("");
   const [deliverySlots, setDeliverySlots] = useState<{ iso: string; label: string }[]>([]);
@@ -116,7 +118,10 @@ export default function CartPage() {
   };
 
   const baseTotalPaise = cart.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
-  const displayTotal = discountInfo ? discountInfo.finalTotal : baseTotalPaise;
+  const previewShippingFeePaise = calculateShippingFee(baseTotalPaise);
+  const shippingFeePaise = discountInfo ? discountInfo.shippingFeePaise : previewShippingFeePaise;
+  const displayTotal = discountInfo ? discountInfo.finalTotal : baseTotalPaise + previewShippingFeePaise;
+  const amountToFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD_PAISE - baseTotalPaise);
   const itemCount = cart.reduce((s, i) => s + i.quantity, 0);
 
   const handlePay = async () => {
@@ -156,9 +161,10 @@ export default function CartPage() {
         amount,
         keyId,
         discountPercent,
+        shippingFeePaise: sf,
         deliveryLabel: dl,
       } = await res.json();
-      setDiscountInfo({ discountPercent, finalTotal: amount });
+      setDiscountInfo({ discountPercent, finalTotal: amount, shippingFeePaise: sf });
       setDeliveryLabel(dl);
 
       const razorpay = new window.Razorpay({
@@ -404,16 +410,26 @@ export default function CartPage() {
                   {discountInfo && (
                     <div className="flex justify-between text-emerald-700 font-bold bg-emerald-50 p-3 rounded-2xl border border-emerald-200/60">
                       <span>Loyalty Discount ({discountInfo.discountPercent}%)</span>
-                      <span>−{fmt(baseTotalPaise - discountInfo.finalTotal)}</span>
+                      <span>−{fmt(baseTotalPaise - (discountInfo.finalTotal - discountInfo.shippingFeePaise))}</span>
                     </div>
                   )}
 
                   <div className="flex justify-between text-brand-brown/70 font-medium">
                     <span className="flex items-center gap-1.5">
-                      <Truck className="w-3.5 h-3.5 text-emerald-600" /> Delivery
+                      <Truck className="w-3.5 h-3.5 text-emerald-600" /> Shipping
                     </span>
-                    <span className="font-bold text-emerald-600 uppercase">FREE</span>
+                    {shippingFeePaise === 0 ? (
+                      <span className="font-bold text-emerald-600 uppercase">FREE</span>
+                    ) : (
+                      <span className="font-bold text-brand-brown">{fmt(shippingFeePaise)}</span>
+                    )}
                   </div>
+
+                  {shippingFeePaise > 0 && (
+                    <div className="text-[11px] font-bold text-brand-terracotta italic bg-brand-terracotta/5 p-2.5 rounded-xl border border-brand-terracotta/10">
+                      Add {fmt(amountToFreeShipping)} more to get free shipping (orders ₹599+ ship free; ₹65 standard shipping below that).
+                    </div>
+                  )}
 
                   {deliveryLabel && (
                     <div className="text-[11px] font-bold text-brand-brown/50 italic bg-brand-oat/40 p-2.5 rounded-xl border border-brand-brown/8">

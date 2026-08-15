@@ -162,7 +162,7 @@ export default function HowItWorks() {
           {[
             { label: "Delivery: Wed & Sat only" },
             { label: "Order online, pay by card / UPI / netbanking" },
-            { label: "Free shipping over ₹499" },
+            { label: "Free shipping over ₹599 · ₹65 below" },
             { label: "Bake to order — no advance stock" },
           ].map(({ label }) => (
             <span key={label} className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white border border-brand-brown/8 text-[10px] sm:text-xs md:text-sm font-black tracking-[0.12em] uppercase text-brand-brown/60 shadow-sm">

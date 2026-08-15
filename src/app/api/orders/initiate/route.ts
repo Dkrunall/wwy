@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { getRazorpay } from "@/lib/razorpay";
 import { applyDiscounts } from "@/lib/discounts";
+import { calculateShippingFee } from "@/lib/shipping";
 import { calculateDeliveryDate, deliveryDateISO, formatDeliveryDate, isValidDeliveryDate, parseDeliveryDays } from "@/lib/dateUtils";
 import { CartItem } from "@/lib/supabase";
 import { isPincodeServiceable } from "@/lib/baker";
@@ -58,7 +59,9 @@ export async function POST(req: NextRequest) {
     }
 
     const baseTotalPaise = cart.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
-    const { finalTotal, discountPercent } = await applyDiscounts(resolvedCustomerId ?? "", baseTotalPaise);
+    const { finalTotal: finalGoodsPaise, discountPercent } = await applyDiscounts(resolvedCustomerId ?? "", baseTotalPaise);
+    const shippingFeePaise = calculateShippingFee(baseTotalPaise);
+    const finalTotal = finalGoodsPaise + shippingFeePaise;
 
     const deliveryDate = (chosenDate && isValidDeliveryDate(chosenDate, deliveryDays, cutoffHour))
       ? new Date(chosenDate + "T00:00:00Z")
@@ -84,6 +87,7 @@ export async function POST(req: NextRequest) {
         flat_number: flat,
         customer_name: customerName,
         total_paise: finalTotal,
+        shipping_fee_paise: shippingFeePaise,
         notes: notes?.trim() || null,
         status: "pending",
         payment_status: "pending",
@@ -119,6 +123,7 @@ export async function POST(req: NextRequest) {
       amount: finalTotal,
       keyId: process.env.RAZORPAY_KEY_ID,
       discountPercent,
+      shippingFeePaise,
       deliveryLabel,
     });
   } catch (err) {

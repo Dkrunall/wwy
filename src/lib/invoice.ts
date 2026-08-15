@@ -19,6 +19,7 @@ interface InvoiceData {
   phone?: string | null;
   items: InvoiceItem[];
   total_paise: number;
+  shipping_fee_paise?: number;
   discount_percent?: number;
   delivery_date?: string | null;
   created_at: string;
@@ -165,24 +166,38 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     const totalsX = 330;
     const totalsWidth = 215;
 
-    if (data.discount_percent && data.discount_percent > 0) {
-      const subtotal = data.items.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
+    const shippingFeePaise = data.shipping_fee_paise || 0;
+    const goodsTotal = data.total_paise - shippingFeePaise;
+    const subtotal = data.items.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
+    const hasDiscount = !!data.discount_percent && data.discount_percent > 0;
+
+    if (hasDiscount) {
       doc.fillColor("#5C4A3C");
       doc.font("Helvetica").fontSize(9);
       doc.text(`Subtotal: Rs.${(subtotal / 100).toFixed(0)}`, totalsX, y, { width: totalsWidth, align: "right" });
       y += 16;
-      
+
       doc.fillColor("#E89936");
       doc.font("Helvetica-Bold").fontSize(9);
       doc.text(
-        `Loyalty Discount (${data.discount_percent}%): -Rs.${((subtotal - data.total_paise) / 100).toFixed(0)}`,
+        `Loyalty Discount (${data.discount_percent}%): -Rs.${((subtotal - goodsTotal) / 100).toFixed(0)}`,
         totalsX,
         y,
         { width: totalsWidth, align: "right" }
       );
-      y += 20;
+      y += 16;
     }
-    
+
+    doc.fillColor("#5C4A3C");
+    doc.font("Helvetica").fontSize(9);
+    doc.text(
+      shippingFeePaise > 0 ? `Shipping: Rs.${(shippingFeePaise / 100).toFixed(0)}` : "Shipping: FREE",
+      totalsX,
+      y,
+      { width: totalsWidth, align: "right" }
+    );
+    y += 20;
+
     // Grand Total Capsule
     doc.strokeColor("#E89936").lineWidth(1).roundedRect(325, y - 4, 220, 32, 6).stroke();
     doc.fillColor("#FFFDFB").roundedRect(325.5, y - 3.5, 219, 31, 6).fill();
