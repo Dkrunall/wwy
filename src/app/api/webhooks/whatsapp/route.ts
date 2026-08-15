@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { calculateDeliveryDate, formatDeliveryDate, deliveryDateISO } from "@/lib/dateUtils";
 import { applyDiscounts } from "@/lib/discounts";
+import { calculateShippingFee } from "@/lib/shipping";
 import { getRazorpay } from "@/lib/razorpay";
 import { isPincodeServiceable } from "@/lib/baker";
 import Anthropic from "@anthropic-ai/sdk";
@@ -358,7 +359,9 @@ async function stepConfirmOrder(
   }
 
   const subtotal = cart.reduce((s, i) => s + i.qty * i.price, 0);
-  const { finalTotal, discountPercent } = await applyDiscounts(customer?.id || "", subtotal);
+  const { finalTotal: finalGoodsTotal, discountPercent } = await applyDiscounts(customer?.id || "", subtotal);
+  const shippingFeePaise = calculateShippingFee(subtotal);
+  const finalTotal = finalGoodsTotal + shippingFeePaise;
 
   // Use earliest delivery date across cart items
   const deliveryISO = cart.reduce((min, item) =>
@@ -382,6 +385,7 @@ async function stepConfirmOrder(
       flat_number: customer?.flat_number || phone.slice(-6),
       customer_name: customer?.name || "WhatsApp Customer",
       total_paise: finalTotal,
+      shipping_fee_paise: shippingFeePaise,
       status: "pending",
       payment_status: "pending",
       delivery_status: "placed",
@@ -413,6 +417,9 @@ async function stepConfirmOrder(
 
   let msg = `Order *${orderNumber}* is placed! 🎉\nTotal: ₹${(finalTotal / 100).toFixed(0)}`;
   if (discountPercent > 0) msg += ` _(${discountPercent}% loyalty discount applied)_`;
+  msg += shippingFeePaise > 0
+    ? `\nShipping: ₹${(shippingFeePaise / 100).toFixed(0)} (free over ₹599)`
+    : `\nShipping: FREE`;
   msg += `\nDelivery: ${formatISODate(deliveryISO)}`;
   if (rzpLink) msg += `\n\nPay here: ${rzpLink}\n\n_Link expires in 15 minutes._`;
 

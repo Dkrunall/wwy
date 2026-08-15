@@ -33,7 +33,7 @@ interface Feedback { id: string; order_id: string | null; flat_number: string; r
 interface Session { phone: string; step: string; cart: unknown; temp: unknown; updated_at: string; }
 
 type Tab = OmsTab;
-type ModalType = "add-product" | "edit-product" | "add-baker" | "edit-baker" | "edit-customer" | "delete-baker" | null;
+type ModalType = "add-product" | "edit-product" | "add-baker" | "edit-baker" | "edit-customer" | "delete-baker" | "manage-categories" | null;
 
 function timeAgo(iso: string): string {
   const m = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
@@ -102,6 +102,12 @@ function OmsDashboardInner() {
   const [formSaving, setFormSaving] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [formError, setFormError] = useState("");
+
+  // Category management (rename/delete a category across all its products)
+  const [categoryEdits, setCategoryEdits] = useState<Record<string, string>>({});
+  const [deletingCategory, setDeletingCategory] = useState<string | null>(null);
+  const [categorySaving, setCategorySaving] = useState<string | null>(null);
+  const [categoryError, setCategoryError] = useState("");
 
   // Notification center
   interface Notif { id: string; title: string; body: string | null; read: boolean; created_at: string; }
@@ -303,6 +309,28 @@ function OmsDashboardInner() {
     setProducts(p=>p.filter(x=>x.id!==id)); setDeleteConfirmId(null);
   };
 
+  // ── Category management ──
+  const renameCategory = async (oldName: string) => {
+    const newName = (categoryEdits[oldName] ?? oldName).trim();
+    if (!newName || newName === oldName) return;
+    setCategoryError(""); setCategorySaving(oldName);
+    const { error } = await supabase.from("products").update({ category: newName }).eq("category", oldName);
+    setCategorySaving(null);
+    if (error) { setCategoryError("Rename failed: " + error.message); return; }
+    setProducts(p => p.map(x => x.category === oldName ? { ...x, category: newName } : x));
+    setCategoryEdits(e => { const n = { ...e }; delete n[oldName]; return n; });
+    if (categoryFilter === oldName) setCategoryFilter(newName);
+  };
+  const deleteCategory = async (name: string) => {
+    setCategoryError(""); setCategorySaving(name);
+    const { error } = await supabase.from("products").delete().eq("category", name);
+    setCategorySaving(null);
+    if (error) { setCategoryError("Delete failed: " + error.message); return; }
+    setProducts(p => p.filter(x => x.category !== name));
+    setDeletingCategory(null);
+    if (categoryFilter === name) setCategoryFilter("all");
+  };
+
   // ── Baker CRUD ──
   const openAddBaker = () => { setEditingBaker(null); setBakerForm({name:"",email:"",phone:"",pincodes:"",daily_capacity:"20",is_active:true,address:"",lat:"",lng:""}); setFormError(""); setModal("add-baker"); };
   const openEditBaker = (b: Baker) => { setEditingBaker(b); setBakerForm({name:b.name,email:b.email||"",phone:b.phone,pincodes:(b.pincodes||[]).join(", "),daily_capacity:String(b.daily_capacity||20),is_active:b.is_active,address:b.address||"",lat:b.lat!=null?String(b.lat):"",lng:b.lng!=null?String(b.lng):""}); setFormError(""); setModal("edit-baker"); };
@@ -488,7 +516,7 @@ function OmsDashboardInner() {
     return new Date(b.created_at).getTime()-new Date(a.created_at).getTime();
   }),[customers,orders,searchQuery,customerSort]);
 
-  const closeModal = () => { setModal(null); setEditingProduct(null); setEditingBaker(null); setEditingCustomer(null); setDeletingBakerId(null); setFormError(""); };
+  const closeModal = () => { setModal(null); setEditingProduct(null); setEditingBaker(null); setEditingCustomer(null); setDeletingBakerId(null); setFormError(""); setDeletingCategory(null); setCategoryEdits({}); setCategoryError(""); };
 
 
   const inputCls = "w-full bg-brand-oat/40 border border-brand-brown/15 rounded-2xl px-4 py-3 font-bold text-brand-brown text-sm outline-none focus:border-brand-orange transition-colors";
@@ -598,6 +626,54 @@ function OmsDashboardInner() {
             </div>
           )}
 
+
+          {/* Manage Categories */}
+          {modal==="manage-categories" && (
+            <div className="relative bg-white rounded-3xl shadow-2xl w-full max-w-lg p-6 flex flex-col gap-4 max-h-[85vh]" onClick={e=>e.stopPropagation()}>
+              <div className="flex items-center justify-between">
+                <h2 className="font-serif text-xl font-black text-brand-brown">Manage Categories</h2>
+                <button onClick={closeModal} className="p-1.5 rounded-xl hover:bg-brand-brown/5 text-brand-brown/40 hover:text-brand-brown cursor-pointer"><X className="w-4 h-4"/></button>
+              </div>
+              {categoryError && <p className="text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">{categoryError}</p>}
+              <div className="flex flex-col gap-3 overflow-y-auto pr-1">
+                {existingCategories.length===0 && <p className="text-sm font-bold text-brand-brown/40 text-center py-6">No categories yet — add a product to create one.</p>}
+                {existingCategories.map(c=>{
+                  const count = products.filter(p=>p.category===c).length;
+                  const isDeleting = deletingCategory===c;
+                  const isSaving = categorySaving===c;
+                  return (
+                    <div key={c} className="border border-brand-brown/10 rounded-2xl p-3.5 flex flex-col gap-2.5">
+                      <div className="flex items-center gap-2.5">
+                        <input
+                          className={inputCls+" py-2.5"}
+                          value={categoryEdits[c] ?? c}
+                          onChange={e=>setCategoryEdits(ed=>({...ed,[c]:e.target.value}))}
+                        />
+                        <span className="text-[10px] font-black uppercase tracking-wider text-brand-brown/40 whitespace-nowrap">{count} item{count===1?"":"s"}</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={()=>renameCategory(c)}
+                          disabled={isSaving || (categoryEdits[c] ?? c).trim()===c || !(categoryEdits[c] ?? c).trim()}
+                          className="flex-1 py-2 rounded-xl bg-brand-brown hover:bg-brand-orange text-white text-[10px] font-black uppercase tracking-wider disabled:opacity-40 cursor-pointer flex items-center justify-center gap-1.5"
+                        >
+                          {isSaving && <Loader2 className="w-3 h-3 animate-spin"/>}Save Rename
+                        </button>
+                        {isDeleting ? (
+                          <>
+                            <button onClick={()=>setDeletingCategory(null)} className="flex-1 py-2 rounded-xl border border-brand-brown/15 text-[10px] font-black uppercase tracking-wider text-brand-brown/60 hover:bg-brand-brown/5 cursor-pointer">Cancel</button>
+                            <button onClick={()=>deleteCategory(c)} disabled={isSaving} className="flex-1 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-[10px] font-black uppercase tracking-wider disabled:opacity-50 cursor-pointer">Confirm Delete {count} Product{count===1?"":"s"}</button>
+                          </>
+                        ) : (
+                          <button onClick={()=>setDeletingCategory(c)} className="px-3.5 py-2 rounded-xl border border-rose-200 text-rose-600 text-[10px] font-black uppercase tracking-wider hover:bg-rose-50 cursor-pointer">Delete Category</button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Delete Product Confirm */}
           {deleteConfirmId && (
@@ -758,6 +834,7 @@ function OmsDashboardInner() {
             {tab==="orders" && <>
               <button onClick={exportCSV} className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white border border-brand-brown/10 text-[10px] font-black uppercase tracking-widest text-brand-brown/60 hover:text-brand-brown hover:border-brand-brown/25 shadow-sm transition-all duration-200 cursor-pointer"><Download className="w-3.5 h-3.5"/>Export CSV</button>
             </>}
+            {tab==="products" && <button onClick={()=>{setCategoryError("");setCategoryEdits({});setModal("manage-categories");}} className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-white border border-brand-brown/10 text-[10px] font-black uppercase tracking-widest text-brand-brown/60 hover:text-brand-brown hover:border-brand-brown/25 shadow-sm transition-all duration-200 cursor-pointer">Manage Categories</button>}
             {tab==="products" && <button onClick={openAddProduct} className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-brand-brown hover:bg-brand-orange text-white text-xs font-black uppercase tracking-widest shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"><Plus className="w-3.5 h-3.5"/>Add Product</button>}
             {tab==="bakers"   && <button onClick={openAddBaker}   className="flex items-center gap-1.5 px-4 py-2.5 rounded-2xl bg-brand-brown hover:bg-brand-orange text-white text-xs font-black uppercase tracking-widest shadow-md hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"><Plus className="w-3.5 h-3.5"/>Add Baker</button>}
           </div>

@@ -28,6 +28,7 @@ create table if not exists orders (
   customer_name text not null,
   status text default 'pending' check (status in ('pending','confirmed','delivered')),
   total_paise integer not null,
+  shipping_fee_paise integer not null default 0,
   notes text,
   created_at timestamptz default now(),
   updated_at timestamptz default now()

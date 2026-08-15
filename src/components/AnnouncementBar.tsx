@@ -1,7 +1,7 @@
 "use client";
 
 const ANNOUNCEMENT =
-  "Bake days: Wed & Sat · Orders close Mon & Thu, 9 PM · Free shipping over ₹499";
+  "Bake days: Wed & Sat · Orders close Mon & Thu, 9 PM · Free shipping over ₹599 · ₹65 shipping below ₹599";
 
 export default function AnnouncementBar() {
   return (

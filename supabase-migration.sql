@@ -88,6 +88,12 @@ ALTER TABLE orders ADD COLUMN IF NOT EXISTS borzo_tracking_url TEXT;
 -- building). Email (via OTP login) is the real identity now.
 ALTER TABLE customers DROP CONSTRAINT IF EXISTS customers_flat_number_key;
 
+-- ─── Orders: shipping fee (added 2026-08-15) ────────────────────────────────
+-- Free shipping at/above ₹599 subtotal, flat ₹65 standard fee below it.
+-- total_paise already includes this fee; kept separately so invoices/OMS can
+-- break out the line item and so the loyalty-discount % calc isn't thrown off.
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping_fee_paise INTEGER NOT NULL DEFAULT 0;
+
 -- ─── Products: image upload from OMS product form ───────────────────────────
 ALTER TABLE products ADD COLUMN IF NOT EXISTS image_url TEXT;
 

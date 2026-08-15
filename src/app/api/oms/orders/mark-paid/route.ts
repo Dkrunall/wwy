@@ -39,8 +39,10 @@ export async function POST(req: NextRequest) {
     const itemsSubtotal = (order.order_items || []).reduce(
       (s: number, i: { quantity: number; unit_price_paise: number }) => s + i.quantity * i.unit_price_paise, 0
     );
-    const discountPercent = itemsSubtotal > order.total_paise
-      ? Math.round((1 - order.total_paise / itemsSubtotal) * 100) : 0;
+    const shippingFeePaise = order.shipping_fee_paise || 0;
+    const goodsTotal = order.total_paise - shippingFeePaise;
+    const discountPercent = itemsSubtotal > goodsTotal
+      ? Math.round((1 - goodsTotal / itemsSubtotal) * 100) : 0;
 
     let invoiceUrl: string | undefined;
     try {
@@ -52,6 +54,7 @@ export async function POST(req: NextRequest) {
         phone: customer?.phone,
         items: order.order_items || [],
         total_paise: order.total_paise,
+        shipping_fee_paise: shippingFeePaise,
         discount_percent: discountPercent,
         delivery_date: order.delivery_date,
         created_at: order.created_at,
