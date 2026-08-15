@@ -94,6 +94,41 @@ ALTER TABLE customers DROP CONSTRAINT IF EXISTS customers_flat_number_key;
 -- break out the line item and so the loyalty-discount % calc isn't thrown off.
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS shipping_fee_paise INTEGER NOT NULL DEFAULT 0;
 
+-- ─── Coupons (added 2026-08-15) ─────────────────────────────────────────────
+-- Admin-generated codes (OMS → Coupons) plus two automatic behaviors:
+--   - auto_apply + new_customer_only: e.g. a 10% welcome coupon for a
+--     customer's first order, applied without a code
+--   - auto_apply + min_order_paise: e.g. auto-applies once cart subtotal
+--     crosses a threshold, and stops applying (no code needed either way) if
+--     the cart drops back below it
+-- Coupon discounts stack with the existing loyalty discount (applied on top).
+CREATE TABLE IF NOT EXISTS coupons (
+  id                 UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  code               TEXT UNIQUE NOT NULL,
+  description        TEXT,
+  discount_type      TEXT NOT NULL DEFAULT 'percent' CHECK (discount_type IN ('percent','fixed')),
+  discount_value     INTEGER NOT NULL, -- percent (0-100), or paise if fixed
+  min_order_paise    INTEGER NOT NULL DEFAULT 0,
+  auto_apply         BOOLEAN NOT NULL DEFAULT false,
+  new_customer_only  BOOLEAN NOT NULL DEFAULT false,
+  active             BOOLEAN NOT NULL DEFAULT true,
+  usage_limit        INTEGER, -- null = unlimited total redemptions
+  used_count         INTEGER NOT NULL DEFAULT 0,
+  expires_at         TIMESTAMPTZ,
+  created_at         TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE coupons ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "coupons_all" ON coupons FOR ALL USING (true);
+
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS coupon_code           TEXT;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS coupon_discount_paise INTEGER NOT NULL DEFAULT 0;
+
+-- Example seed coupons (edit/remove as needed, or manage from OMS → Coupons):
+-- INSERT INTO coupons (code, description, discount_type, discount_value, auto_apply, new_customer_only)
+--   VALUES ('WELCOME10', '10% off your first order', 'percent', 10, true, true) ON CONFLICT DO NOTHING;
+-- INSERT INTO coupons (code, description, discount_type, discount_value, min_order_paise, auto_apply)
+--   VALUES ('SPEND899', 'Auto-applies on orders ₹899+', 'percent', 10, 89900, true) ON CONFLICT DO NOTHING;
+
 -- ─── Products: image upload from OMS product form ───────────────────────────
 ALTER TABLE products ADD COLUMN IF NOT EXISTS image_url TEXT;
 

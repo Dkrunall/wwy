@@ -20,6 +20,8 @@ interface InvoiceData {
   items: InvoiceItem[];
   total_paise: number;
   shipping_fee_paise?: number;
+  coupon_code?: string | null;
+  coupon_discount_paise?: number;
   discount_percent?: number;
   delivery_date?: string | null;
   created_at: string;
@@ -167,25 +169,42 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     const totalsWidth = 215;
 
     const shippingFeePaise = data.shipping_fee_paise || 0;
+    const couponDiscountPaise = data.coupon_discount_paise || 0;
     const goodsTotal = data.total_paise - shippingFeePaise;
     const subtotal = data.items.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
-    const hasDiscount = !!data.discount_percent && data.discount_percent > 0;
+    const hasLoyaltyDiscount = !!data.discount_percent && data.discount_percent > 0;
+    const hasCoupon = couponDiscountPaise > 0;
+    const loyaltyDiscountPaise = Math.max(0, subtotal - goodsTotal - couponDiscountPaise);
 
-    if (hasDiscount) {
+    if (hasLoyaltyDiscount || hasCoupon) {
       doc.fillColor("#5C4A3C");
       doc.font("Helvetica").fontSize(9);
       doc.text(`Subtotal: Rs.${(subtotal / 100).toFixed(0)}`, totalsX, y, { width: totalsWidth, align: "right" });
       y += 16;
 
-      doc.fillColor("#E89936");
-      doc.font("Helvetica-Bold").fontSize(9);
-      doc.text(
-        `Loyalty Discount (${data.discount_percent}%): -Rs.${((subtotal - goodsTotal) / 100).toFixed(0)}`,
-        totalsX,
-        y,
-        { width: totalsWidth, align: "right" }
-      );
-      y += 16;
+      if (hasLoyaltyDiscount) {
+        doc.fillColor("#E89936");
+        doc.font("Helvetica-Bold").fontSize(9);
+        doc.text(
+          `Loyalty Discount (${data.discount_percent}%): -Rs.${(loyaltyDiscountPaise / 100).toFixed(0)}`,
+          totalsX,
+          y,
+          { width: totalsWidth, align: "right" }
+        );
+        y += 16;
+      }
+
+      if (hasCoupon) {
+        doc.fillColor("#E89936");
+        doc.font("Helvetica-Bold").fontSize(9);
+        doc.text(
+          `Coupon (${data.coupon_code || "—"}): -Rs.${(couponDiscountPaise / 100).toFixed(0)}`,
+          totalsX,
+          y,
+          { width: totalsWidth, align: "right" }
+        );
+        y += 16;
+      }
     }
 
     doc.fillColor("#5C4A3C");

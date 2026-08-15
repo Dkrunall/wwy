@@ -3,6 +3,7 @@ import { createServerSupabase } from "@/lib/supabase-server";
 import { getRazorpay } from "@/lib/razorpay";
 import { applyDiscounts } from "@/lib/discounts";
 import { calculateShippingFee } from "@/lib/shipping";
+import { resolveCoupon, redeemCoupon } from "@/lib/couponResolve";
 import { calculateDeliveryDate, deliveryDateISO, formatDeliveryDate, isValidDeliveryDate, parseDeliveryDays } from "@/lib/dateUtils";
 import { CartItem } from "@/lib/supabase";
 import { isPincodeServiceable } from "@/lib/baker";
@@ -15,12 +16,14 @@ function generateOrderNumber(): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const { cart, flat, customerName, notes, deliveryDate: chosenDate } = (await req.json()) as {
+    const { cart, flat, customerName, notes, deliveryDate: chosenDate, couponCode, skipAutoCoupon } = (await req.json()) as {
       cart: CartItem[];
       flat: string;
       customerName: string;
       notes?: string;
       deliveryDate?: string;
+      couponCode?: string;
+      skipAutoCoupon?: boolean;
     };
 
     if (!cart || cart.length === 0) {
@@ -59,7 +62,17 @@ export async function POST(req: NextRequest) {
     }
 
     const baseTotalPaise = cart.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
-    const { finalTotal: finalGoodsPaise, discountPercent } = await applyDiscounts(resolvedCustomerId ?? "", baseTotalPaise);
+    const { finalTotal: loyaltyFinalPaise, discountPercent } = await applyDiscounts(resolvedCustomerId ?? "", baseTotalPaise);
+    const loyaltyDiscountPaise = baseTotalPaise - loyaltyFinalPaise;
+
+    const { coupon, discountPaise: couponDiscountPaise, error: couponError } =
+      await resolveCoupon(supabase, resolvedCustomerId, baseTotalPaise, couponCode, skipAutoCoupon);
+    if (couponCode && couponCode.trim() && couponError) {
+      return NextResponse.json({ error: couponError }, { status: 400 });
+    }
+
+    const totalDiscountPaise = Math.min(baseTotalPaise, loyaltyDiscountPaise + couponDiscountPaise);
+    const finalGoodsPaise = baseTotalPaise - totalDiscountPaise;
     const shippingFeePaise = calculateShippingFee(baseTotalPaise);
     const finalTotal = finalGoodsPaise + shippingFeePaise;
 
@@ -88,6 +101,8 @@ export async function POST(req: NextRequest) {
         customer_name: customerName,
         total_paise: finalTotal,
         shipping_fee_paise: shippingFeePaise,
+        coupon_code: coupon?.code ?? null,
+        coupon_discount_paise: couponDiscountPaise,
         notes: notes?.trim() || null,
         status: "pending",
         payment_status: "pending",
@@ -114,6 +129,8 @@ export async function POST(req: NextRequest) {
     }));
     await supabase.from("order_items").insert(items);
 
+    if (coupon) await redeemCoupon(supabase, coupon);
+
     // Baker assignment now happens from OMS after payment — see admin bulk-assign flow.
 
     return NextResponse.json({
@@ -124,6 +141,8 @@ export async function POST(req: NextRequest) {
       keyId: process.env.RAZORPAY_KEY_ID,
       discountPercent,
       shippingFeePaise,
+      couponCode: coupon?.code ?? null,
+      couponDiscountPaise,
       deliveryLabel,
     });
   } catch (err) {
