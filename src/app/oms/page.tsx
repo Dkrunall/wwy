@@ -923,16 +923,16 @@ function OmsDashboardInner() {
             {label:"Today Revenue",value:fmt(todayRevenue),unit:"paid",icon:TrendingUp,color:"text-brand-brown",bg:"bg-brand-orange/10 border-brand-orange/20",bar:"bg-brand-orange",pct:1},
             {label:"Total Customers",value:customers.length,unit:"accounts",icon:Users,color:"text-brand-brown",bg:"bg-brand-brown/5 border-brand-brown/15",bar:"bg-brand-brown/40",pct:1},
           ].map(({label,value,unit,icon:Icon,bg,bar,pct})=>(
-            <div key={label} className="relative overflow-hidden bg-white/90 backdrop-blur-md rounded-3xl p-6 border border-brand-brown/10 shadow-sm hover:shadow-xl hover:scale-[1.01] transition-all duration-300 flex flex-col justify-between min-h-[145px]">
-              <div>
-                <div className="flex items-center justify-between mb-2">
+            <div key={label} className="relative overflow-hidden bg-white/90 backdrop-blur-md rounded-3xl p-4 sm:p-6 border border-brand-brown/10 shadow-sm hover:shadow-xl hover:scale-[1.01] transition-all duration-300 flex flex-col justify-between min-h-[145px] min-w-0">
+              <div className="min-w-0">
+                <div className="flex items-center justify-between mb-2 gap-2">
                   <span className="text-[10px] font-black uppercase tracking-widest text-brand-brown/40 leading-none">{label}</span>
-                  <div className={`p-2 rounded-2xl ${bg} border`}>
+                  <div className={`p-2 rounded-2xl ${bg} border shrink-0`}>
                     <Icon className="w-4 h-4 text-brand-brown/70"/>
                   </div>
                 </div>
-                <div className="flex items-baseline gap-1.5 mt-2">
-                  <span className="font-serif text-3xl sm:text-4xl font-black text-brand-brown tracking-tight">{value}</span>
+                <div className="flex items-baseline gap-1.5 mt-2 min-w-0">
+                  <span className="font-serif text-2xl sm:text-4xl font-black text-brand-brown tracking-tight break-words">{value}</span>
                 </div>
               </div>
               <div className="mt-4">
@@ -1186,9 +1186,9 @@ function OmsDashboardInner() {
 
             {/* Pagination */}
             {totalPages>1&&(
-              <div className="flex items-center justify-between pt-2">
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
                 <button onClick={()=>setOrderPage(p=>Math.max(1,p-1))} disabled={orderPage===1} className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white border border-brand-brown/10 text-xs font-black text-brand-brown/60 hover:text-brand-brown disabled:opacity-30 cursor-pointer shadow-sm"><ChevronLeft className="w-4 h-4"/>Prev</button>
-                <span className="text-xs font-bold text-brand-brown/50">Page {orderPage} of {totalPages} · {filteredOrders.length} orders</span>
+                <span className="order-last sm:order-none w-full sm:w-auto text-center text-xs font-bold text-brand-brown/50">Page {orderPage} of {totalPages} · {filteredOrders.length} orders</span>
                 <button onClick={()=>setOrderPage(p=>Math.min(totalPages,p+1))} disabled={orderPage===totalPages} className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-white border border-brand-brown/10 text-xs font-black text-brand-brown/60 hover:text-brand-brown disabled:opacity-30 cursor-pointer shadow-sm">Next<ChevronRight className="w-4 h-4"/></button>
               </div>
             )}
@@ -1424,9 +1424,9 @@ function OmsDashboardInner() {
                   {/* Baker stats */}
                   <div className="grid grid-cols-3 gap-2">
                     {[{label:"Active",value:stats.active,color:"text-brand-orange"},{label:"Delivered",value:stats.delivered,color:"text-emerald-700"},{label:"Revenue",value:fmt(stats.revenue),color:"text-brand-brown"}].map(s=>(
-                      <div key={s.label} className="bg-brand-oat/30 rounded-2xl px-3 py-2.5 text-center border border-brand-brown/10">
+                      <div key={s.label} className="bg-brand-oat/30 rounded-2xl px-2 py-2.5 text-center border border-brand-brown/10 min-w-0 overflow-hidden">
                         <p className="text-[8px] font-black uppercase tracking-widest text-brand-brown/40">{s.label}</p>
-                        <p className={`font-serif text-base font-black ${s.color}`}>{s.value}</p>
+                        <p className={`font-serif text-sm sm:text-base font-black break-words ${s.color}`}>{s.value}</p>
                       </div>
                     ))}
                   </div>
@@ -1466,9 +1466,9 @@ function OmsDashboardInner() {
                 {label:"Avg Order Value",value:fmt(analytics.avgOrderValue),sub:"per order"},
                 {label:"New Customers",value:analytics.newCustomers,sub:"last 30 days"},
               ].map(({label,value,sub})=>(
-                <div key={label} className="bg-white rounded-[2rem] p-5 border border-brand-brown/10 shadow-sm flex flex-col gap-1.5 hover:shadow-md transition-shadow">
+                <div key={label} className="bg-white rounded-[2rem] p-4 sm:p-5 border border-brand-brown/10 shadow-sm flex flex-col gap-1.5 hover:shadow-md transition-shadow min-w-0 overflow-hidden">
                   <span className="text-[9px] font-black uppercase tracking-widest text-brand-brown/40">{label}</span>
-                  <span className="font-serif text-3xl font-black text-brand-brown tracking-tight">{value}</span>
+                  <span className="font-serif text-2xl sm:text-3xl font-black text-brand-brown tracking-tight break-words">{value}</span>
                   <span className="text-[10px] font-bold text-brand-brown/40 mt-1">{sub}</span>
                 </div>
               ))}
@@ -1476,9 +1476,9 @@ function OmsDashboardInner() {
 
             {/* Week comparison */}
             <div className="bg-white rounded-[2rem] p-6 border border-brand-brown/10 shadow-sm grid grid-cols-2 sm:grid-cols-3 gap-6 divide-x divide-brand-brown/10">
-              <div><p className="text-[9px] font-black uppercase tracking-widest text-brand-brown/40 mb-1">This Week</p><p className="font-serif text-3xl font-black text-brand-brown">{fmt(analytics.thisWeekRevenue)}</p></div>
-              <div className="pl-6"><p className="text-[9px] font-black uppercase tracking-widest text-brand-brown/40 mb-1">Last Week</p><p className="font-serif text-3xl font-black text-brand-brown/30">{fmt(analytics.lastWeekRevenue)}</p></div>
-              {analytics.lastWeekRevenue>0&&<div className="pl-6"><p className="text-[9px] font-black uppercase tracking-widest text-brand-brown/40 mb-1">Change</p><p className={`font-serif text-3xl font-black ${analytics.thisWeekRevenue>=analytics.lastWeekRevenue?"text-emerald-600":"text-rose-600"}`}>{analytics.thisWeekRevenue>=analytics.lastWeekRevenue?"+":""}{(((analytics.thisWeekRevenue-analytics.lastWeekRevenue)/analytics.lastWeekRevenue)*100).toFixed(0)}%</p></div>}
+              <div className="min-w-0"><p className="text-[9px] font-black uppercase tracking-widest text-brand-brown/40 mb-1">This Week</p><p className="font-serif text-2xl sm:text-3xl font-black text-brand-brown break-words">{fmt(analytics.thisWeekRevenue)}</p></div>
+              <div className="pl-6 min-w-0"><p className="text-[9px] font-black uppercase tracking-widest text-brand-brown/40 mb-1">Last Week</p><p className="font-serif text-2xl sm:text-3xl font-black text-brand-brown/30 break-words">{fmt(analytics.lastWeekRevenue)}</p></div>
+              {analytics.lastWeekRevenue>0&&<div className="pl-6 min-w-0 col-span-2 sm:col-span-1"><p className="text-[9px] font-black uppercase tracking-widest text-brand-brown/40 mb-1">Change</p><p className={`font-serif text-2xl sm:text-3xl font-black break-words ${analytics.thisWeekRevenue>=analytics.lastWeekRevenue?"text-emerald-600":"text-rose-600"}`}>{analytics.thisWeekRevenue>=analytics.lastWeekRevenue?"+":""}{(((analytics.thisWeekRevenue-analytics.lastWeekRevenue)/analytics.lastWeekRevenue)*100).toFixed(0)}%</p></div>}
             </div>
 
             {/* 7-day chart */}

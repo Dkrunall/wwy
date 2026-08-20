@@ -218,12 +218,12 @@ export default function OrderDetailsPage() {
       <main className="md:ml-72 flex-1 w-auto min-w-0 py-8 px-6 sm:px-10 xl:px-12 relative flex flex-col gap-6">
 
         {/* Top Header / Navigation Bar */}
-        <div className="flex items-center justify-between gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <Link href="/oms" className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-brand-brown/60 hover:text-brand-orange bg-white px-4 py-2.5 rounded-full border border-brand-brown/10 shadow-sm transition-all hover:shadow">
             <ChevronLeft className="w-4 h-4" /> Back to Orders
           </Link>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {!isCancelled && order.delivery_status !== "delivered" && (
               <button onClick={() => setConfirmingCancel(true)} className="inline-flex items-center gap-1.5 bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white text-xs font-black uppercase px-4 py-2.5 rounded-full border border-rose-200 hover:border-rose-600 transition-all cursor-pointer shadow-sm">
                 <XCircle className="w-4 h-4" /> Cancel Order
