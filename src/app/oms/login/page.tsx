@@ -46,7 +46,7 @@ export default function OmsLoginPage() {
         {/* Glassmorphic card */}
         <div className="bg-white border border-brand-brown/5 rounded-[2.5rem] p-8 sm:p-10 shadow-2xl w-full flex flex-col items-center gap-6">
           <div className="w-16 h-16 rounded-full bg-brand-oat flex items-center justify-center shadow-inner">
-            <Image src="/logo.png" alt="WWY" width={42} height={42} className="object-contain" />
+            <Image src="/WWY-LOGO_White.png" alt="WWY" width={42} height={42} className="object-contain" />
           </div>
 
           <div className="text-center">

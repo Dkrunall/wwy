@@ -411,7 +411,7 @@ export default function BakerDashboard() {
               {unreadCount > 0 && <span className="absolute top-1 right-1 w-4 h-4 bg-brand-orange text-white text-[9px] font-black rounded-full flex items-center justify-center leading-none">{unreadCount > 9 ? "9+" : unreadCount}</span>}
             </button>
             <div className="bg-brand-oat p-1 rounded-lg">
-              <Image src="/logo.png" alt="WWY" width={26} height={26} className="object-contain" />
+              <Image src="/WWY-LOGO_White.png" alt="WWY" width={26} height={26} className="object-contain" />
             </div>
             <span className="font-black text-brand-brown text-sm hidden sm:block">Wild Wild Yeast</span>
           </div>

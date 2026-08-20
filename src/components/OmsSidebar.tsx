@@ -59,7 +59,7 @@ export default function OmsSidebar({
       <aside className="hidden md:flex flex-col w-72 bg-white text-brand-brown border-r border-brand-brown/10 fixed inset-y-0 left-0 p-6 z-30 shadow-md">
         <div className="flex items-center justify-between gap-3 mb-8">
           <Link href="/oms" className="flex items-center gap-3">
-            <div className="bg-brand-brown/5 p-2 rounded-2xl"><Image src="/logo.png" alt="WWY" width={34} height={34} className="object-contain" /></div>
+            <div className="bg-brand-brown/5 p-2 rounded-2xl"><Image src="/WWY-LOGO_White.png" alt="WWY" width={34} height={34} className="object-contain" /></div>
             <div><h1 className="font-serif text-lg font-black text-brand-brown leading-tight">Wild Wild Yeast</h1><span className="text-[9px] font-black tracking-[0.2em] uppercase text-brand-orange">Order Desk</span></div>
           </Link>
           <button onClick={onBellClick} className="relative p-2 rounded-xl hover:bg-brand-brown/5 transition-colors shrink-0 cursor-pointer">
@@ -108,7 +108,7 @@ export default function OmsSidebar({
           <div className="fixed inset-0 bg-brand-brown/40 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
           <div className="relative flex flex-col w-4/5 max-w-xs bg-white text-brand-brown p-6 shadow-2xl z-50 border-r border-brand-brown/10">
             <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-2"><Image src="/logo.png" alt="WWY" width={28} height={28} className="object-contain" /><span className="font-serif font-black text-brand-brown leading-none">WWY Desk</span></div>
+              <div className="flex items-center gap-2"><Image src="/WWY-LOGO_White.png" alt="WWY" width={28} height={28} className="object-contain" /><span className="font-serif font-black text-brand-brown leading-none">WWY Desk</span></div>
               <button onClick={() => setMobileMenuOpen(false)} className="p-2 bg-brand-brown/5 rounded-full cursor-pointer"><X className="w-4 h-4 text-brand-brown/60" /></button>
             </div>
             <nav className="flex flex-col gap-1.5 flex-grow">
