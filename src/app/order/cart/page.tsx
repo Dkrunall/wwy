@@ -254,7 +254,7 @@ export default function CartPage() {
         order_id: razorpayOrderId,
         name: "Wild Wild Yeast",
         description: `Order ${orderNumber}`,
-        image: "/logo.png",
+        image: "/WWY-LOGO_White.png",
         theme: { color: "#2C1A0E" },
         handler: async (response: {
           razorpay_order_id: string;
