@@ -202,7 +202,7 @@ export default function AccountPage() {
           </div>
           <div className="flex items-center gap-2">
             <div className="bg-brand-oat p-1 rounded-lg">
-              <Image src="/logo.png" alt="WWY" width={26} height={26} className="object-contain" />
+              <Image src="/WWY-LOGO_White.png" alt="WWY" width={26} height={26} className="object-contain" />
             </div>
             <span className="font-black text-brand-brown text-sm hidden sm:block">Wild Wild Yeast</span>
           </div>

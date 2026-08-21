@@ -53,7 +53,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
 
     // Brand Logo in top right
     try {
-      const logoPath = path.join(process.cwd(), "public", "logo.png");
+      const logoPath = path.join(process.cwd(), "public", "WWY-LOGO_White.png");
       doc.image(logoPath, 465, 45, { width: 80 });
     } catch (e) {
       console.error("Could not load invoice logo:", e);
