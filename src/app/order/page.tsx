@@ -9,38 +9,29 @@ import {
   Search,
   X,
   Sparkles,
-  CupSoda,
   Wheat,
-  FlaskConical,
-  Box,
-  Archive,
   Layers,
   Flame,
   Clock,
   CheckCircle2,
+  Cookie,
 } from "lucide-react";
 import { supabase, Product, CartItem } from "@/lib/supabase";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-const CATEGORIES = ["All", "Sodas", "Starters", "Breads", "Bundles", "Storage"];
+const CATEGORIES = ["All", "Crafted Bakes", "Be-Sides"];
 
 const CATEGORY_SUBTITLES: Record<string, string> = {
   All: "Everything we bake & ferment in small batches.",
-  Sodas: "Alive in every sip — naturally fizzy & probiotic.",
-  Starters: "100-year-old living wild yeast culture, ready to bake.",
-  Breads: "Wild-fermented for 72h. Long-proofed & crusty.",
-  Bundles: "The complete artisanal introduction set.",
-  Storage: "Keep your sourdough starter alive for generations.",
+  "Crafted Bakes": "Sourdough, croissants & buns, slow-fermented and baked fresh.",
+  "Be-Sides": "Biscotti, macaroons, cookies & crackers — crisp, chewy, delightful.",
 };
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   All: <Layers className="w-3.5 h-3.5" />,
-  Sodas: <CupSoda className="w-3.5 h-3.5" />,
-  Starters: <FlaskConical className="w-3.5 h-3.5" />,
-  Breads: <Wheat className="w-3.5 h-3.5" />,
-  Bundles: <Box className="w-3.5 h-3.5" />,
-  Storage: <Archive className="w-3.5 h-3.5" />,
+  "Crafted Bakes": <Wheat className="w-3.5 h-3.5" />,
+  "Be-Sides": <Cookie className="w-3.5 h-3.5" />,
 };
 
 function getProductFallbackImage(name: string, category: string): string {

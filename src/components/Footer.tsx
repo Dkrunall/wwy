@@ -35,8 +35,8 @@ export default function Footer() {
             <div className="flex flex-col gap-4 sm:gap-6">
               <span className="text-brand-orange mb-1">Shop</span>
               <Link href="/order" className="hover:text-white transition-colors">All Products</Link>
-              <Link href="/order?category=Sodas" className="hover:text-white transition-colors">Botanical Sodas</Link>
-              <Link href="/order?category=Starters" className="hover:text-white transition-colors">Wild Starter</Link>
+              <Link href="/order?category=Crafted%20Bakes" className="hover:text-white transition-colors">Crafted Bakes</Link>
+              <Link href="/order?category=Be-Sides" className="hover:text-white transition-colors">Be-Sides</Link>
             </div>
             <div className="flex flex-col gap-4 sm:gap-6">
               <span className="text-brand-orange mb-1">Company</span>

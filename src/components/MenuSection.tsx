@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase, Product, CartItem } from "@/lib/supabase";
 
-const CATEGORIES = ["All", "Sodas", "Starters", "Breads", "Bundles", "Storage"];
+const CATEGORIES = ["All", "Crafted Bakes", "Be-Sides"];
 
 function fmt(paise: number) {
   return `₹${(paise / 100).toFixed(0)}`;
