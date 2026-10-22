@@ -5,6 +5,8 @@ import path from "path";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const PDFDocument: any = typeof _pdfkit === "function" ? _pdfkit : (_pdfkit.default ?? _pdfkit);
 
+const GSTIN = "27ABFFB6655G1ZB";
+
 interface InvoiceItem {
   product_name: string;
   quantity: number;
@@ -89,6 +91,10 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
       doc.font("Helvetica-Bold").fontSize(8).text("DELIVERY DATE", 165, 170);
       doc.font("Helvetica").fontSize(9.5).text(data.delivery_date, 165, 180);
     }
+
+    doc.fillColor("#5C4A3C");
+    doc.font("Helvetica-Bold").fontSize(8).text("GSTIN", 65, 198);
+    doc.font("Helvetica").fontSize(9.5).text(GSTIN, 100, 197);
 
     // Right Bento Card: Billing Info
     doc.strokeColor("#EADBC8").lineWidth(0.75).roundedRect(300, 125, 245, 92, 8).stroke();
@@ -268,7 +274,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     
     doc.fillColor("#923D26");
     doc.font("Helvetica-Bold").fontSize(7.5).text(
-      "WILD WILD YEAST · SOURDOUGH & NATURAL FERMENTS",
+      `WILD WILD YEAST · SOURDOUGH & NATURAL FERMENTS · GSTIN ${GSTIN}`,
       50,
       footerY + 16,
       { align: "center", width: 495 }
