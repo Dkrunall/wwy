@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerSupabase } from "@/lib/supabase-server";
-import { generateInvoicePDF } from "@/lib/invoice";
+import { generateInvoicePDF, withTaxInfo } from "@/lib/invoice";
 import { deriveLoyaltyDiscount } from "@/lib/coupons";
 import { sendPaymentConfirmedToCustomer } from "@/lib/email";
 
@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
       flat_number: order.flat_number,
       address: customer?.address,
       phone: customer?.phone,
-      items: order.order_items || [],
+      items: await withTaxInfo(supabase, order.order_items || []),
       total_paise: order.total_paise,
       shipping_fee_paise: shippingFeePaise,
       coupon_code: order.coupon_code,

@@ -26,7 +26,7 @@ interface Order {
   borzo_order_id: string | null; borzo_tracking_url: string | null;
   source: string | null; created_at: string; order_items?: OrderItem[];
 }
-interface Product { id: string; name: string; category: string; description?: string | null; price_paise: number; available: boolean; image_url?: string | null; }
+interface Product { id: string; name: string; category: string; description?: string | null; price_paise: number; available: boolean; image_url?: string | null; hsn_code?: string | null; gst_rate?: number | null; }
 interface Customer { id: string; name: string; flat_number: string; phone: string | null; address?: string | null; pincode?: string | null; created_at: string; }
 interface Baker { id: string; name: string; email?: string | null; phone: string; is_active: boolean; share_token: string; pincodes?: string[]; daily_capacity?: number; address?: string | null; lat?: number | null; lng?: number | null; }
 interface Setting { key: string; value: string; }
@@ -102,7 +102,7 @@ function OmsDashboardInner() {
   const [deletingCouponId, setDeletingCouponId] = useState<string | null>(null);
   const [editingBaker, setEditingBaker] = useState<Baker | null>(null);
   const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
-  const [productForm, setProductForm] = useState({name:"",category:"",description:"",price:"",available:true,image_url:""});
+  const [productForm, setProductForm] = useState({name:"",category:"",description:"",price:"",available:true,image_url:"",hsn_code:"",gst_rate:"0"});
   const [imageUploading, setImageUploading] = useState(false);
   const [imageUploadError, setImageUploadError] = useState("");
   const [bakerForm, setBakerForm] = useState({name:"",email:"",phone:"",pincodes:"",daily_capacity:"20",is_active:true,address:"",lat:"",lng:""});
@@ -278,8 +278,8 @@ function OmsDashboardInner() {
   };
 
   // ── Product CRUD ──
-  const openAddProduct = () => { setEditingProduct(null); setProductForm({name:"",category:"",description:"",price:"",available:true,image_url:""}); setFormError(""); setImageUploadError(""); setModal("add-product"); };
-  const openEditProduct = (p: Product) => { setEditingProduct(p); setProductForm({name:p.name,category:p.category,description:p.description||"",price:(p.price_paise/100).toString(),available:p.available,image_url:p.image_url||""}); setFormError(""); setImageUploadError(""); setModal("edit-product"); };
+  const openAddProduct = () => { setEditingProduct(null); setProductForm({name:"",category:"",description:"",price:"",available:true,image_url:"",hsn_code:"",gst_rate:"0"}); setFormError(""); setImageUploadError(""); setModal("add-product"); };
+  const openEditProduct = (p: Product) => { setEditingProduct(p); setProductForm({name:p.name,category:p.category,description:p.description||"",price:(p.price_paise/100).toString(),available:p.available,image_url:p.image_url||"",hsn_code:p.hsn_code||"",gst_rate:String(p.gst_rate ?? 0)}); setFormError(""); setImageUploadError(""); setModal("edit-product"); };
   const uploadProductImage = async (file: File) => {
     setImageUploadError("");
     setImageUploading(true);
@@ -301,8 +301,10 @@ function OmsDashboardInner() {
     if(!productForm.name.trim()){setFormError("Name required.");return;}
     if(!productForm.category.trim()){setFormError("Category required.");return;}
     if(isNaN(price_paise)||price_paise<=0){setFormError("Valid price required.");return;}
+    const gst_rate = parseFloat(productForm.gst_rate||"0");
+    if(isNaN(gst_rate)||gst_rate<0||gst_rate>40){setFormError("GST % must be between 0 and 40.");return;}
     setFormSaving(true);
-    const payload = {name:productForm.name.trim(),category:productForm.category.trim(),description:productForm.description.trim()||null,price_paise,available:productForm.available,image_url:productForm.image_url.trim()||null};
+    const payload = {name:productForm.name.trim(),category:productForm.category.trim(),description:productForm.description.trim()||null,price_paise,available:productForm.available,image_url:productForm.image_url.trim()||null,hsn_code:productForm.hsn_code.trim()||null,gst_rate};
     if(editingProduct) {
       const {error} = await supabase.from("products").update(payload).eq("id",editingProduct.id);
       if(error){setFormError("Save failed: "+error.message);setFormSaving(false);return;}
@@ -615,6 +617,10 @@ function OmsDashboardInner() {
                 <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Category</label><input className={inputCls} list="cat-list" placeholder="Bread" value={productForm.category} onChange={e=>setProductForm(f=>({...f,category:e.target.value}))}/><datalist id="cat-list">{existingCategories.map(c=><option key={c} value={c}/>)}</datalist></div>
                 <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Description <span className="normal-case font-bold text-brand-brown/30">(optional)</span></label><textarea className={inputCls+" resize-none"} rows={2} placeholder="e.g. Naturally leavened, 700g" value={productForm.description} onChange={e=>setProductForm(f=>({...f,description:e.target.value}))}/></div>
                 <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Price (₹)</label><input className={inputCls} type="number" min="0" placeholder="450" value={productForm.price} onChange={e=>setProductForm(f=>({...f,price:e.target.value}))}/></div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">HSN code</label><input className={inputCls} placeholder="1905" value={productForm.hsn_code} onChange={e=>setProductForm(f=>({...f,hsn_code:e.target.value}))}/></div>
+                  <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">GST % <span className="normal-case font-bold text-brand-brown/30">(incl. in price)</span></label><select className={inputCls} value={productForm.gst_rate} onChange={e=>setProductForm(f=>({...f,gst_rate:e.target.value}))}>{["0","5","18","40"].concat(["0","5","18","40"].includes(productForm.gst_rate)?[]:[productForm.gst_rate]).map(r=><option key={r} value={r}>{r}%</option>)}</select></div>
+                </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Product Image</label>
                   <div className="flex items-center gap-3">
