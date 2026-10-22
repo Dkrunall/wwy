@@ -5,11 +5,40 @@ import path from "path";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const PDFDocument: any = typeof _pdfkit === "function" ? _pdfkit : (_pdfkit.default ?? _pdfkit);
 
+const GSTIN = "27ABFFB6655G1ZB";
+// Seller is in Maharashtra and delivers locally, so every sale is intra-state (CGST + SGST)
+const PLACE_OF_SUPPLY = "Maharashtra (27)";
+
 interface InvoiceItem {
+  product_id?: string | null;
   product_name: string;
   quantity: number;
   unit_price_paise: number;
+  hsn_code?: string | null;
+  gst_rate?: number | null;
 }
+
+// Attach each item's current HSN code + GST rate from the products table.
+// Never throws: if the lookup fails (e.g. migration not yet run) items go out at 0% GST.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function withTaxInfo<T extends InvoiceItem>(supabase: any, items: T[]): Promise<T[]> {
+  const ids = [...new Set(items.map(i => i.product_id).filter(Boolean))];
+  if (ids.length === 0) return items;
+  const { data, error } = await supabase.from("products").select("id, hsn_code, gst_rate").in("id", ids);
+  if (error || !data) {
+    console.error("Could not load GST info for invoice:", error);
+    return items;
+  }
+  const byId = new Map<string, { hsn_code: string | null; gst_rate: number | null }>(
+    data.map((p: { id: string; hsn_code: string | null; gst_rate: number | null }) => [p.id, p])
+  );
+  return items.map(i => {
+    const p = i.product_id ? byId.get(i.product_id) : undefined;
+    return p ? { ...i, hsn_code: p.hsn_code, gst_rate: Number(p.gst_rate) || 0 } : i;
+  });
+}
+
+const rs2 = (paise: number) => `Rs.${(paise / 100).toFixed(2)}`;
 
 interface InvoiceData {
   order_number: string;
@@ -65,11 +94,11 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     // ─── BENTO-STYLE METADATA DETAILS CARDS ──────────────────────────────────
     
     // Left Bento Card: Invoice Info
-    doc.strokeColor("#EADBC8").lineWidth(0.75).roundedRect(50, 125, 235, 92, 8).stroke();
-    doc.fillColor("#FFFDFB").roundedRect(50.37, 125.37, 234.25, 91.25, 8).fill();
+    doc.strokeColor("#EADBC8").lineWidth(0.75).roundedRect(50, 125, 235, 104, 8).stroke();
+    doc.fillColor("#FFFDFB").roundedRect(50.37, 125.37, 234.25, 103.25, 8).fill();
     
     doc.fillColor("#E89936");
-    doc.font("Helvetica-Bold").fontSize(7.5).text("INVOICE METADATA", 65, 138);
+    doc.font("Helvetica-Bold").fontSize(7.5).text("TAX INVOICE", 65, 138);
     
     doc.fillColor("#923D26");
     doc.font("Times-Bold").fontSize(11).text(data.order_number, 65, 151);
@@ -90,9 +119,15 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
       doc.font("Helvetica").fontSize(9.5).text(data.delivery_date, 165, 180);
     }
 
+    doc.fillColor("#5C4A3C");
+    doc.font("Helvetica-Bold").fontSize(8).text("GSTIN", 65, 198);
+    doc.font("Helvetica").fontSize(9.5).text(GSTIN, 140, 197);
+    doc.font("Helvetica-Bold").fontSize(8).text("PLACE OF SUPPLY", 65, 212);
+    doc.font("Helvetica").fontSize(9.5).text(PLACE_OF_SUPPLY, 140, 211);
+
     // Right Bento Card: Billing Info
-    doc.strokeColor("#EADBC8").lineWidth(0.75).roundedRect(300, 125, 245, 92, 8).stroke();
-    doc.fillColor("#FFFDFB").roundedRect(300.37, 125.37, 244.25, 91.25, 8).fill();
+    doc.strokeColor("#EADBC8").lineWidth(0.75).roundedRect(300, 125, 245, 104, 8).stroke();
+    doc.fillColor("#FFFDFB").roundedRect(300.37, 125.37, 244.25, 103.25, 8).fill();
     
     doc.fillColor("#E89936");
     doc.font("Helvetica-Bold").fontSize(7.5).text("BILL TO CUSTOMER", 315, 138);
@@ -115,7 +150,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     }
 
     // ─── LEDGER PRODUCT TABLE ────────────────────────────────────────────────
-    const tableTop = 240;
+    const tableTop = 250;
     
     // Header Row Container
     doc.fillColor("#923D26").rect(50, tableTop, 495, 26).fill();
@@ -125,8 +160,10 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     doc.font("Helvetica-Bold").fontSize(8.5);
     doc.text("NO.", 65, tableTop + 9);
     doc.text("ITEM DESCRIPTION", 90, tableTop + 9);
-    doc.text("QTY", 330, tableTop + 9, { width: 30, align: "center" });
-    doc.text("UNIT PRICE", 370, tableTop + 9, { width: 80, align: "right" });
+    doc.text("HSN", 265, tableTop + 9, { width: 45, align: "center" });
+    doc.text("GST", 312, tableTop + 9, { width: 36, align: "center" });
+    doc.text("QTY", 350, tableTop + 9, { width: 30, align: "center" });
+    doc.text("UNIT PRICE", 382, tableTop + 9, { width: 75, align: "right" });
     doc.text("TOTAL", 465, tableTop + 9, { width: 80, align: "right" });
     
     let y = tableTop + 36;
@@ -144,13 +181,15 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
       
       // Product Name
       doc.fillColor("#923D26");
-      doc.font("Times-Bold").fontSize(10.5).text(item.product_name, 90, y + 3);
+      doc.font("Times-Bold").fontSize(10.5).text(item.product_name, 90, y + 3, { width: 170, height: 14, ellipsis: true });
       
       // Numbers
       doc.fillColor("#5C4A3C");
       doc.font("Helvetica").fontSize(9.5);
-      doc.text(String(item.quantity), 330, y + 3, { width: 30, align: "center" });
-      doc.text(`Rs.${(item.unit_price_paise / 100).toFixed(0)}`, 370, y + 3, { width: 80, align: "right" });
+      doc.text(item.hsn_code || "-", 265, y + 3, { width: 45, align: "center" });
+      doc.text(`${Number(item.gst_rate) || 0}%`, 312, y + 3, { width: 36, align: "center" });
+      doc.text(String(item.quantity), 350, y + 3, { width: 30, align: "center" });
+      doc.text(`Rs.${(item.unit_price_paise / 100).toFixed(0)}`, 382, y + 3, { width: 75, align: "right" });
       
       doc.fillColor("#923D26");
       doc.font("Helvetica-Bold").fontSize(10).text(`Rs.${(lineTotal / 100).toFixed(0)}`, 465, y + 3, { width: 80, align: "right" });
@@ -175,6 +214,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     const hasLoyaltyDiscount = !!data.discount_percent && data.discount_percent > 0;
     const hasCoupon = couponDiscountPaise > 0;
     const loyaltyDiscountPaise = Math.max(0, subtotal - goodsTotal - couponDiscountPaise);
+    const sectionTop = y;
 
     if (hasLoyaltyDiscount || hasCoupon) {
       doc.fillColor("#5C4A3C");
@@ -229,6 +269,67 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
       { width: 200, align: "right" }
     );
 
+    // ─── GST SUMMARY (left column, beside totals) ────────────────────────────
+    // Prices are GST-inclusive. Spread loyalty + coupon discounts across lines pro rata,
+    // tax shipping at the highest item rate (it's part of the same composite supply),
+    // then back the tax out of each rate bucket.
+    const totalDiscount = Math.max(0, subtotal - goodsTotal);
+    const byRate = new Map<number, number>();
+    for (const item of data.items) {
+      const gross = item.quantity * item.unit_price_paise;
+      const net = subtotal > 0 ? gross - (totalDiscount * gross) / subtotal : 0;
+      const rate = Number(item.gst_rate) || 0;
+      byRate.set(rate, (byRate.get(rate) || 0) + net);
+    }
+    if (shippingFeePaise > 0) {
+      const shipRate = Math.max(0, ...data.items.map(i => Number(i.gst_rate) || 0));
+      byRate.set(shipRate, (byRate.get(shipRate) || 0) + shippingFeePaise);
+    }
+    // Round each bucket, then push any leftover paisa onto the largest so the summary adds up to the grand total
+    const buckets = [...byRate.entries()].map(([rate, amount]) => ({ rate, inclusive: Math.round(amount) }));
+    const residue = data.total_paise - buckets.reduce((s, b) => s + b.inclusive, 0);
+    if (buckets.length > 0 && Math.abs(residue) <= buckets.length) {
+      buckets.reduce((max, b) => (b.inclusive > max.inclusive ? b : max)).inclusive += residue;
+    }
+    const taxRows = buckets.sort((a, b) => a.rate - b.rate).map(({ rate, inclusive }) => {
+      const taxable = Math.round((inclusive * 100) / (100 + rate));
+      const tax = inclusive - taxable;
+      const cgst = Math.round(tax / 2);
+      return { rate, taxable, cgst, sgst: tax - cgst };
+    });
+
+    const sumX = 50, sumW = 260;
+    const cols = [
+      { label: "GST RATE", x: sumX + 8, w: 62, align: "left" as const },
+      { label: "TAXABLE", x: sumX + 70, w: 64, align: "right" as const },
+      { label: "CGST", x: sumX + 134, w: 58, align: "right" as const },
+      { label: "SGST", x: sumX + 192, w: 60, align: "right" as const },
+    ];
+    let ty = sectionTop;
+    doc.fillColor("#E89936").font("Helvetica-Bold").fontSize(7.5).text("GST SUMMARY", sumX, ty);
+    ty += 13;
+    doc.fillColor("#FCF8F2").roundedRect(sumX, ty - 3, sumW, 15, 3).fill();
+    doc.fillColor("#923D26").font("Helvetica-Bold").fontSize(7);
+    for (const c of cols) doc.text(c.label, c.x, ty + 1, { width: c.w, align: c.align });
+    ty += 16;
+    const drawTaxRow = (cells: string[], bold: boolean) => {
+      doc.fillColor(bold ? "#923D26" : "#5C4A3C").font(bold ? "Helvetica-Bold" : "Helvetica").fontSize(8);
+      cells.forEach((v, i) => doc.text(v, cols[i].x, ty, { width: cols[i].w, align: cols[i].align }));
+      ty += 13;
+    };
+    for (const t of taxRows) {
+      drawTaxRow([`${t.rate}%`, rs2(t.taxable), rs2(t.cgst), rs2(t.sgst)], false);
+    }
+    doc.strokeColor("#EADBC8").lineWidth(0.5).moveTo(sumX, ty - 2).lineTo(sumX + sumW, ty - 2).stroke();
+    ty += 2;
+    drawTaxRow([
+      "Total",
+      rs2(taxRows.reduce((s, t) => s + t.taxable, 0)),
+      rs2(taxRows.reduce((s, t) => s + t.cgst, 0)),
+      rs2(taxRows.reduce((s, t) => s + t.sgst, 0)),
+    ], true);
+    doc.fillColor("#8C7665").font("Helvetica-Oblique").fontSize(7).text("All prices are inclusive of GST.", sumX, ty + 2);
+
     // ─── ARTISAN STORAGE & CARE INSTRUCTIONS BENTO ───────────────────────────
     const careTop = 635;
     doc.strokeColor("#EADBC8").lineWidth(0.75).roundedRect(50, careTop, 495, 80, 8).stroke();
@@ -268,7 +369,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     
     doc.fillColor("#923D26");
     doc.font("Helvetica-Bold").fontSize(7.5).text(
-      "WILD WILD YEAST · SOURDOUGH & NATURAL FERMENTS",
+      `WILD WILD YEAST · SOURDOUGH & NATURAL FERMENTS · GSTIN ${GSTIN}`,
       50,
       footerY + 16,
       { align: "center", width: 495 }

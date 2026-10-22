@@ -136,3 +136,7 @@ ALTER TABLE products ADD COLUMN IF NOT EXISTS image_url TEXT;
 -- dashboard (Storage → New bucket → Public), same as the existing "invoices"
 -- bucket. The OMS upload route uses the service-role key server-side, so no
 -- extra storage policy is required.
+
+-- ─── GST tax invoice: per-product HSN code + GST rate (prices are GST-inclusive) ───
+ALTER TABLE products ADD COLUMN IF NOT EXISTS hsn_code TEXT;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS gst_rate NUMERIC(5,2) NOT NULL DEFAULT 0;

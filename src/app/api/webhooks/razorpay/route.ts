@@ -3,7 +3,8 @@ import { createServerSupabase } from "@/lib/supabase-server";
 import { verifyWebhookSignature } from "@/lib/razorpay";
 import { sendPaymentConfirmedToCustomer, sendOwnerNotification, sendNewOrderToBaker } from "@/lib/email";
 import { createAdminNotification, createBakerNotification } from "@/lib/notifications";
-import { generateInvoicePDF } from "@/lib/invoice";
+import { deriveLoyaltyDiscount } from "@/lib/coupons";
+import { generateInvoicePDF, withTaxInfo } from "@/lib/invoice";
 
 export async function POST(req: NextRequest) {
   const rawBody = await req.text();
@@ -85,9 +86,9 @@ export async function POST(req: NextRequest) {
   const itemsSubtotal = (order.order_items || []).reduce(
     (s: number, i: { quantity: number; unit_price_paise: number }) => s + i.quantity * i.unit_price_paise, 0
   );
-  const discountPercent = itemsSubtotal > order.total_paise
-    ? Math.round((1 - order.total_paise / itemsSubtotal) * 100)
-    : 0;
+  const shippingFeePaise = order.shipping_fee_paise || 0;
+  const couponDiscountPaise = order.coupon_discount_paise || 0;
+  const { discountPercent } = deriveLoyaltyDiscount(itemsSubtotal, order.total_paise, shippingFeePaise, couponDiscountPaise);
 
   let invoiceUrl: string | undefined;
   try {
@@ -97,8 +98,11 @@ export async function POST(req: NextRequest) {
       flat_number: order.flat_number,
       address: customer?.address,
       phone: customer?.phone,
-      items: order.order_items || [],
+      items: await withTaxInfo(supabase, order.order_items || []),
       total_paise: order.total_paise,
+      shipping_fee_paise: shippingFeePaise,
+      coupon_code: order.coupon_code,
+      coupon_discount_paise: couponDiscountPaise,
       discount_percent: discountPercent,
       delivery_date: order.delivery_date,
       created_at: order.created_at,
