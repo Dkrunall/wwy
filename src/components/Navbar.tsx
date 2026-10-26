@@ -6,13 +6,13 @@ import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { Search, User, ShoppingBag, X } from "lucide-react";
 import AnnouncementBar from "./AnnouncementBar";
-import { WHATSAPP_CONTACT_URL } from "@/lib/contact";
 import { supabase } from "@/lib/supabase";
 
 const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
-  { label: "Shop", href: "/order" },
+  { label: "Shop", href: "/shop" },
+  { label: "Gifting", href: "/gifting" },
   { label: "Our Story", href: "/story" },
-  { label: "Contact", href: WHATSAPP_CONTACT_URL, external: true },
+  { label: "Contact", href: "/contact" },
 ];
 
 function getCartCount(): number {

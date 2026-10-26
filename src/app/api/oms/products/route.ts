@@ -28,6 +28,14 @@ type ProductFields = {
   image_url: string | null;
   hsn_code: string | null;
   gst_rate: number;
+  ingredients: string | null;
+  allergens: string | null;
+  net_quantity: string | null;
+  best_before: string | null;
+  storage: string | null;
+  manufacturer_name: string | null;
+  manufacturer_address: string | null;
+  manufacturer_fssai: string | null;
 };
 
 function parseProduct(body: Record<string, unknown>): ProductFields | string {
@@ -49,6 +57,14 @@ function parseProduct(body: Record<string, unknown>): ProductFields | string {
     image_url: optional(body.image_url),
     hsn_code: optional(body.hsn_code),
     gst_rate,
+    ingredients: optional(body.ingredients),
+    allergens: optional(body.allergens),
+    net_quantity: optional(body.net_quantity),
+    best_before: optional(body.best_before),
+    storage: optional(body.storage),
+    manufacturer_name: optional(body.manufacturer_name),
+    manufacturer_address: optional(body.manufacturer_address),
+    manufacturer_fssai: optional(body.manufacturer_fssai),
   };
 }
 

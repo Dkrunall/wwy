@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { WHATSAPP_CONTACT_URL } from "@/lib/contact";
+import { BUSINESS, businessValue } from "@/lib/business";
 
 export default function Footer() {
   return (
@@ -26,7 +26,7 @@ export default function Footer() {
               Wild by nature. Crafted by time.
             </p>
             <p className="text-brand-oat/25 font-bold text-[10px] sm:text-xs max-w-xs italic">
-              WWY food is made with time, not shortcuts.
+              WWY food is made slowly, and only to order.
             </p>
           </div>
 
@@ -34,17 +34,42 @@ export default function Footer() {
           <div className="flex gap-10 sm:gap-16 text-xs sm:text-sm font-black tracking-[0.2em] uppercase text-brand-oat/60">
             <div className="flex flex-col gap-4 sm:gap-6">
               <span className="text-brand-orange mb-1">Shop</span>
-              <Link href="/order" className="hover:text-white transition-colors">All Products</Link>
+              <Link href="/shop" className="hover:text-white transition-colors">All Products</Link>
+              <Link href="/gifting" className="hover:text-white transition-colors">Gifting</Link>
               <Link href="/order?category=Crafted%20Bakes" className="hover:text-white transition-colors">Crafted Bakes</Link>
               <Link href="/order?category=Be-Sides" className="hover:text-white transition-colors">Be-Sides</Link>
             </div>
             <div className="flex flex-col gap-4 sm:gap-6">
               <span className="text-brand-orange mb-1">Company</span>
               <Link href="/story" className="hover:text-white transition-colors">Our Story</Link>
-              <Link href={WHATSAPP_CONTACT_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Contact</Link>
+              <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
+              <Link href="/delivery" className="hover:text-white transition-colors">Delivery</Link>
+              <Link href="/refund" className="hover:text-white transition-colors">Refunds</Link>
             </div>
           </div>
 
+        </div>
+
+        {/* Legal identity (Consumer Protection (E-Commerce) Rules 2020) */}
+        <div className="w-full max-w-6xl border-t border-white/10 pt-8 mb-8 sm:mb-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-[11px] sm:text-xs font-bold text-brand-oat/45 leading-relaxed normal-case tracking-normal">
+          <div>
+            <p className="text-brand-oat/70 font-black uppercase tracking-[0.18em] text-[10px] mb-2">{BUSINESS.legalName}</p>
+            <p>Registered office: {businessValue(BUSINESS.registeredAddress)}</p>
+            <p>LLPIN: {businessValue(BUSINESS.llpin)}</p>
+            <p>GSTIN: {businessValue(BUSINESS.gstin)}</p>
+            <p>FSSAI Lic. No.: {businessValue(BUSINESS.fssai)}</p>
+          </div>
+          <div>
+            <p className="text-brand-oat/70 font-black uppercase tracking-[0.18em] text-[10px] mb-2">Customer care</p>
+            <p>Email: {businessValue(BUSINESS.careEmail)}</p>
+            <p>Phone: {BUSINESS.carePhone}</p>
+          </div>
+          <div>
+            <p className="text-brand-oat/70 font-black uppercase tracking-[0.18em] text-[10px] mb-2">Grievance officer</p>
+            <p>{businessValue(BUSINESS.grievanceOfficer.name)}</p>
+            <p>Email: {businessValue(BUSINESS.grievanceOfficer.email)}</p>
+            <p>Phone: {businessValue(BUSINESS.grievanceOfficer.phone)}</p>
+          </div>
         </div>
 
         {/* Bottom Legal */}
@@ -64,8 +89,8 @@ export default function Footer() {
             <span className="opacity-50">© 2026 WILD WILD YEAST. All Rights Reserved.</span>
           </div>
           <div className="flex gap-6 sm:gap-8">
-            <Link href="#" className="hover:text-brand-orange transition-colors">Privacy</Link>
-            <Link href="#" className="hover:text-brand-orange transition-colors">Terms</Link>
+            <Link href="/privacy" className="hover:text-brand-orange transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-brand-orange transition-colors">Terms</Link>
           </div>
         </div>
       </div>

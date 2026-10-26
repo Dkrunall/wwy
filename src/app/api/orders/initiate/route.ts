@@ -5,6 +5,7 @@ import { applyDiscounts } from "@/lib/discounts";
 import { calculateShippingFee } from "@/lib/shipping";
 import { resolveCoupon, redeemCoupon } from "@/lib/couponResolve";
 import { calculateDeliveryDate, deliveryDateISO, formatDeliveryDate, isValidDeliveryDate, parseDeliveryDays } from "@/lib/dateUtils";
+import { DEFAULT_CUTOFF_HOUR_IST, DEFAULT_DELIVERY_DAYS } from "@/lib/schedule";
 import { CartItem } from "@/lib/supabase";
 import { isPincodeServiceable } from "@/lib/baker";
 
@@ -43,8 +44,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "We are on a short break. Back soon! 🌾" }, { status: 503 });
     }
 
-    const deliveryDays = settingsMap.delivery_days ? parseDeliveryDays(settingsMap.delivery_days) : [3, 6];
-    const cutoffHour = settingsMap.cutoff_hour_ist ? parseInt(settingsMap.cutoff_hour_ist, 10) : 12;
+    const deliveryDays = settingsMap.delivery_days ? parseDeliveryDays(settingsMap.delivery_days) : DEFAULT_DELIVERY_DAYS;
+    const cutoffHour = settingsMap.cutoff_hour_ist ? parseInt(settingsMap.cutoff_hour_ist, 10) : DEFAULT_CUTOFF_HOUR_IST;
 
     // Resolve customer server-side by flat number — don't trust localStorage UUID
     const { data: customer } = await supabase

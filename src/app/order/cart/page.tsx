@@ -203,7 +203,7 @@ export default function CartPage() {
   const handlePay = async () => {
     if (cart.length === 0) return;
     if (!customerId) {
-      setError("Session error — please sign out and sign in again.");
+      setError("Session error, please sign out and sign in again.");
       return;
     }
     setError("");
@@ -282,7 +282,7 @@ export default function CartPage() {
         },
         modal: {
           ondismiss: () => {
-            setError("Payment cancelled. Your order is saved — you can retry.");
+            setError("Payment cancelled. Your order is saved, you can retry.");
             setLoading(false);
           },
         },
@@ -307,7 +307,7 @@ export default function CartPage() {
           <div>
             <h2 className="font-serif text-2xl font-bold text-brand-brown">Your Cart is Empty</h2>
             <p className="text-xs sm:text-sm font-medium text-brand-brown/60 mt-1">
-              Add fresh sourdoughs or live ginger sodas to set your bake in motion.
+              Add sourdough or ginger ale to set your bake in motion.
             </p>
           </div>
           <button

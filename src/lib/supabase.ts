@@ -26,6 +26,14 @@ export type Product = {
   available: boolean;
   image_url: string | null;
   created_at: string;
+  ingredients?: string | null;
+  allergens?: string | null;
+  net_quantity?: string | null;
+  best_before?: string | null;
+  storage?: string | null;
+  manufacturer_name?: string | null;
+  manufacturer_address?: string | null;
+  manufacturer_fssai?: string | null;
 };
 
 export type Customer = {

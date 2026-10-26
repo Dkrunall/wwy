@@ -87,7 +87,7 @@ export default function ProductSection() {
           </div>
           <div className="flex flex-col items-center lg:items-end gap-4 lg:pb-2 max-w-xs lg:max-w-sm lg:ml-auto">
             <p className="text-sm sm:text-base md:text-lg font-bold text-brand-brown/60 leading-relaxed text-center lg:text-right">
-              Small-batch ferments made when you order — never before. Slow time, honest ingredients.
+              Small-batch ferments made when you order, never before. Slow time, honest ingredients.
             </p>
             <Link
               href="/shop"

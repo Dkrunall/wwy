@@ -1,3 +1,4 @@
+-- Run supabase-plan-migration.sql first (adds the hsn_code / gst_rate columns that STEP 1 reads).
 -- P0-1: set real MRPs on the products table.
 -- Run in Supabase SQL Editor (Dashboard -> SQL Editor).
 -- price_paise = MRP in rupees x 100, MRP inclusive of all taxes (e.g. Rs 350 -> 35000).
@@ -7,26 +8,26 @@ select id, name, category, price_paise, available, hsn_code, gst_rate
 from products
 order by category, name;
 
--- STEP 2: fill in the MRP (in RUPEES) for each product below, using the exact
--- names from step 1, then run from "begin;" to "commit;".
--- It aborts without changing anything if a price is left null, a name does not
--- match, or a product from step 1 is missing from the list.
+-- STEP 2: the 11 live products are listed below. Replace each null with the MRP in RUPEES
+-- (for example 350), then run from "begin;" to "commit;".
+-- It aborts without changing anything if a price is left null or a name does not match.
+-- Products not listed (for example the old unavailable Sodas, Starters and Bundles) keep their price.
 begin;
 
 create temp table new_prices (name text primary key, mrp_rupees numeric) on commit drop;
 
 insert into new_prices (name, mrp_rupees) values
-  ('PRODUCT NAME 1',  null),
-  ('PRODUCT NAME 2',  null),
-  ('PRODUCT NAME 3',  null),
-  ('PRODUCT NAME 4',  null),
-  ('PRODUCT NAME 5',  null),
-  ('PRODUCT NAME 6',  null),
-  ('PRODUCT NAME 7',  null),
-  ('PRODUCT NAME 8',  null),
-  ('PRODUCT NAME 9',  null),
-  ('PRODUCT NAME 10', null),
-  ('PRODUCT NAME 11', null);
+  ('Biscotti', null),
+  ('Cookies', null),
+  ('Crackers', null),
+  ('Croissant', null),
+  ('Macaroons', null),
+  ('Savoury Sourdough', null),
+  ('Sourdough Buns', null),
+  ('Sourdough Classic Heritage', null),
+  ('Sourdough Laadi Pav', null),
+  ('Sourdough Pita Bread', null),
+  ('Sweet Sourdough', null);
 
 do $$
 begin
@@ -36,10 +37,6 @@ begin
   if exists (select 1 from new_prices n where not exists (select 1 from products p where p.name = n.name)) then
     raise exception 'A name in new_prices does not match any product: %',
       (select string_agg(n.name, ', ') from new_prices n where not exists (select 1 from products p where p.name = n.name));
-  end if;
-  if exists (select 1 from products p where not exists (select 1 from new_prices n where n.name = p.name)) then
-    raise exception 'Products missing from new_prices: %',
-      (select string_agg(p.name, ', ') from products p where not exists (select 1 from new_prices n where n.name = p.name));
   end if;
 end $$;
 

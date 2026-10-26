@@ -16,7 +16,7 @@ const timeline = [
   {
     year: "2019",
     title: "The First Culture",
-    body: "It started with a single jar of flour and water left on a windowsill in Bandra. Three days later, something was alive inside it.",
+    body: "It started with a single jar of flour and water left on a windowsill in Bandra. Three days later, it was bubbling.",
   },
   {
     year: "2021",
@@ -38,15 +38,15 @@ const timeline = [
 const howWeThink = [
   {
     label: "Time is the ingredient",
-    body: "Not speed, not shortcuts. Dough that needs resting. Flavours that change quietly. Drinks that continue to live after they leave us.",
+    body: "Not speed, not shortcuts. Dough that needs resting. Flavours that change quietly. Bakes made close to the day they reach you.",
   },
   {
     label: "Honesty over claims",
-    body: "Some days the loaf is different. Some days the bubbles are louder. That's not inconsistency — that's life.",
+    body: "Some days the loaf is different. Some days the bubbles are louder. Wild fermentation moves with the weather.",
   },
   {
     label: "Made for someone",
-    body: "Every loaf and every bottle is made with a recipient in mind. Not mass-produced. Not sitting idle. Not waiting to be sold.",
+    body: "Every loaf is made against an order with a name on it.",
   },
 ];
  
@@ -84,7 +84,7 @@ export default function StoryPage() {
         <div className="absolute inset-0 z-0">
           <Image
             src="/f1.png"
-            alt="Wheat Field Sunset"
+            alt="Wheat field at sunset, the grain behind our flour"
             fill
             className="object-cover opacity-[0.22] mix-blend-luminosity"
             priority
@@ -106,7 +106,7 @@ export default function StoryPage() {
             <span className="text-brand-gold italic font-light">Crafted by time.</span>
           </h1>
           <p className="story-hero-text text-base sm:text-lg md:text-xl font-bold text-brand-oat/60 max-w-xl leading-relaxed">
-            A fermentation studio built on waiting. Nothing made in advance. Everything alive when it reaches you.
+            A fermentation studio built on waiting. Nothing made in advance. Everything baked for your delivery day.
           </p>
         </div>
       </section>
@@ -122,16 +122,16 @@ export default function StoryPage() {
             </span>
             <h2 className="font-serif font-normal text-brand-brown leading-[1.1] tracking-tight mb-6"
               style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}>
-              What is in <br />
+              What&apos;s on <br />
               <span className="italic text-brand-orange">your plate.</span>
             </h2>
             <p className="text-sm font-bold text-brand-brown/40 uppercase tracking-widest leading-relaxed mb-6">
-              Wild Wild Yeast started in a home kitchen out of a pure obsession with the ancient alchemy of wild cultures.
+              Wild Wild Yeast started in a home kitchen out of an obsession with the ancient craft of wild cultures.
             </p>
             
             {/* Tag pills */}
             <div className="flex flex-wrap gap-2 mt-4">
-              {["Wild, but credible", "Craft, but approachable", "Premium, but not stiff", "Veg only"].map(tag => (
+              {["Veg only"].map(tag => (
                 <span key={tag} className="px-4.5 py-2 rounded-full border border-brand-brown/10 text-[9px] font-black tracking-[0.12em] uppercase text-brand-brown/40 bg-white/40">
                   {tag}
                 </span>
@@ -141,10 +141,10 @@ export default function StoryPage() {
  
           {/* Right Column: Detailed Narrative */}
           <div className="w-full lg:w-7/12 flex flex-col gap-6 text-sm sm:text-base font-medium text-brand-brown/70 leading-relaxed lg:border-l lg:border-brand-brown/10 lg:pl-16">
-            <p>The beauty of sourdough starts with a wild yeast. Don’t worry, it’s not a bad thing—in fact, wild yeast is present on nearly everything we see and touch, including your own hands.</p>
-            <p>When combined with water, flour, and <strong>TIME</strong>, you are left with nature’s very own yeast pack: a wild yeast starter. This starter is fed daily to keep it alive and active. There is nothing artificial in this process and there are no shortcuts—no commercial yeast is ever added.</p>
+            <p>The beauty of sourdough starts with a wild yeast. Wild yeast lives on nearly everything we touch, including your hands.</p>
+            <p>When combined with water, flour, and <strong>TIME</strong>, you are left with nature’s very own yeast pack: a wild yeast starter. This starter is fed daily to keep it active. There are no shortcuts in this process, and no commercial yeast is ever added.</p>
             <p>From there, it’s a slow process. A 12–24 hour fermentation ensures that time does the work. Time is the actual catalyst: it builds the crumb structure you see when the loaf is cut and shapes the crust.</p>
-            <p>Our focus is freshness, which is why we bake and brew only against a confirmed order. Nothing sits waiting, and no batch is made using stock production models. What is ordered at the cutoff is what goes into the oven or the ferment tank. Nothing ships until it is actually ready.</p>
+            <p>Our focus is freshness, which is why we bake only against a confirmed order. Nothing sits waiting, and no batch is made for stock. What is ordered by the cutoff is what goes into the oven. Nothing ships until it is ready.</p>
             <p className="text-brand-brown font-serif italic text-lg sm:text-xl mt-4">Wild by nature. Crafted by time.</p>
           </div>
           
@@ -154,7 +154,7 @@ export default function StoryPage() {
         <div className="flex gap-4 sm:gap-6 h-[45vw] sm:h-[350px] md:h-[420px] mt-16 max-w-5xl mx-auto px-2">
           <div className="w-1/2 rounded-[2rem] overflow-hidden shadow-xl border border-brand-brown/5">
             <div className="relative w-full h-full">
-              <Image src="/product_img/1-starter-top.jpg" alt="The wild starter, alive and bubbling" fill className="object-cover hover:scale-105 transition-transform duration-700" />
+              <Image src="/product_img/1-starter-top.jpg" alt="Our wild yeast starter in a jar, bubbling" fill className="object-cover hover:scale-105 transition-transform duration-700" />
             </div>
           </div>
           <div className="w-1/2 rounded-[2rem] overflow-hidden shadow-xl border border-brand-brown/5 mt-6 sm:mt-10">
@@ -215,10 +215,10 @@ export default function StoryPage() {
           </h2>
           <div className="max-w-2xl mx-auto text-center flex flex-col gap-4 mb-16">
             <p className="text-sm sm:text-base font-bold text-brand-brown/60 leading-relaxed">
-              At Wild Wild Yeast, fermentation isn&apos;t a feature. It&apos;s the organising principle. Everything we make uses time, microbes, and natural transformation — not preservatives, additives, stabilisers, or chemical shortcuts.
+              Fermentation sets the pace for everything we make. Time and wild cultures do the work.
             </p>
             <p className="text-sm sm:text-base font-bold text-brand-brown/60 leading-relaxed">
-              Because fermented food is alive, it cannot be treated like inventory. We produce only against orders. High-quality ingredients are not a choice. They are the only way this system works.
+              Fermented food cannot be treated like inventory. We produce only against orders, and good ingredients are the only way this system works.
             </p>
           </div>
           <div className="think-container grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -246,7 +246,7 @@ export default function StoryPage() {
             <span className="italic font-light">in motion.</span>
           </h2>
           <p className="text-white/80 font-bold text-sm sm:text-base max-w-md mx-auto mb-10 leading-relaxed">
-            Every provision is made to order. Slow-fermented. Nothing added that doesn't belong.
+            Every provision is made to order and slow-fermented, with nothing added that doesn't belong.
           </p>
           <Link href="/shop"
             className="inline-block bg-white text-brand-orange hover:bg-brand-brown hover:text-white px-12 py-5 rounded-full font-black text-xs tracking-[0.2em] uppercase shadow-xl transition-all duration-300 active:scale-95">

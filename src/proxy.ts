@@ -52,6 +52,12 @@ export async function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // The homepage URL is served the holding page with a rewrite, not a redirect, so it returns 200
+  // and search engines index "/" rather than "/coming-soon" (P4-5).
+  if (pathname === "/") {
+    return NextResponse.rewrite(new URL("/coming-soon", req.url));
+  }
+
   // Everyone else → coming soon (skip the coming-soon page itself)
   if (pathname !== "/coming-soon") {
     return NextResponse.redirect(new URL("/coming-soon", req.url));
@@ -60,6 +66,8 @@ export async function proxy(req: NextRequest) {
   return NextResponse.next();
 }
 
+// robots.txt, sitemap.xml, favicon, /_next and /api are never gated or rewritten (P4-4).
+// API routes do their own auth; the payment page exception above only matters for page routes.
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:png|jpg|jpeg|svg|webp|gif|woff2?|ttf|otf|mp4|ico)$).*)"],
+  matcher: ["/((?!api/|_next/|robots\\.txt|sitemap\\.xml|favicon\\.ico|.*\\.(?:png|jpg|jpeg|svg|webp|gif|woff2?|ttf|otf|mp4|ico)$).*)"],
 };

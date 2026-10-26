@@ -62,7 +62,7 @@ export default function Hero() {
       
       {/* Massive Background Text watermark */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full text-center pointer-events-none z-0 opacity-[0.03] select-none">
-        <h1 className="font-serif font-black tracking-tighter whitespace-nowrap" style={{ fontSize: "clamp(10rem, 25vw, 30rem)", lineHeight: 0.8 }}>WILD<br/>FERMENT</h1>
+        <h1 className="font-serif font-black tracking-tighter whitespace-nowrap" style={{ fontSize: "clamp(10rem, 25vw, 30rem)", lineHeight: 0.8 }}>WILD<br/>YEAST</h1>
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-12 relative z-10 flex flex-col lg:flex-row items-center gap-8 sm:gap-12 lg:gap-8 w-full">
@@ -81,7 +81,7 @@ export default function Hero() {
           </h1>
 
           <p className="hero-text text-sm sm:text-base md:text-xl font-bold text-brand-brown/70 max-w-sm sm:max-w-md mb-6 sm:mb-10">
-            Bake-to-order sourdough. Brew-to-order ferments. Mumbai only.
+            Bake-to-order sourdough. Mumbai only.
           </p>
 
           <div className="hero-text flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
@@ -92,9 +92,9 @@ export default function Hero() {
               <WhatsAppIcon size={14} />
               Order here
             </Link>
-            <button className="w-full sm:w-auto bg-white text-brand-brown hover:bg-brand-oat px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-sm border border-brand-brown/5 active:scale-95">
+            <Link href="/story#how-it-works" className="w-full sm:w-auto inline-flex items-center justify-center bg-white text-brand-brown hover:bg-brand-oat px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-sm border border-brand-brown/5 active:scale-95">
               How It Works
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -108,15 +108,15 @@ export default function Hero() {
 
             {/* Decorative floating badge */}
             <div className="absolute -bottom-5 sm:-bottom-6 -left-5 sm:-left-6 bg-brand-gold text-brand-brown w-20 sm:w-24 h-20 sm:h-24 rounded-full flex flex-col justify-center items-center -rotate-12 shadow-lg border-2 border-brand-oat z-30">
-              <span className="font-black text-xl sm:text-2xl leading-none">100%</span>
-              <span className="text-[7px] sm:text-[8px] font-bold uppercase tracking-widest">Natural</span>
+              <span className="font-black text-base sm:text-lg leading-none text-center">12–24 hrs</span>
+              <span className="text-[7px] sm:text-[8px] font-bold uppercase tracking-widest">Fermentation</span>
             </div>
           </div>
 
           {/* Accent floating element — visible on more screens, more vibrant */}
           <div className="hero-card hidden sm:block absolute top-[5%] -left-[10%] md:right-[85%] w-28 sm:w-32 lg:w-48 h-28 sm:h-32 lg:h-48 rounded-[2rem] bg-white p-2 sm:p-3 shadow-[0_30px_60px_rgba(0,0,0,0.15)] rotate-[-15deg] z-10 hover:scale-110 hover:rotate-0 transition-transform duration-500 cursor-pointer">
             <div className="relative w-full h-full rounded-[1.5rem] overflow-hidden shadow-[inset_0_10px_30px_rgba(0,0,0,0.08)]">
-              <Image src="/p3.png" alt="Can" fill className="object-cover" />
+              <Image src="/product_img/5-crumb.jpg" alt="A sourdough loaf cut in half to show its open crumb" fill className="object-cover" />
             </div>
           </div>
         </div>

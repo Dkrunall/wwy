@@ -145,8 +145,8 @@ export default function ComingSoonPage() {
               maxWidth: "360px",
             }}
           >
-            A studio for slow-made bread<br />
-            and naturally fermented drinks.
+            A studio for slow-made bread,<br />
+            baked to order in Mumbai.
           </p>
 
           {/* Location */}
@@ -159,16 +159,6 @@ export default function ComingSoonPage() {
               Mumbai &nbsp;&middot;&nbsp; Online &nbsp;&middot;&nbsp; Bake-to-order
             </span>
             <div className="w-8 h-px" style={{ background: "rgba(232,153,54,0.3)" }} />
-          </div>
-
-          {/* Date */}
-          <div className="fade-up d5">
-            <span
-              className="font-sans text-[11px] tracking-[0.35em] uppercase"
-              style={{ color: "rgba(242,235,220,0.2)" }}
-            >
-              2026 / 01
-            </span>
           </div>
 
         </div>
