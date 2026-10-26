@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { sendDeliveryUpdateToCustomer } from "@/lib/email";
 import { createBorzoDelivery } from "@/lib/borzo";
+import { OMS_COOKIE, verifyOmsToken } from "@/lib/omsAuth";
 
 // Called manually from OMS or via Vercel Cron (add to vercel.json)
 // Processes delivery status transitions for today's orders.
@@ -16,7 +17,7 @@ async function isAuthorized(req: NextRequest): Promise<boolean> {
   if (secret && secret === process.env.CRON_SECRET) return true;
   // OMS session cookie
   const cookieStore = await cookies();
-  return cookieStore.get("oms_auth")?.value === "1";
+  return verifyOmsToken(cookieStore.get(OMS_COOKIE)?.value);
 }
 
 export async function GET(req: NextRequest) {

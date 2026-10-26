@@ -95,12 +95,8 @@ function OrderPageInner() {
 
     (async () => {
       try {
-        const { data: setting } = await supabase
-          .from("settings")
-          .select("value")
-          .eq("key", "vacation_mode")
-          .single();
-        if (setting?.value === "true") {
+        const vac = await fetch("/api/oms/vacation").then((r) => r.json()).catch(() => null);
+        if (vac?.vacation_mode === true) {
           router.replace("/coming-soon");
           return;
         }

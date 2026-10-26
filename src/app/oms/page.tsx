@@ -6,7 +6,7 @@ import React, { useEffect, useState, useCallback, useMemo, Suspense } from "reac
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { omsDb as supabase } from "@/lib/omsDb";
 import { fmt, fmtDate, D_LABELS, D_THEME, PAY_THEME } from "@/lib/orderDisplay";
 import OmsSidebar, { OMS_NAV, type OmsTab } from "@/components/OmsSidebar";
 import {
@@ -212,8 +212,17 @@ function OmsDashboardInner() {
       const bMatch = pincode && b.pincodes?.includes(pincode) ? 0 : 1;
       return aMatch - bMatch;
     });
+  // Product writes go through the admin API; the anon client has no write access.
+  const productsApi = async (method: "POST"|"PATCH"|"DELETE", body: object): Promise<{error?: string; product?: Product}> => {
+    try {
+      const res = await fetch("/api/oms/products",{method,headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+      const json = await res.json().catch(()=>({}));
+      return res.ok ? json : {error: json.error || `Request failed (${res.status})`};
+    } catch { return {error: "Network error"}; }
+  };
   const toggleAvailability = async (pid: string, cur: boolean) => {
-    await supabase.from("products").update({available:!cur}).eq("id",pid);
+    const {error} = await productsApi("PATCH",{id:pid,available:!cur});
+    if(error) return;
     setProducts(p=>p.map(x=>x.id===pid?{...x,available:!cur}:x));
   };
   const runCron = async () => {
@@ -306,19 +315,20 @@ function OmsDashboardInner() {
     setFormSaving(true);
     const payload = {name:productForm.name.trim(),category:productForm.category.trim(),description:productForm.description.trim()||null,price_paise,available:productForm.available,image_url:productForm.image_url.trim()||null,hsn_code:productForm.hsn_code.trim()||null,gst_rate};
     if(editingProduct) {
-      const {error} = await supabase.from("products").update(payload).eq("id",editingProduct.id);
-      if(error){setFormError("Save failed: "+error.message);setFormSaving(false);return;}
+      const {error} = await productsApi("PATCH",{id:editingProduct.id,...payload});
+      if(error){setFormError("Save failed: "+error);setFormSaving(false);return;}
       setProducts(p=>p.map(x=>x.id===editingProduct.id?{...x,...payload}:x));
     } else {
-      const {data,error} = await supabase.from("products").insert(payload).select().single();
-      if(error){setFormError("Save failed: "+error.message);setFormSaving(false);return;}
-      if(data) setProducts(p=>[...p,data]);
+      const {product,error} = await productsApi("POST",payload);
+      if(error){setFormError("Save failed: "+error);setFormSaving(false);return;}
+      if(product) setProducts(p=>[...p,product]);
     }
     setFormSaving(false); setModal(null);
   };
   const deleteProduct = async (id: string) => {
-    await supabase.from("products").delete().eq("id",id);
-    setProducts(p=>p.filter(x=>x.id!==id)); setDeleteConfirmId(null);
+    const {error} = await productsApi("DELETE",{id});
+    if(!error) setProducts(p=>p.filter(x=>x.id!==id));
+    setDeleteConfirmId(null);
   };
 
   // ── Category management ──
@@ -326,18 +336,18 @@ function OmsDashboardInner() {
     const newName = (categoryEdits[oldName] ?? oldName).trim();
     if (!newName || newName === oldName) return;
     setCategoryError(""); setCategorySaving(oldName);
-    const { error } = await supabase.from("products").update({ category: newName }).eq("category", oldName);
+    const { error } = await productsApi("PATCH", { category: oldName, newCategory: newName });
     setCategorySaving(null);
-    if (error) { setCategoryError("Rename failed: " + error.message); return; }
+    if (error) { setCategoryError("Rename failed: " + error); return; }
     setProducts(p => p.map(x => x.category === oldName ? { ...x, category: newName } : x));
     setCategoryEdits(e => { const n = { ...e }; delete n[oldName]; return n; });
     if (categoryFilter === oldName) setCategoryFilter(newName);
   };
   const deleteCategory = async (name: string) => {
     setCategoryError(""); setCategorySaving(name);
-    const { error } = await supabase.from("products").delete().eq("category", name);
+    const { error } = await productsApi("DELETE", { category: name });
     setCategorySaving(null);
-    if (error) { setCategoryError("Delete failed: " + error.message); return; }
+    if (error) { setCategoryError("Delete failed: " + error); return; }
     setProducts(p => p.filter(x => x.category !== name));
     setDeletingCategory(null);
     if (categoryFilter === name) setCategoryFilter("all");

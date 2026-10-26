@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerSupabase } from "@/lib/supabase-server";
+import { OMS_COOKIE, verifyOmsToken } from "@/lib/omsAuth";
 
 const MAX_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
-  if (cookieStore.get("oms_auth")?.value !== "1") {
+  if (!(await verifyOmsToken(cookieStore.get(OMS_COOKIE)?.value))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

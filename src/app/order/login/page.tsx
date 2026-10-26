@@ -74,13 +74,9 @@ export default function OrderLoginPage() {
         });
         // Check serviceability against active bakers
         setPincodeServiceable("checking");
-        const { data: bakers } = await supabase
-          .from("bakers")
-          .select("pincodes")
-          .eq("is_active", true);
+        const svc = await fetch(`/api/pincode/serviceable?code=${pincode}`).then((r) => r.json()).catch(() => null);
         if (cancelled) return;
-        const serviceable = (bakers || []).flatMap((b: { pincodes?: string[] }) => b.pincodes || []);
-        setPincodeServiceable(serviceable.length > 0 && !serviceable.includes(pincode) ? "blocked" : "ok");
+        setPincodeServiceable(svc?.serviceable === false ? "blocked" : "ok");
       })
       .catch(() => { if (!cancelled) { setPincodeLookup("notfound"); setPincodeServiceable("blocked"); } });
     return () => { cancelled = true; };
@@ -144,12 +140,8 @@ export default function OrderLoginPage() {
 
     // Validate pincode against serviceable bakers
     setError(""); setLoading(true);
-    const { data: bakers } = await supabase
-      .from("bakers")
-      .select("pincodes")
-      .eq("is_active", true);
-    const serviceable = (bakers || []).flatMap((b) => b.pincodes || []);
-    if (serviceable.length > 0 && !serviceable.includes(pincode.trim())) {
+    const svc = await fetch(`/api/pincode/serviceable?code=${pincode.trim()}`).then((r) => r.json()).catch(() => null);
+    if (svc?.serviceable === false) {
       setError("Sorry, we don't deliver to this pincode yet. We're expanding soon!");
       setLoading(false);
       return;

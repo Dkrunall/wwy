@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
+import { OMS_COOKIE, createSignedToken, verifyOmsToken, verifySignedToken } from "@/lib/omsAuth";
 
-const DEV_KEY = process.env.DEV_PREVIEW_KEY ?? "wwy2026";
+// No fallback key: if DEV_PREVIEW_KEY is unset, nobody can unlock the preview.
+const DEV_KEY = process.env.DEV_PREVIEW_KEY;
 const COOKIE = "wwy_dev";
+const DEV_SCOPE = "dev";
+const DEV_SESSION_SECONDS = 60 * 60 * 24 * 7; // 7 days
 
-export function proxy(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname, searchParams } = req.nextUrl;
 
   // ── OMS auth (existing) ──────────────────────────────────────────────────
   if (pathname.startsWith("/oms") && pathname !== "/oms/login") {
-    const auth = req.cookies.get("oms_auth");
-    if (auth?.value !== "1") {
+    if (!(await verifyOmsToken(req.cookies.get(OMS_COOKIE)?.value))) {
       return NextResponse.redirect(new URL("/oms/login", req.url));
     }
   }
@@ -24,14 +27,23 @@ export function proxy(req: NextRequest) {
   }
 
   // Unlock: correct key sets cookie and sends to home
-  if (searchParams.get("dev") === DEV_KEY) {
-    const res = NextResponse.redirect(new URL("/", req.url));
-    res.cookies.set(COOKIE, "1", { httpOnly: true, sameSite: "lax", path: "/" });
-    return res;
+  if (DEV_KEY && searchParams.get("dev") === DEV_KEY) {
+    const token = await createSignedToken(DEV_SCOPE, DEV_SESSION_SECONDS);
+    if (token) {
+      const res = NextResponse.redirect(new URL("/", req.url));
+      res.cookies.set(COOKIE, token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: DEV_SESSION_SECONDS,
+        path: "/",
+      });
+      return res;
+    }
   }
 
-  // Dev with valid cookie → full access
-  if (req.cookies.get(COOKIE)?.value === "1") {
+  // Dev with valid signed cookie → full access
+  if (await verifySignedToken(DEV_SCOPE, req.cookies.get(COOKIE)?.value)) {
     return NextResponse.next();
   }
 

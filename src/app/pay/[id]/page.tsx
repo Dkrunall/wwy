@@ -4,7 +4,6 @@ export const dynamic = "force-dynamic";
 
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 
 interface OrderItem {
   product_name: string;
@@ -48,12 +47,9 @@ export default function PayPage() {
   const [error, setError] = useState("");
 
   const fetchOrder = useCallback(async () => {
-    const { data } = await supabase
-      .from("orders")
-      .select("id, order_number, customer_name, total_paise, payment_status, delivery_date, order_items(product_name, quantity, unit_price_paise)")
-      .eq("razorpay_order_id", razorpayOrderId)
-      .single();
-    setOrder(data as Order | null);
+    const res = await fetch(`/api/pay/order?id=${encodeURIComponent(razorpayOrderId)}`);
+    const d = await res.json().catch(() => null);
+    setOrder((d?.order ?? null) as Order | null);
     setLoading(false);
   }, [razorpayOrderId]);
 

@@ -61,7 +61,32 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const baseTotalPaise = cart.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
+    // Never trust client prices: reprice every line from the products table.
+    const productIds = [...new Set(cart.map((i) => i.product_id))];
+    const { data: productRows } = await supabase
+      .from("products")
+      .select("id, name, price_paise, available")
+      .in("id", productIds);
+    const productMap = new Map((productRows || []).map((p) => [p.id as string, p]));
+
+    const pricedCart: CartItem[] = [];
+    for (const i of cart) {
+      const product = productMap.get(i.product_id);
+      if (!product || !product.available) {
+        return NextResponse.json({ error: "An item in your cart is no longer available. Please refresh your cart." }, { status: 400 });
+      }
+      if (!Number.isInteger(i.quantity) || i.quantity < 1 || i.quantity > 100) {
+        return NextResponse.json({ error: "Invalid item quantity" }, { status: 400 });
+      }
+      pricedCart.push({
+        product_id: product.id,
+        product_name: product.name,
+        quantity: i.quantity,
+        unit_price_paise: product.price_paise,
+      });
+    }
+
+    const baseTotalPaise = pricedCart.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
     const { finalTotal: loyaltyFinalPaise, discountPercent } = await applyDiscounts(resolvedCustomerId ?? "", baseTotalPaise);
     const loyaltyDiscountPaise = baseTotalPaise - loyaltyFinalPaise;
 
@@ -120,7 +145,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Save order items
-    const items = cart.map((i) => ({
+    const items = pricedCart.map((i) => ({
       order_id: order.id,
       product_id: i.product_id,
       product_name: i.product_name,

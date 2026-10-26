@@ -3,13 +3,14 @@ import { cookies } from "next/headers";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { sendDeliveryUpdateToCustomer } from "@/lib/email";
 import { createBorzoDelivery } from "@/lib/borzo";
+import { OMS_COOKIE, verifyOmsToken } from "@/lib/omsAuth";
 
 const VALID_STATUSES = ["placed","mixing","stretching","resting","cold_proof","baking","out_for_delivery","delivered"];
 const EMAIL_MILESTONES = ["resting","baking","out_for_delivery","delivered"];
 
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
-  if (cookieStore.get("oms_auth")?.value !== "1") {
+  if (!(await verifyOmsToken(cookieStore.get(OMS_COOKIE)?.value))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
