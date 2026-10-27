@@ -17,17 +17,17 @@ begin;
 create temp table new_prices (name text primary key, mrp_rupees numeric) on commit drop;
 
 insert into new_prices (name, mrp_rupees) values
-  ('Biscotti', null),
-  ('Cookies', null),
-  ('Crackers', null),
-  ('Croissant', null),
-  ('Macaroons', null),
-  ('Savoury Sourdough', null),
-  ('Sourdough Buns', null),
-  ('Sourdough Classic Heritage', null),
-  ('Sourdough Laadi Pav', null),
-  ('Sourdough Pita Bread', null),
-  ('Sweet Sourdough', null);
+  ('Biscotti', 449),
+  ('Cookies', 499),
+  ('Crackers', 399),
+  ('Croissant', 449),
+  ('Macaroons', 649),
+  ('Savoury Sourdough', 599),
+  ('Sourdough Buns', 449),
+  ('Sourdough Classic Heritage', 549),
+  ('Sourdough Laadi Pav', 399),
+  ('Sourdough Pita Bread', 399),
+  ('Sweet Sourdough', 599);
 
 do $$
 begin
