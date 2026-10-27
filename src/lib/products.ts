@@ -47,7 +47,7 @@ export const products: Product[] = [
     details: [
       "Wild-fermented with our own sourdough culture",
       "No commercial yeast · No shortcuts",
-      "Hand-scored · Baked fresh to order",
+      "Baked fresh to order",
       "Best eaten within 2 days · Freezes well",
     ],
     leadTime: "Baked to order · Delivery Wed & Sat",

@@ -16,7 +16,7 @@ Branch: `fix/website-action-plan`. Legend: **Done** = finished in code. **Done, 
    3. `supabase-lock-all.sql`: closes the open database policies. **Only after steps 1 and 2 of this list.**
 4. **Test as a customer** after the lock-down: register, log in by email, order history, account (edit phone and address), checkout.
 5. **Fill in the business identity** in `src/lib/business.ts` (see section 3). Every empty value shows as "[to be added before launch]" on the site.
-6. **Set the same prices in `src/lib/products.ts`** (`price` and `priceNum`), which still say ₹1. `/shop` reads this file, not the database.
+6. Prices only need setting in the database now: `/shop` reads price, availability and the declarations from the `products` table (falling back to `src/lib/products.ts` if the database cannot be read). The prices in `products.ts` are the fallback copy.
 7. **Real-money test order** on Razorpay live keys, then refund it (P0-1 "done when").
 8. At launch: remove the dev gate (delete the gate section of `src/proxy.ts`) so `/` serves the real homepage and the policy pages are public for Razorpay review.
 
@@ -26,7 +26,7 @@ Branch: `fix/website-action-plan`. Legend: **Done** = finished in code. **Done, 
 
 | # | Status | What was done / what is left |
 |---|---|---|
-| P0-1 prices ₹1 | **Done, needs input** | The price display already divides by 100 correctly. `supabase-fix-prices.sql` is ready with the 11 live product names; it needs your MRPs. `lib/products.ts` needs the same prices. The live-money test order is yours to run. |
+| P0-1 prices ₹1 | **Done, needs input** | The price display already divides by 100 correctly. `supabase-fix-prices.sql` is ready with the 11 live product names; it needs your MRPs. `/shop` now reads prices from the database, so there is one source. The live-money test order is yours to run. |
 | P0-2 browser price | **Done** | `api/orders/initiate` reprices every line from the `products` table, rejects unavailable products and bad quantities, and ignores client prices. |
 | P0-3 policy pages | **Done, needs input** | `/privacy`, `/terms`, `/refund`, `/delivery`, `/contact` built and linked in the footer. Draft text, **have it reviewed by your lawyer**. Choices I made that you must confirm: damage reports within **24 hours** with a photo; refunds in **5 to 7 working days**; invoices kept **8 years**; Mumbai courts. Set in `src/lib/business.ts` (`POLICY`) and the page text. |
 | P0-4 legal identity | **Done, needs input** | Footer and Contact show Brewad LLP, address, LLPIN, GSTIN, FSSAI, care email and phone, and grievance officer, from `src/lib/business.ts`. The address, LLPIN, GSTIN, FSSAI number, care email and grievance officer are empty: I do not have them. The FSSAI **logo** is not added (needs the official file). Per-SKU manufacturer fields exist in the OMS and show on `/order` cards. |
@@ -41,7 +41,7 @@ Branch: `fix/website-action-plan`. Legend: **Done** = finished in code. **Done, 
 | P1-2 "100% Natural", "Zero Artificial Additives" | **Done** | Replaced with "12 to 24 hrs Fermentation" and "0 Commercial yeast" (C3, C4). "No preservatives" is not claimed anywhere. |
 | P1-3 title and meta | **Done** | Title is "Wild Wild Yeast \| Sourdough, Mumbai" and the description is the C2 text without "ginger ale". Switch to C1/C2 as written once ferments are listed (D1). |
 | P1-4 fermentation continues | **Done** | C11. |
-| P1-5 outsourced process claims | **Partly done, needs input** | I removed "stone-baked" and "scored by hand" wording on the homepage process steps. **Confirm with the baking partner** in writing: hand scoring, stone deck oven, sea salt. `lib/products.ts` still says "Hand-scored" for the Classic Heritage loaf. |
+| P1-5 outsourced process claims | **Partly done, needs input** | I removed "stone-baked" and "scored by hand" wording on the homepage process steps. **Confirm with the baking partner** in writing: hand scoring, stone deck oven, sea salt. The "Hand-scored" line was removed from the Classic Heritage card; "Hand-laminated" on the croissant card is still unverified. |
 | P1-6 brand brief | **Done** | The three lines are gone. |
 | P1-7 "Living food" | **Done** | Marquee now says BAKED TO ORDER (C10). |
 | P1-8 Priya T review | **Decision for you** | Left as is. It credits "every bake from Dnyanesh". Keep it or drop the review. |
@@ -57,7 +57,7 @@ Branch: `fix/website-action-plan`. Legend: **Done** = finished in code. **Done, 
 | P2-5 phantom products | **Done** | The lead-time table now lists only sourdough and breads, croissants and Be-Sides. |
 | P2-6 login identifier | **Open (D2)** | Email OTP login is unchanged. Moving to phone plus WhatsApp OTP (Twilio) is a separate project: it changes auth, the customer key and the RLS policies. |
 | P2-7 dead CTAs | **Done** | "Shop the Set" is "See the menu"; the drag line and the "journal" line are replaced (C8, C9, C22); "How It Works" now links to the section. |
-| P2-8 two catalogues | **Partly done** | `/shop` is the indexable catalogue (canonical, product data, in nav). `/order` is marked noindex with `/shop` as canonical. Ordering still happens on `/order` because it holds the cart and the database prices. Merging them is a larger rebuild. |
+| P2-8 two catalogues | **Partly done** | `/shop` is the indexable catalogue (canonical, product data, in nav) and now takes price, availability and declarations from the same database rows as `/order` (`lib/shopProducts.ts`, refreshed every 60 s), so the two cannot disagree. `/order` is noindex with `/shop` as canonical. Ordering still happens on `/order` because it holds the cart. |
 | P2-9 timeline facts | **Needs input** | I cannot verify the 2019, 2021 and 2023 entries. The 2023 "Soda Experiments" entry is unchanged. |
 | P2-10 cart copy | **Done** | C26. |
 
