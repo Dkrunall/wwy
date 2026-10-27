@@ -59,7 +59,7 @@ export async function sendDeliveryUpdate(
     resting: `Good morning *${name}*! 🌅 Your sourdough dough is resting and developing flavour.\nOrder: *${orderNumber}*`,
     baking: `Into the oven it goes! 🔥 Your bread is baking right now.\nOrder: *${orderNumber}*`,
     out_for_delivery: `Your order is on its way! 🚗 Order: *${orderNumber}*\nExpected within 2 hours. Contact your baker if needed.`,
-    delivered: `Delivered! 🎉 Enjoy your order, *${name}*!\n\nWe'd love your feedback — just reply with your thoughts. See you next time. 🌾`,
+    delivered: `Delivered! 🎉 Enjoy your order, *${name}*!\n\nWe'd love your feedback, just reply with your thoughts. See you next time. 🌾`,
   };
   const msg = messages[status];
   if (msg) await sendMessage(phone, msg);

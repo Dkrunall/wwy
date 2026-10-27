@@ -1,3 +1,5 @@
+import { CUTOFF_LEAD_DAYS, DEFAULT_CUTOFF_HOUR_IST, DEFAULT_DELIVERY_DAYS } from "@/lib/schedule";
+
 const DAY_MAP: Record<string, number> = { sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6 };
 
 // Parse "wed,sat" → [3, 6]
@@ -17,36 +19,40 @@ function daysUntilNext(currentDay: number, deliveryDays: number[]): number {
   return 7 - currentDay + sorted[0];
 }
 
-// Returns the earliest valid delivery date given delivery days and cutoff hour (IST).
-export function calculateDeliveryDate(deliveryDays = [3, 6], cutoffHour = 12): Date {
-  const now = new Date();
-  const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+// The moment orders close for a delivery date (a UTC-midnight Date standing for an IST calendar day).
+function cutoffInstant(deliveryDate: Date, cutoffHour: number): number {
+  return deliveryDate.getTime() - CUTOFF_LEAD_DAYS * DAY_MS + cutoffHour * 60 * 60 * 1000 - IST_OFFSET_MS;
+}
+
+// The next delivery day still open for orders, and when it closes.
+// Rule: orders close CUTOFF_LEAD_DAYS before the delivery day at `cutoffHour` IST
+// (default 9 PM Monday for Wednesday, 9 PM Thursday for Saturday).
+export function getNextWindow(
+  deliveryDays = DEFAULT_DELIVERY_DAYS,
+  cutoffHour = DEFAULT_CUTOFF_HOUR_IST,
+  now = new Date()
+): { date: Date; cutoffAt: Date } {
   const ist = new Date(now.getTime() + IST_OFFSET_MS);
-
-  const hoursIST = ist.getUTCHours();
-  const pastCutoff = hoursIST >= cutoffHour;
-
-  const min = new Date(ist);
-  min.setUTCDate(min.getUTCDate() + (pastCutoff ? 2 : 1));
-
-  const day = min.getUTCDay();
-  const sorted = [...deliveryDays].sort((a, b) => a - b);
-
-  let daysUntil: number;
-  const next = sorted.find((d) => d >= day);
-  if (next !== undefined) {
-    daysUntil = next - day;
-  } else {
-    // Wrap to next week
-    daysUntil = 7 - day + sorted[0];
+  const today = Date.UTC(ist.getUTCFullYear(), ist.getUTCMonth(), ist.getUTCDate());
+  for (let i = 0; i < 21; i++) {
+    const date = new Date(today + i * DAY_MS);
+    if (!deliveryDays.includes(date.getUTCDay())) continue;
+    const cutoff = cutoffInstant(date, cutoffHour);
+    if (now.getTime() < cutoff) return { date, cutoffAt: new Date(cutoff) };
   }
+  throw new Error("No open delivery window found");
+}
 
-  min.setUTCDate(min.getUTCDate() + daysUntil);
-  return new Date(Date.UTC(min.getUTCFullYear(), min.getUTCMonth(), min.getUTCDate()));
+// Returns the earliest valid delivery date given delivery days and cutoff hour (IST).
+export function calculateDeliveryDate(deliveryDays = DEFAULT_DELIVERY_DAYS, cutoffHour = DEFAULT_CUTOFF_HOUR_IST): Date {
+  return getNextWindow(deliveryDays, cutoffHour).date;
 }
 
 // Returns the next `count` available delivery slots.
-export function getAvailableDeliverySlots(count = 5, deliveryDays = [3, 6], cutoffHour = 12): Date[] {
+export function getAvailableDeliverySlots(count = 5, deliveryDays = DEFAULT_DELIVERY_DAYS, cutoffHour = DEFAULT_CUTOFF_HOUR_IST): Date[] {
   const earliest = calculateDeliveryDate(deliveryDays, cutoffHour);
   const slots: Date[] = [earliest];
   let current = earliest;
@@ -59,7 +65,7 @@ export function getAvailableDeliverySlots(count = 5, deliveryDays = [3, 6], cuto
   return slots;
 }
 
-export function isValidDeliveryDate(isoDate: string, deliveryDays = [3, 6], cutoffHour = 12): boolean {
+export function isValidDeliveryDate(isoDate: string, deliveryDays = DEFAULT_DELIVERY_DAYS, cutoffHour = DEFAULT_CUTOFF_HOUR_IST): boolean {
   const d = new Date(isoDate + "T00:00:00Z");
   const day = d.getUTCDay();
   if (!deliveryDays.includes(day)) return false;

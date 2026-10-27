@@ -9,7 +9,6 @@ import {
   ClipboardList, User, ChevronRight, Package, CheckCircle,
   Loader2, MessageCircle, Palmtree, MapPin, Phone, Bell, X, Settings,
 } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 const fmt = (p: number) => `₹${(p / 100).toFixed(0)}`;
@@ -145,64 +144,26 @@ export default function BakerDashboard() {
   const [capacitySaving, setCapacitySaving] = useState(false);
 
   // ── data fetching ────────────────────────────────────────────────────────────
-  const enrichPhones = async (rows: BakerOrder[]): Promise<BakerOrder[]> => {
-    if (!rows.length) return rows;
-    const flats = [...new Set(rows.map((o) => o.flat_number))];
-    const { data: custs } = await supabase.from("customers").select("flat_number, phone").in("flat_number", flats);
-    const map: Record<string, string | null> = {};
-    for (const c of custs || []) map[c.flat_number] = c.phone;
-    return rows.map((o) => ({ ...o, customer_phone: map[o.flat_number] ?? null }));
-  };
-
   const fetchData = useCallback(async () => {
-    const { data: b, error: bErr } = await supabase
-      .from("bakers")
-      .select("id, name, phone, address, daily_capacity")
-      .eq("share_token", token)
-      .eq("is_active", true)
-      .single();
-
-    if (bErr || !b) { setError("Invalid or expired link."); setLoading(false); return; }
-    setBaker(b);
-    setBakerId(b.id);
-
-    const [{ data: ordersData }, { data: holidaySetting }, { count }] = await Promise.all([
-      supabase
-        .from("orders")
-        .select(ORDER_SELECT)
-        .eq("baker_id", b.id)
-        .eq("payment_status", "paid")
-        .not("delivery_status", "eq", "delivered")
-        .order("created_at", { ascending: true }),
-      supabase.from("settings").select("value").eq("key", `baker_holiday_${b.id}`).single(),
-      supabase
-        .from("orders")
-        .select("id", { count: "exact", head: true })
-        .eq("baker_id", b.id)
-        .eq("payment_status", "paid")
-        .eq("delivery_status", "delivered"),
-    ]);
-
-    setIsHoliday(holidaySetting?.value === "true");
-    setDeliveredCount(count ?? 0);
-    setQueue(await enrichPhones((ordersData || []) as BakerOrder[]));
+    const res = await fetch(`/api/baker/dashboard?token=${encodeURIComponent(token)}`);
+    const d = await res.json().catch(() => null);
+    if (!res.ok || !d?.baker) { setError("Invalid or expired link."); setLoading(false); return; }
+    setBaker(d.baker);
+    setBakerId(d.baker.id);
+    setIsHoliday(d.isHoliday === true);
+    setDeliveredCount(d.deliveredCount ?? 0);
+    setQueue((d.queue || []) as BakerOrder[]);
     setLoading(false);
   }, [token]);
 
   const fetchHistory = useCallback(async () => {
     if (!bakerId) return;
     setHistoryLoading(true);
-    const { data } = await supabase
-      .from("orders")
-      .select(ORDER_SELECT)
-      .eq("baker_id", bakerId)
-      .eq("payment_status", "paid")
-      .eq("delivery_status", "delivered")
-      .order("created_at", { ascending: false })
-      .limit(40);
-    setHistory((data || []) as BakerOrder[]);
+    const res = await fetch(`/api/baker/dashboard?token=${encodeURIComponent(token)}&view=history`);
+    const d = await res.json().catch(() => null);
+    setHistory((d?.history || []) as BakerOrder[]);
     setHistoryLoading(false);
-  }, [bakerId]);
+  }, [bakerId, token]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
   useEffect(() => { if (panel === "history" && bakerId) fetchHistory(); }, [panel, bakerId, fetchHistory]);

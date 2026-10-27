@@ -173,13 +173,13 @@ export default function MenuSection() {
               className="font-serif font-normal text-brand-brown tracking-tight leading-[1.05]"
               style={{ fontSize: "clamp(2.5rem, 6.5vw, 4.8rem)" }}
             >
-              Shop <span className="text-brand-terracotta italic font-light">the ferments.</span>
+              This week&apos;s <span className="text-brand-terracotta italic font-light">menu.</span>
             </h2>
           </div>
 
           <div className="flex items-end justify-between lg:justify-end gap-6">
             <p className="text-xs sm:text-sm md:text-base font-bold text-brand-brown/60 leading-relaxed max-w-sm">
-              Small-batch ferments made strictly when ordered. Drag or slide through our artisanal range below.
+              Made in small batches against paid orders.
             </p>
 
             {/* Slider Navigation Arrows */}

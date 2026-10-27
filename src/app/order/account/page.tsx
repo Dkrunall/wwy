@@ -222,7 +222,7 @@ export default function AccountPage() {
                   {customerName?.[0]?.toUpperCase() || "?"}
                 </div>
                 <div className="min-w-0">
-                  <p className="font-black text-white text-base leading-tight truncate">{customerName || "—"}</p>
+                  <p className="font-black text-white text-base leading-tight truncate">{customerName || ""}</p>
                   <p className="text-white/50 text-[11px] font-bold mt-0.5">Flat {flat}</p>
                 </div>
               </div>
@@ -475,9 +475,9 @@ export default function AccountPage() {
               </div>
               <div className="p-5 flex flex-col gap-4">
                 {[
-                  { label: "Full Name", value: customerName || "—" },
-                  { label: "Flat Number", value: flat || "—" },
-                  { label: "Email Address", value: email || "—" },
+                  { label: "Full Name", value: customerName || "Not set" },
+                  { label: "Flat Number", value: flat || "Not set" },
+                  { label: "Email Address", value: email || "Not set" },
                 ].map(({ label, value }) => (
                   <div key={label} className="flex flex-col gap-1">
                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{label}</p>

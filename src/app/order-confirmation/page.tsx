@@ -59,7 +59,7 @@ export default function OrderConfirmationPage() {
 
               <div className="space-y-4">
                 {[
-                  { label: "Order confirmed — fermentation begins", done: true, desc: "Ingredients prepped & starter fed" },
+                  { label: "Order confirmed, fermentation begins", done: true, desc: "Ingredients prepped & starter fed" },
                   { label: "Developing flavour & structure", done: false, desc: "Slow long cold fermentation" },
                   { label: "Baked, brewed & dispatched", done: false, desc: "Out for delivery to your doorstep" },
                   { label: "Delivered fresh", done: false, desc: "Handed over warm and crusty" },

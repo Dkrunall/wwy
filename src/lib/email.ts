@@ -28,7 +28,7 @@ export async function sendPaymentConfirmedToCustomer(
   await createTransporter().sendMail({
     from: `Wild Wild Yeast <${process.env.GMAIL_USER}>`,
     to: email,
-    subject: `✅ Order Confirmed — ${orderNumber}`,
+    subject: `✅ Order Confirmed: ${orderNumber}`,
     html,
   });
 }
@@ -43,39 +43,39 @@ export async function sendDeliveryUpdateToCustomer(
 
   const updates: Record<string, { subject: string; headline: string; body: string }> = {
     mixing: {
-      subject: `🫙 Your dough is being mixed — ${orderNumber}`,
+      subject: `🫙 Your dough is being mixed: ${orderNumber}`,
       headline: "Mixing has begun",
       body: `It's started! <b>${name}</b>, your baker has begun mixing the dough for your order. 🫙 Wild fermentation in progress.`,
     },
     stretching: {
-      subject: `🤲 Stretch & fold in progress — ${orderNumber}`,
+      subject: `🤲 Stretch & fold in progress: ${orderNumber}`,
       headline: "Stretch & fold",
       body: `Your dough is being stretched and folded, <b>${name}</b>! 🤲 This is where the structure and chew develops. Good things take time.`,
     },
     resting: {
-      subject: `🌅 Your dough is bulk-resting — ${orderNumber}`,
+      subject: `🌅 Your dough is bulk-resting: ${orderNumber}`,
       headline: "Dough is resting",
       body: `Your sourdough dough is now resting and developing flavour, <b>${name}</b>. The magic happens when we slow down. 🌙`,
     },
     cold_proof: {
-      subject: `❄️ Into the fridge — ${orderNumber}`,
+      subject: `❄️ Into the fridge: ${orderNumber}`,
       headline: "Cold proofing",
       body: `Your dough has gone into the fridge for a slow cold proof, <b>${name}</b>. ❄️ This is what gives our bread its signature tang.`,
     },
     baking: {
-      subject: `🔥 Into the oven — ${orderNumber}`,
+      subject: `🔥 Into the oven: ${orderNumber}`,
       headline: "Baking now",
       body: `Into the oven it goes! 🔥 Your bread is baking right now, <b>${name}</b>. Won't be long.`,
     },
     out_for_delivery: {
-      subject: `🚗 Your order is on the way — ${orderNumber}`,
+      subject: `🚗 Your order is on the way: ${orderNumber}`,
       headline: "Out for delivery",
       body: `Your order is on its way, <b>${name}</b>! 🚗 Expected within 2 hours. Please be available to receive it.`,
     },
     delivered: {
-      subject: `🎉 Delivered! — ${orderNumber}`,
+      subject: `🎉 Delivered!: ${orderNumber}`,
       headline: "Delivered",
-      body: `Your order has been delivered, <b>${name}</b>! 🎉<br/><br/>Enjoy every bite. We'd love your feedback — just reply to this email with your thoughts.`,
+      body: `Your order has been delivered, <b>${name}</b>! 🎉<br/><br/>Enjoy every bite. We'd love your feedback, just reply to this email with your thoughts.`,
     },
   };
 
@@ -147,7 +147,7 @@ export async function sendNewOrderToBaker(
   await createTransporter().sendMail({
     from: `Wild Wild Yeast <${process.env.GMAIL_USER}>`,
     to: email,
-    subject: `New Order ${order.orderNumber} — ${order.customerName} · Flat ${order.flatNumber}`,
+    subject: `New Order ${order.orderNumber}: ${order.customerName} · Flat ${order.flatNumber}`,
     html,
   });
 }
@@ -181,7 +181,7 @@ export async function sendOwnerNotification(order: OrderEmailData): Promise<void
 
   const html = `
     <div style="font-family:sans-serif;max-width:560px;margin:0 auto;color:#2c1a0e">
-      <h2 style="color:#c9a96e">🌾 New Order — Wild Wild Yeast</h2>
+      <h2 style="color:#c9a96e">🌾 New Order: Wild Wild Yeast</h2>
       <p><b>Order:</b> ${order.order_number}</p>
       <p><b>Customer:</b> ${order.customer_name} · Flat ${order.flat_number}</p>
       ${order.delivery_date ? `<p><b>Delivery Date:</b> ${order.delivery_date}</p>` : ""}
@@ -210,7 +210,7 @@ export async function sendOwnerNotification(order: OrderEmailData): Promise<void
   await createTransporter().sendMail({
     from: process.env.GMAIL_USER,
     to: process.env.OWNER_EMAIL,
-    subject: `New Order ${order.order_number} — ₹${total} — ${order.customer_name}`,
+    subject: `New Order ${order.order_number}: ₹${total}: ${order.customer_name}`,
     html,
   });
 }

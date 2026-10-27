@@ -7,6 +7,12 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ShoppingBag } from "lucide-react";
 import { products } from "@/lib/products";
+import PincodeCheck from "@/components/PincodeCheck";
+import { BUSINESS } from "@/lib/business";
+import { cutoffRuleText, deliveryDaysShort } from "@/lib/schedule";
+
+// Flavours customers name in their reviews (P3-2). Flavours rotate weekly.
+const FLAVOURS = ["Mango bird's eye chilli", "Paneer thecha", "Hung curd chilli oil", "Lychee chilli", "Chocolate chip cherry"];
 
 const categories = ["All", "Crafted Bakes", "Be-Sides"];
 
@@ -25,7 +31,7 @@ export default function ShopPage() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 max-w-full">
           <div>
             <span className="text-brand-orange text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
-              This Week's Fermentation
+              This week's menu
             </span>
             <h1
               className="font-serif font-normal text-brand-brown tracking-tight leading-[1.05]"
@@ -39,10 +45,10 @@ export default function ShopPage() {
           </div>
           <div className="flex flex-col gap-2 pb-2">
             <p className="text-sm sm:text-base font-bold text-brand-brown/40 max-w-xs leading-relaxed">
-              WWY food is made with time, not shortcuts. Small batch. Slow-fermented. Honest ingredients.
+              WWY food is made slowly, and only to order.
             </p>
             <p className="text-[10px] font-black tracking-[0.15em] uppercase text-brand-brown/30">
-              Made to order · Delivery Wed &amp; Sat only
+              Made to order · Delivery {deliveryDaysShort()} only
             </p>
             <Link
               href="/order"
@@ -55,8 +61,31 @@ export default function ShopPage() {
  
         {/* Seasonal drop note */}
         <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-brown/25 mt-6">
-          Seasonal drops announced weekly — follow the journal to stay ahead.
+          New flavours go up every week on Instagram, @{BUSINESS.instagramHandle}.
         </p>
+
+        {/* Orders close */}
+        <p className="text-[10px] font-black tracking-[0.15em] uppercase text-brand-brown/40 mt-2">
+          Orders close {cutoffRuleText()}
+        </p>
+
+        {/* Pincode check before browsing (P3-4) */}
+        <div className="mt-6">
+          <PincodeCheck />
+        </div>
+
+        {/* Flavours (P3-2) */}
+        <div className="mt-8">
+          <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-brown/40 mb-3">Flavours we bake</p>
+          <div className="flex flex-wrap gap-2">
+            {FLAVOURS.map((f) => (
+              <span key={f} className="px-4 py-2 rounded-full bg-white border border-brand-brown/10 text-[11px] font-black tracking-wide text-brand-brown/70">
+                {f}
+              </span>
+            ))}
+          </div>
+          <p className="text-xs font-bold text-brand-brown/40 mt-3">Flavours rotate weekly. Check Instagram for this week&apos;s batch.</p>
+        </div>
  
         {/* Category Filter */}
         <div className="flex gap-6 sm:gap-8 mt-8 flex-wrap border-b border-brand-brown/10 pb-4">
@@ -146,6 +175,27 @@ function ProductCard({ product }: { product: typeof products[0] }) {
           </p>
         </div>
  
+        <details className="group/details text-xs font-bold text-brand-brown/60">
+          <summary className="cursor-pointer list-none text-[10px] font-black tracking-[0.18em] uppercase text-brand-brown/50 hover:text-brand-orange">
+            Product details
+          </summary>
+          <dl className="mt-3 flex flex-col gap-1.5 leading-relaxed">
+            <div><dt className="inline font-black text-brand-brown/80">MRP: </dt><dd className="inline">{product.price} (incl. all taxes)</dd></div>
+            <div><dt className="inline font-black text-brand-brown/80">Type: </dt><dd className="inline">Vegetarian</dd></div>
+            {product.declarations?.ingredients && <div><dt className="inline font-black text-brand-brown/80">Ingredients: </dt><dd className="inline">{product.declarations.ingredients}</dd></div>}
+            {product.declarations?.allergens && <div><dt className="inline font-black text-brand-brown/80">Allergens: </dt><dd className="inline">{product.declarations.allergens}</dd></div>}
+            {product.declarations?.netQuantity && <div><dt className="inline font-black text-brand-brown/80">Net quantity: </dt><dd className="inline">{product.declarations.netQuantity}</dd></div>}
+            {product.declarations?.bestBefore && <div><dt className="inline font-black text-brand-brown/80">Best before: </dt><dd className="inline">{product.declarations.bestBefore}</dd></div>}
+            {product.declarations?.storage && <div><dt className="inline font-black text-brand-brown/80">Storage: </dt><dd className="inline">{product.declarations.storage}</dd></div>}
+            {product.declarations?.manufacturer && (
+              <div><dt className="inline font-black text-brand-brown/80">Manufactured by: </dt><dd className="inline">{product.declarations.manufacturer.name}, {product.declarations.manufacturer.address}. FSSAI {product.declarations.manufacturer.fssai}</dd></div>
+            )}
+            <ul className="list-disc pl-4 mt-1">
+              {product.details.map((d) => <li key={d}>{d}</li>)}
+            </ul>
+          </dl>
+        </details>
+
         <div className="flex items-center justify-between mt-auto pt-3 border-t border-brand-brown/5">
           <span className="font-black text-brand-orange text-lg">{product.price}</span>
           <Link

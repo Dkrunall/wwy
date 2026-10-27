@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { omsDb as supabase } from "@/lib/omsDb";
 import { fmt, fmtDate, getStepIndex, D_LABELS, D_THEME, PAY_THEME } from "@/lib/orderDisplay";
 import OmsSidebar from "@/components/OmsSidebar";
 import {

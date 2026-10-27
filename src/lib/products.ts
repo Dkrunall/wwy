@@ -14,6 +14,18 @@ export type Product = {
   details: string[];
   leadTime: string;
   detailImage?: { src: string; alt: string };
+  /**
+   * Legal Metrology e-commerce declarations (P3-1). Fill every field per SKU before launch;
+   * the shop card shows each one that is set. White-label items must name their manufacturer.
+   */
+  declarations?: {
+    ingredients?: string;
+    allergens?: string;
+    netQuantity?: string;
+    bestBefore?: string;
+    storage?: string;
+    manufacturer?: { name: string; address: string; fssai: string };
+  };
 };
 
 const SUPABASE_IMG =
@@ -25,13 +37,13 @@ export const products: Product[] = [
     name: "Sourdough Classic Heritage",
     category: "Crafted Bakes",
     badge: "BEST SELLER",
-    price: "₹1",
-    priceNum: 1,
+    price: "₹549",
+    priceNum: 549,
     image: `${SUPABASE_IMG}/product_1789026023953_5397.png`,
     bgColor: "bg-[#F5EDD7]",
     desc: "Timeless, wholesome and slow-crafted for flavour that lasts.",
     longDesc:
-      "Our founding loaf. Leavened entirely with our wild culture and given a long, slow ferment, the Classic Heritage is what everyone orders first — and keeps ordering. An open, airy crumb under a deeply scored, well-baked crust.",
+      "Our founding loaf. Leavened entirely with our wild culture and given a long, slow ferment, the Classic Heritage is what everyone orders first, and keeps ordering. An open, airy crumb under a deeply scored, well-baked crust.",
     details: [
       "Wild-fermented with our own sourdough culture",
       "No commercial yeast · No shortcuts",
@@ -45,15 +57,15 @@ export const products: Product[] = [
     name: "Savoury Sourdough",
     category: "Crafted Bakes",
     badge: "MISSAL · PANEER THECHA & MORE",
-    price: "₹1",
-    priceNum: 1,
+    price: "₹599",
+    priceNum: 599,
     image: `${SUPABASE_IMG}/product_1789026019003_15257.png`,
     bgColor: "bg-[#E8E0D0]",
     desc: "Bold flavours. Artisan sourdough. Perfectly balanced.",
     longDesc:
-      "For when you want your bread to bring its own flavour to the table. Folded with bold, savoury mix-ins — think Missal Sourdough and Paneer Thecha, with more flavours rotating in — and finished on our usual wild-fermented base.",
+      "For when you want your bread to bring its own flavour to the table. Folded with bold, savoury mix-ins, think Missal Sourdough and Paneer Thecha, with more flavours rotating in, and finished on our usual wild-fermented base.",
     details: [
-      "Rotating savoury folds — ask what's in this week's batch",
+      "Rotating savoury folds, ask what's in this week's batch",
       "Wild-fermented sourdough base",
       "Great on its own or lightly toasted",
       "Best eaten within 2 days",
@@ -65,13 +77,13 @@ export const products: Product[] = [
     name: "Sweet Sourdough",
     category: "Crafted Bakes",
     badge: "BLUEBERRY CREAM CHEESE & MORE",
-    price: "₹1",
-    priceNum: 1,
+    price: "₹599",
+    priceNum: 599,
     image: `${SUPABASE_IMG}/product_1789026030597_4895.png`,
     bgColor: "bg-[#FFDDC1]",
     desc: "Indulgent, nostalgic and beautifully baked.",
     longDesc:
-      "A sweeter side of sourdough — swirled babka-style with fillings like Blueberry Cream Cheese and Apple Pie, styled the way we'd want to eat it ourselves. Indulgent, nostalgic, and made in small batches.",
+      "A sweeter side of sourdough, swirled babka-style with fillings like Blueberry Cream Cheese and Apple Pie, styled the way we'd want to eat it ourselves. Indulgent, nostalgic, and made in small batches.",
     details: [
       "Babka-styled swirl · Rotating sweet fillings",
       "Wild-fermented dough base",
@@ -85,8 +97,8 @@ export const products: Product[] = [
     name: "Croissant",
     category: "Crafted Bakes",
     badge: "BUTTER · CHOCOLATE & MORE",
-    price: "₹1",
-    priceNum: 1,
+    price: "₹449",
+    priceNum: 449,
     image: `${SUPABASE_IMG}/product_1789026013793_11161.png`,
     bgColor: "bg-[#F5EDD7]",
     desc: "Flaky, rich and made with the finest butter.",
@@ -94,7 +106,7 @@ export const products: Product[] = [
       "Laminated by hand, layer by layer, with the finest butter we could find. Comes in classic Butter and Chocolate, with more variants rotating through the week.",
     details: [
       "Hand-laminated, all-butter dough",
-      "Classic & Chocolate — more variants rotate weekly",
+      "Classic & Chocolate, more variants rotate weekly",
       "Best eaten fresh, the day of delivery",
       "Warm slightly before serving for best flake",
     ],
@@ -104,16 +116,16 @@ export const products: Product[] = [
     id: 5,
     name: "Sourdough Buns",
     category: "Crafted Bakes",
-    price: "₹1",
-    priceNum: 1,
+    price: "₹449",
+    priceNum: 449,
     image: `${SUPABASE_IMG}/product_1789026020943_17703.png`,
     bgColor: "bg-[#E2D4E0]",
     desc: "Soft, airy and naturally leavened to perfection.",
     longDesc:
-      "Soft, pillowy buns leavened the same wild way as our loaves — just shaped smaller and baked a little quicker. Great for burgers, sliders, or simply buttered.",
+      "Soft, pillowy buns leavened the same wild way as our loaves, just shaped smaller and baked a little quicker. Great for burgers, sliders, or simply buttered.",
     details: [
       "Naturally leavened · Soft, airy crumb",
-      "Sold as a set — great for burgers & sliders",
+      "Sold as a set, great for burgers & sliders",
       "Best eaten within 2 days · Freezes well",
     ],
     leadTime: "Baked to order · Delivery Wed & Sat",
@@ -122,13 +134,13 @@ export const products: Product[] = [
     id: 6,
     name: "Sourdough Pita Bread",
     category: "Crafted Bakes",
-    price: "₹1",
-    priceNum: 1,
+    price: "₹399",
+    priceNum: 399,
     image: `${SUPABASE_IMG}/product_1789026029169_15135.png`,
     bgColor: "bg-[#FCEEA7]",
     desc: "Soft, pocketed and perfect for every table.",
     longDesc:
-      "Our take on pita, wild-leavened instead of commercially yeasted — soft, pillowy, and reliably pocketed. Perfect for dips, wraps, or mopping up a good curry.",
+      "Our take on pita, wild-leavened instead of commercially yeasted, soft, pillowy, and reliably pocketed. Perfect for dips, wraps, or mopping up a good curry.",
     details: [
       "Wild-fermented dough · Naturally pocketed",
       "Great with dips, wraps or curries",
@@ -140,13 +152,13 @@ export const products: Product[] = [
     id: 7,
     name: "Sourdough Laadi Pav",
     category: "Crafted Bakes",
-    price: "₹1",
-    priceNum: 1,
+    price: "₹399",
+    priceNum: 399,
     image: `${SUPABASE_IMG}/product_1789026027121_29849.png`,
     bgColor: "bg-[#E8E0D0]",
     desc: "Soft, slightly sweet and beautifully golden.",
     longDesc:
-      "The classic pull-apart laadi pav, given the wild-fermented treatment. Soft, slightly sweet, and beautifully golden — pairs perfectly with pav bhaji or vada pav.",
+      "The classic pull-apart laadi pav, given the wild-fermented treatment. Soft, slightly sweet, and beautifully golden, pairs perfectly with pav bhaji or vada pav.",
     details: [
       "Naturally leavened · Soft pull-apart loaf",
       "Slightly sweet, golden crust",
@@ -158,17 +170,17 @@ export const products: Product[] = [
     id: 8,
     name: "Biscotti",
     category: "Be-Sides",
-    price: "₹1",
-    priceNum: 1,
+    price: "₹449",
+    priceNum: 449,
     image: `${SUPABASE_IMG}/product_1789027587699_24195.png`,
     bgColor: "bg-[#F5EDD7]",
     desc: "Crisp, twice-baked and perfect to dunk or nibble.",
     longDesc:
-      "Twice-baked the traditional way for a satisfying crunch. Studded with almonds, they're built for dunking in coffee or tea — or just nibbling straight from the jar.",
+      "Twice-baked the traditional way for a satisfying crunch. Studded with almonds, they're built for dunking in coffee or tea, or just nibbling straight from the jar.",
     details: [
       "Twice-baked for a signature crunch",
       "Studded with almonds",
-      "Keeps well — great for gifting",
+      "Keeps well, great for gifting",
     ],
     leadTime: "Delivery Wed & Sat",
   },
@@ -176,8 +188,8 @@ export const products: Product[] = [
     id: 9,
     name: "Macaroons",
     category: "Be-Sides",
-    price: "₹1",
-    priceNum: 1,
+    price: "₹649",
+    priceNum: 649,
     image: `${SUPABASE_IMG}/product_1789026016743_8725.png`,
     bgColor: "bg-[#D1E8E2]",
     desc: "Delicate, chewy and full of flavour.",
@@ -194,13 +206,13 @@ export const products: Product[] = [
     id: 10,
     name: "Cookies",
     category: "Be-Sides",
-    price: "₹1",
-    priceNum: 1,
+    price: "₹499",
+    priceNum: 499,
     image: `${SUPABASE_IMG}/product_1789027590179_6914.png`,
     bgColor: "bg-[#FFDDC1]",
     desc: "Classic, comforting and baked to perfection.",
     longDesc:
-      "Classic, comforting, chocolate chip cookies — baked to that perfect edge-crisp, centre-soft finish.",
+      "Classic, comforting, chocolate chip cookies, baked to that perfect edge-crisp, centre-soft finish.",
     details: [
       "Classic chocolate chip",
       "Crisp edges, soft centre",
@@ -212,8 +224,8 @@ export const products: Product[] = [
     id: 11,
     name: "Crackers",
     category: "Be-Sides",
-    price: "₹1",
-    priceNum: 1,
+    price: "₹399",
+    priceNum: 399,
     image: `${SUPABASE_IMG}/product_1789026010767_15387.png`,
     bgColor: "bg-[#E2D4E0]",
     desc: "Crunchy, flavourful and perfect for every occasion.",
@@ -222,7 +234,7 @@ export const products: Product[] = [
     details: [
       "Crunchy, well-seasoned bite",
       "Pairs well with cheese & dips",
-      "Keeps well — great for hampers",
+      "Keeps well, great for hampers",
     ],
     leadTime: "Delivery Wed & Sat",
   },

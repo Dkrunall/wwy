@@ -238,7 +238,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
         doc.fillColor("#E89936");
         doc.font("Helvetica-Bold").fontSize(9);
         doc.text(
-          `Coupon (${data.coupon_code || "—"}): -Rs.${(couponDiscountPaise / 100).toFixed(0)}`,
+          `Coupon (${data.coupon_code || "-"}): -Rs.${(couponDiscountPaise / 100).toFixed(0)}`,
           totalsX,
           y,
           { width: totalsWidth, align: "right" }

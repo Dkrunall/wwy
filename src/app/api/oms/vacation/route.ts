@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerSupabase } from "@/lib/supabase-server";
+import { OMS_COOKIE, verifyOmsToken } from "@/lib/omsAuth";
 
 async function isAuthorized(): Promise<boolean> {
   const cookieStore = await cookies();
-  return cookieStore.get("oms_auth")?.value === "1";
+  return verifyOmsToken(cookieStore.get(OMS_COOKIE)?.value);
 }
 
 export async function POST(req: NextRequest) {

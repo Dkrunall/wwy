@@ -23,9 +23,9 @@ export default function EnergyBanner() {
           className="font-serif font-normal text-brand-oat text-center leading-[1.05] mb-12 sm:mb-20 tracking-tight drop-shadow-2xl relative z-30 px-4"
           style={{ fontSize: "clamp(2.8rem, 7.5vw, 6.2rem)" }}
         >
-          Alive in{" "}
+          Made to{" "}
           <span className="italic font-light text-brand-gold relative inline-block">
-            every batch.
+            order.
             <svg className="absolute -bottom-3 sm:-bottom-4 left-0 w-full h-6 sm:h-8 text-brand-orange opacity-80" viewBox="0 0 100 20" preserveAspectRatio="none"><path d="M0 10 Q 50 20 100 10" fill="transparent" stroke="currentColor" strokeWidth="4" strokeLinecap="round"/></svg>
           </span>
         </h3>
@@ -33,42 +33,42 @@ export default function EnergyBanner() {
         {/* Beautiful Editorial Showcase Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 w-full">
           
-          {/* Card 1: Soda */}
-          <Link href="/shop" className="group flex flex-col bg-white/5 backdrop-blur-sm border border-white/10 rounded-[2rem] p-6 sm:p-8 hover:bg-white/10 hover:border-white/20 hover:scale-[1.01] hover:-translate-y-0.5 transition-all duration-500 cursor-pointer shadow-lg">
+          {/* Card 1: Gifting */}
+          <Link href="/gifting" className="group flex flex-col bg-white/10 backdrop-blur-sm border border-white/20 rounded-[2.2rem] p-6 sm:p-8 hover:bg-white/[0.15] hover:border-white/30 hover:scale-[1.01] hover:-translate-y-0.5 transition-all duration-500 cursor-pointer shadow-2xl relative">
             <div className="relative w-full aspect-square rounded-[1.5rem] overflow-hidden mb-6 bg-brand-oat/5">
-              <Image src="/p3.png" alt="Can" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+              <Image src="/p5.png" alt="A sourdough loaf in a Wild Wild Yeast paper bag" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
             </div>
-            <span className="text-[10px] font-black tracking-[0.2em] text-brand-gold uppercase mb-1">PROBIOTIC SODA</span>
-            <h4 className="font-serif font-normal text-brand-oat text-xl sm:text-2xl tracking-tight leading-tight group-hover:text-brand-gold transition-colors">Botanical Soda Series</h4>
-            <p className="text-xs text-brand-oat/60 font-bold leading-relaxed mt-2">Naturally fermented botanicals brewed slow over 72 hours. Alive in every single sip.</p>
+            <span className="text-[10px] font-black tracking-[0.2em] text-brand-gold uppercase mb-1">GIFTING</span>
+            <h4 className="font-serif font-normal text-brand-oat text-xl sm:text-2xl tracking-tight leading-tight group-hover:text-brand-gold transition-colors">Hampers</h4>
+            <p className="text-xs text-brand-oat/60 font-bold leading-relaxed mt-2">Four tiers of bread and bakes, packed to order.</p>
           </Link>
- 
-          {/* Card 2: Sampler Set */}
-          <Link href="/shop" className="group flex flex-col bg-white/10 backdrop-blur-sm border border-white/20 rounded-[2.2rem] p-6 sm:p-8 hover:bg-white/[0.15] hover:border-white/30 hover:scale-[1.01] hover:-translate-y-0.5 transition-all duration-500 cursor-pointer shadow-2xl relative">
-            <span className="absolute top-4 right-4 bg-brand-gold text-brand-brown text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest rotate-6 z-20">LIMITED</span>
+
+          {/* Card 2: Best seller */}
+          <Link href="/shop" className="group flex flex-col bg-white/5 backdrop-blur-sm border border-white/10 rounded-[2rem] p-6 sm:p-8 hover:bg-white/10 hover:border-white/20 hover:scale-[1.01] hover:-translate-y-0.5 transition-all duration-500 cursor-pointer shadow-lg relative">
+            <span className="absolute top-4 right-4 bg-brand-gold text-brand-brown text-[8px] font-black px-3 py-1 rounded-full uppercase tracking-widest rotate-6 z-20">BEST SELLER</span>
             <div className="relative w-full aspect-square rounded-[1.5rem] overflow-hidden mb-6 bg-brand-oat/5">
-              <Image src="/p5.png" alt="Bundle" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
-            </div>
-            <span className="text-[10px] font-black tracking-[0.2em] text-brand-gold uppercase mb-1">SIGNATURE BUNDLES</span>
-            <h4 className="font-serif font-normal text-brand-oat text-xl sm:text-2xl tracking-tight leading-tight group-hover:text-brand-gold transition-colors">The Starter Sampler Kit</h4>
-            <p className="text-xs text-brand-oat/60 font-bold leading-relaxed mt-2">A complete curated kit featuring our daily-fed sourdough cultures and signature soda blend.</p>
-          </Link>
- 
-          {/* Card 3: Sourdough */}
-          <Link href="/shop" className="group flex flex-col bg-white/5 backdrop-blur-sm border border-white/10 rounded-[2rem] p-6 sm:p-8 hover:bg-white/10 hover:border-white/20 hover:scale-[1.01] hover:-translate-y-0.5 transition-all duration-500 cursor-pointer shadow-lg">
-            <div className="relative w-full aspect-square rounded-[1.5rem] overflow-hidden mb-6 bg-brand-oat/5">
-              <Image src="/p1.png" alt="Sourdough" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+              <Image src="/new-catelog/sourdough-classic-heritage.png" alt="Sourdough Classic Heritage, a round loaf with a deeply scored crust" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
             </div>
             <span className="text-[10px] font-black tracking-[0.2em] text-brand-gold uppercase mb-1">ARTISAN BREAD</span>
-            <h4 className="font-serif font-normal text-brand-oat text-xl sm:text-2xl tracking-tight leading-tight group-hover:text-brand-gold transition-colors">Classic Sourdough Loaf</h4>
-            <p className="text-xs text-brand-oat/60 font-bold leading-relaxed mt-2">Wild fermented with only flour, water, and sea salt. Baked fresh to order only.</p>
+            <h4 className="font-serif font-normal text-brand-oat text-xl sm:text-2xl tracking-tight leading-tight group-hover:text-brand-gold transition-colors">Sourdough Classic Heritage</h4>
+            <p className="text-xs text-brand-oat/60 font-bold leading-relaxed mt-2">Flour, water, salt and a slow ferment. Baked to order.</p>
           </Link>
- 
+
+          {/* Card 3: Savoury */}
+          <Link href="/shop" className="group flex flex-col bg-white/5 backdrop-blur-sm border border-white/10 rounded-[2rem] p-6 sm:p-8 hover:bg-white/10 hover:border-white/20 hover:scale-[1.01] hover:-translate-y-0.5 transition-all duration-500 cursor-pointer shadow-lg">
+            <div className="relative w-full aspect-square rounded-[1.5rem] overflow-hidden mb-6 bg-brand-oat/5">
+              <Image src="/product_img/6-top-shot.jpg" alt="Three baked sourdough loaves with cheese, cooling on a wire rack" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+            </div>
+            <span className="text-[10px] font-black tracking-[0.2em] text-brand-gold uppercase mb-1">CRAFTED BAKES</span>
+            <h4 className="font-serif font-normal text-brand-oat text-xl sm:text-2xl tracking-tight leading-tight group-hover:text-brand-gold transition-colors">Savoury and sweet sourdough</h4>
+            <p className="text-xs text-brand-oat/60 font-bold leading-relaxed mt-2">New flavours every week, baked for Wednesday and Saturday delivery.</p>
+          </Link>
+
         </div>
  
         {/* CTA Button */}
         <Link href="/shop" className="mt-12 sm:mt-20 inline-flex bg-brand-oat text-brand-brown rounded-full px-8 sm:px-16 py-4 sm:py-5 text-sm font-black uppercase tracking-[0.2em] hover:bg-brand-orange hover:text-white hover:scale-105 transition-all duration-500 shadow-xl whitespace-nowrap z-30">
-          Shop the Set
+          See the menu
         </Link>
  
       </div>

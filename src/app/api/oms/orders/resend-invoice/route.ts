@@ -4,10 +4,11 @@ import { createServerSupabase } from "@/lib/supabase-server";
 import { generateInvoicePDF, withTaxInfo } from "@/lib/invoice";
 import { deriveLoyaltyDiscount } from "@/lib/coupons";
 import { sendPaymentConfirmedToCustomer } from "@/lib/email";
+import { OMS_COOKIE, verifyOmsToken } from "@/lib/omsAuth";
 
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
-  if (cookieStore.get("oms_auth")?.value !== "1") {
+  if (!(await verifyOmsToken(cookieStore.get(OMS_COOKIE)?.value))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

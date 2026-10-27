@@ -11,26 +11,26 @@ const STAGES = [
   {
     src: "/product_img/2-starter-side.jpg",
     stage: "Starter",
-    title: "It begins alive.",
-    body: "Flour, water, and time — nothing else. Fed daily, growing until it's ready to leaven.",
+    title: "It begins with a starter.",
+    body: "Flour, water and time, nothing else. Fed daily, growing until it's ready to leaven.",
   },
   {
     src: "/product_img/3-score.jpg",
     stage: "Score",
-    title: "Scored by hand.",
-    body: "Every loaf is cut just before the oven — the mark that decides how it opens up.",
+    title: "Scored before the oven.",
+    body: "Every loaf is cut just before the oven. The cut decides how it opens up.",
   },
   {
     src: "/product_img/4-bloom.jpg",
     stage: "Bloom",
     title: "Oven spring.",
-    body: "The heat hits and the loaf pushes upward — the moment fermentation shows its work.",
+    body: "The heat hits and the loaf pushes upward. This is the moment the ferment shows its work.",
   },
   {
     src: "/product_img/7-from-the-oven.jpg",
     stage: "Bake",
     title: "No shortcuts in the oven.",
-    body: "Stone-baked, watched closely. This is where the crust gets its character.",
+    body: "Baked hot and watched closely. This is where the crust gets its character.",
   },
   {
     src: "/product_img/8-the-crust.jpg",
@@ -42,7 +42,7 @@ const STAGES = [
     src: "/product_img/5-crumb-sliced.jpg",
     stage: "Table",
     title: "Sliced, and yours.",
-    body: "Open, airy crumb — the payoff for every hour that came before it.",
+    body: "Open, airy crumb: the payoff for every hour that came before it.",
   },
 ];
  

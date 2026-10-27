@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { ChevronDown } from "lucide-react";
+import { cutoffRuleText, deliveryDaysShort } from "@/lib/schedule";
+import { FREE_SHIPPING_THRESHOLD_PAISE, STANDARD_SHIPPING_FEE_PAISE } from "@/lib/shipping";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,14 +14,14 @@ const steps = [
     number: "01",
     day: "Browse",
     title: "Browse the current menu.",
-    body: "Check what's available for the upcoming window. Some products need more lead time — croissants need 48 hours — so check each item before ordering.",
+    body: "Check what's available for the upcoming window. Every item is baked to order for a Wednesday or Saturday delivery.",
     tag: "wildwildyeast.com",
   },
   {
     number: "02",
     day: "Order",
     title: "Order right on our website.",
-    body: "Add what you want to your cart and check out securely with Razorpay — card, UPI, or netbanking. Your order is confirmed instantly, no waiting on a reply.",
+    body: "Add what you want to your cart and check out securely with Razorpay: card, UPI or netbanking. Your order is confirmed instantly, no waiting on a reply.",
     tag: "Razorpay checkout",
   },
   {
@@ -31,17 +33,17 @@ const steps = [
   },
 ];
 
+const CUTOFF_NOTE = `Order by ${cutoffRuleText()}`;
 const deliveryRules = [
-  { product: "Sourdough / Bread", lead: "1–2 days", notes: "Order by midnight the day before delivery" },
-  { product: "Fermented Drinks", lead: "5–6 days", notes: "Window must open at least 6 days before delivery" },
-  { product: "Fermented Sauces", lead: "7–10 days", notes: "Pre-announced seasonal batches" },
-  { product: "Pantry items (Vinegar etc.)", lead: "In stock", notes: "Subject to availability, ships next delivery day" },
+  { product: "Sourdough and breads", lead: "Baked to order", notes: CUTOFF_NOTE },
+  { product: "Croissants", lead: "Baked to order", notes: CUTOFF_NOTE },
+  { product: "Be-Sides (biscotti, macaroons, cookies, crackers)", lead: "Baked to order", notes: CUTOFF_NOTE },
 ];
 
 const faqs = [
   {
-    q: "Why can I only order before the weekly cutoff?",
-    a: "We don't keep stock. Every batch is planned from confirmed, paid orders. The cutoff tells us exactly what to make for that window — closing it is how we avoid waste, overproduction, and preservatives.",
+    q: "Why is there an order cutoff?",
+    a: "We don't keep stock. Every batch is planned from confirmed, paid orders. The cutoff tells us exactly what to make for that window. Closing it is how we avoid waste and overproduction.",
   },
   {
     q: "Why only Wednesday and Saturday delivery?",
@@ -49,23 +51,23 @@ const faqs = [
   },
   {
     q: "What if my payment doesn't go through?",
-    a: "Your order stays pending — nothing is made against it. You can retry checkout from your order history, or place a fresh order. We only start production once payment is confirmed.",
+    a: "Your order stays pending and nothing is made against it. You can retry checkout from your order history, or place a fresh order. We only start production once payment is confirmed.",
   },
   {
     q: "Can I order as a new customer?",
-    a: "Yes. First time, we'll ask for your name, delivery address, and pincode — we check it against our current delivery area before you can place the order. Every order after that is faster.",
+    a: "Yes. First time, we'll ask for your name, delivery address and pincode. We check it against our current delivery area before you can place the order. Every order after that is faster.",
   },
   {
     q: "Why does the bread look different batch to batch?",
-    a: "Wild fermentation responds to temperature, humidity, and the health of the starter on any given day. A Mumbai June batch and a December batch will taste different. That variation isn't a defect — it's evidence that the fermentation is real.",
+    a: "Wild fermentation responds to temperature, humidity, and the health of the starter on any given day. A Mumbai June batch and a December batch will taste different. That variation is what wild fermentation looks like.",
   },
   {
     q: "How should I store my sourdough?",
-    a: "Keep it cut-side down on a board, wrapped in a cotton cloth or bread bag — not plastic. It'll stay good for a couple of days at room temperature. Slice and freeze what you won't eat in that time; it toasts straight from frozen.",
+    a: "Keep it cut-side down on a board, wrapped in a cotton cloth or bread bag, not plastic. It'll stay good for a couple of days at room temperature. Slice and freeze what you won't eat in that time; it toasts straight from frozen.",
   },
   {
     q: "Can I order for a specific event or larger quantity?",
-    a: "Reach out to us directly and we'll work out what's possible. Larger orders need more lead time — we'll be upfront if something isn't doable by your date.",
+    a: "Reach out to us directly and we'll work out what's possible. Larger orders need more lead time, and we'll be upfront if something isn't doable by your date.",
   },
   {
     q: "Where in Mumbai do you deliver?",
@@ -121,6 +123,7 @@ export default function HowItWorks() {
  
   return (
     <section
+      id="how-it-works"
       ref={sectionRef}
       className="w-full bg-brand-oat py-20 sm:py-32 px-4 sm:px-6 relative overflow-hidden z-20"
     >
@@ -149,7 +152,7 @@ export default function HowItWorks() {
           </div>
           <div className="max-w-sm lg:pb-2 flex flex-col gap-2">
             <p className="text-sm sm:text-base md:text-lg font-bold text-brand-brown/60 leading-relaxed">
-              Add to cart, check out with Razorpay, done. We plan batches from confirmed, paid orders — bake and brew to order, and deliver on fixed days.
+              Add to cart, check out with Razorpay, done. We plan batches from confirmed, paid orders: we bake to order and deliver on fixed days.
             </p>
             <p className="text-xs sm:text-sm font-black tracking-[0.15em] uppercase text-brand-brown/40 italic">
               We don't rush food. We plan for it.
@@ -160,10 +163,10 @@ export default function HowItWorks() {
         {/* Delivery days pill */}
         <div className="flex flex-wrap gap-3 mb-12 sm:mb-16">
           {[
-            { label: "Delivery: Wed & Sat only" },
+            { label: `Delivery: ${deliveryDaysShort()} only` },
             { label: "Order online, pay by card / UPI / netbanking" },
-            { label: "Free shipping over ₹599 · ₹65 below" },
-            { label: "Bake to order — no advance stock" },
+            { label: `Free shipping over ₹${FREE_SHIPPING_THRESHOLD_PAISE / 100} · ₹${STANDARD_SHIPPING_FEE_PAISE / 100} below` },
+            { label: "Baked to order, no advance stock" },
           ].map(({ label }) => (
             <span key={label} className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white border border-brand-brown/8 text-[10px] sm:text-xs md:text-sm font-black tracking-[0.12em] uppercase text-brand-brown/60 shadow-sm">
               {label}
@@ -203,7 +206,7 @@ export default function HowItWorks() {
           <div className="flex items-center gap-4 mb-8">
             <div className="w-8 h-px bg-brand-orange" />
             <span className="text-sm sm:text-base md:text-lg font-bold tracking-[0.2em] uppercase text-brand-orange">
-              Lead Times by Product
+              Order Cutoffs by Product
             </span>
           </div>
           <div className="hiw-leads bg-white/80 backdrop-blur-md rounded-[2.5rem] border border-brand-brown/5 shadow-sm overflow-hidden">
@@ -216,7 +219,7 @@ export default function HowItWorks() {
             ))}
           </div>
           <p className="text-xs font-bold text-brand-brown/30 mt-4 italic text-center">
-            Mixed carts with different lead times are offered as split delivery or combined on the later date.
+            Everything in your cart arrives together on the delivery day shown at checkout.
           </p>
         </div>
  
@@ -236,7 +239,7 @@ export default function HowItWorks() {
                 <span className="text-brand-orange italic font-light">works this way.</span>
               </h3>
               <p className="text-sm sm:text-base font-bold text-brand-brown/50 leading-relaxed mt-4 max-w-xs">
-                Our constraints are our credibility. A weekly order cutoff and fixed delivery days are not inconveniences — they are how fresh food without preservatives works.
+                Two cutoffs a week and fixed delivery days let us bake only what has been ordered.
               </p>
             </div>
             <div className="flex-1 bg-white/80 backdrop-blur-md rounded-[2.5rem] px-6 sm:px-8 border border-brand-brown/5 shadow-sm">

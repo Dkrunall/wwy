@@ -74,13 +74,9 @@ export default function OrderLoginPage() {
         });
         // Check serviceability against active bakers
         setPincodeServiceable("checking");
-        const { data: bakers } = await supabase
-          .from("bakers")
-          .select("pincodes")
-          .eq("is_active", true);
+        const svc = await fetch(`/api/pincode/serviceable?code=${pincode}`).then((r) => r.json()).catch(() => null);
         if (cancelled) return;
-        const serviceable = (bakers || []).flatMap((b: { pincodes?: string[] }) => b.pincodes || []);
-        setPincodeServiceable(serviceable.length > 0 && !serviceable.includes(pincode) ? "blocked" : "ok");
+        setPincodeServiceable(svc?.serviceable === false ? "blocked" : "ok");
       })
       .catch(() => { if (!cancelled) { setPincodeLookup("notfound"); setPincodeServiceable("blocked"); } });
     return () => { cancelled = true; };
@@ -144,12 +140,8 @@ export default function OrderLoginPage() {
 
     // Validate pincode against serviceable bakers
     setError(""); setLoading(true);
-    const { data: bakers } = await supabase
-      .from("bakers")
-      .select("pincodes")
-      .eq("is_active", true);
-    const serviceable = (bakers || []).flatMap((b) => b.pincodes || []);
-    if (serviceable.length > 0 && !serviceable.includes(pincode.trim())) {
+    const svc = await fetch(`/api/pincode/serviceable?code=${pincode.trim()}`).then((r) => r.json()).catch(() => null);
+    if (svc?.serviceable === false) {
       setError("Sorry, we don't deliver to this pincode yet. We're expanding soon!");
       setLoading(false);
       return;
@@ -210,7 +202,7 @@ export default function OrderLoginPage() {
             WE&apos;RE ON A<br />SHORT BREAK.
           </h1>
           <p className="text-sm font-bold text-brand-charcoal/50 leading-relaxed">
-            We&apos;re resting and will be back with fresh batches soon. Check our journal for updates. 🌾
+            We&apos;re resting and will be back with fresh batches soon. Follow @wildwildyeast.wwy on Instagram for updates. 🌾
           </p>
         </div>
       </main>
@@ -233,7 +225,7 @@ export default function OrderLoginPage() {
             {step === "update" && "ONE LAST\nTHING."}
           </h1>
           <p className="text-sm font-bold text-brand-charcoal/40">
-            {step === "email" && "Enter your email — we'll send a one-time code. No password."}
+            {step === "email" && "Enter your email, we'll send a one-time code. No password."}
             {step === "otp" && `An 8-digit code was sent to ${email}. Check your inbox (and spam).`}
             {step === "register" && "Just a few details and you're in."}
             {step === "update" && "Add your phone number so your baker can reach you."}
@@ -269,7 +261,7 @@ export default function OrderLoginPage() {
             <div className="flex items-start gap-2 bg-brand-gold/15 border border-brand-gold/30 rounded-xl px-3 py-2.5">
               <span className="text-sm leading-none">📩</span>
               <p className="text-[11px] font-bold text-brand-charcoal/70 leading-snug">
-                Don&apos;t see it in your inbox? Check your <span className="font-black">spam / junk</span> folder — the code can land there.
+                Don&apos;t see it in your inbox? Check your <span className="font-black">spam / junk</span> folder, the code can land there.
               </p>
             </div>
             <div className="flex flex-col gap-2">

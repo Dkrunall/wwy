@@ -23,9 +23,9 @@ import Footer from "@/components/Footer";
 const CATEGORIES = ["All", "Crafted Bakes", "Be-Sides"];
 
 const CATEGORY_SUBTITLES: Record<string, string> = {
-  All: "Everything we bake & ferment in small batches.",
+  All: "Everything we bake in small batches.",
   "Crafted Bakes": "Sourdough, croissants & buns, slow-fermented and baked fresh.",
-  "Be-Sides": "Biscotti, macaroons, cookies & crackers — crisp, chewy, delightful.",
+  "Be-Sides": "Biscotti, macaroons, cookies and crackers: crisp, chewy, delightful.",
 };
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
@@ -95,12 +95,8 @@ function OrderPageInner() {
 
     (async () => {
       try {
-        const { data: setting } = await supabase
-          .from("settings")
-          .select("value")
-          .eq("key", "vacation_mode")
-          .single();
-        if (setting?.value === "true") {
+        const vac = await fetch("/api/oms/vacation").then((r) => r.json()).catch(() => null);
+        if (vac?.vacation_mode === true) {
           router.replace("/coming-soon");
           return;
         }
@@ -253,12 +249,12 @@ function OrderPageInner() {
               style={{ fontSize: "clamp(2.4rem, 5vw, 4.2rem)" }}
             >
               THIS WEEK&apos;S <br className="hidden sm:inline" />
-              <span className="italic font-light text-brand-terracotta">FERMENTATION</span>
+              <span className="italic font-light text-brand-terracotta">MENU</span>
             </h1>
 
             {/* Subtitle */}
             <p className="text-xs sm:text-sm md:text-base text-brand-brown/70 font-medium leading-relaxed max-w-xl mb-6">
-              Small batch artisanal sourdoughs, 100-year-old wild yeast cultures, and live probiotic ginger sodas. Baked fresh strictly when ordered.
+              Small batch sourdough from a wild yeast starter, croissants and bakes. Baked fresh strictly when ordered.
             </p>
 
             {/* Highlight Features Bar */}
@@ -270,12 +266,12 @@ function OrderPageInner() {
               <span className="w-1 h-1 rounded-full bg-brand-brown/20" />
               <span className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                100% Wild Yeast
+                No commercial yeast
               </span>
               <span className="w-1 h-1 rounded-full bg-brand-brown/20" />
               <span className="flex items-center gap-1.5">
                 <Flame className="w-3.5 h-3.5 text-amber-600" />
-                No Artificial Additives
+                Baked to order
               </span>
             </div>
 
@@ -286,7 +282,7 @@ function OrderPageInner() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search sourdough, sodas, starters..."
+                placeholder="Search sourdough, croissants, cookies..."
                 className="w-full bg-white border border-brand-brown/20 rounded-full pl-11 pr-24 py-3.5 text-xs font-bold text-brand-brown placeholder:text-brand-brown/40 outline-none focus:border-brand-terracotta focus:ring-4 focus:ring-brand-terracotta/10 transition-all shadow-sm"
               />
               {searchQuery ? (
@@ -310,7 +306,7 @@ function OrderPageInner() {
             <div className="relative w-full max-w-sm aspect-[4/3] sm:aspect-square rounded-3xl overflow-hidden shadow-2xl border-4 border-white bg-white group">
               <Image
                 src="/product_img/7-from-the-oven.jpg"
-                alt="Fresh sourdough loaf from oven"
+                alt="A sourdough loaf fresh from the oven"
                 fill
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
                 priority
@@ -325,28 +321,13 @@ function OrderPageInner() {
                 </span>
               </div>
 
-              {/* Overlapping Floating Soda Bottle Card */}
-              <div className="absolute -bottom-2 -right-2 z-20 w-28 h-36 sm:w-32 sm:h-40 rounded-2xl bg-white p-2 shadow-2xl border-2 border-brand-oat flex flex-col items-center justify-center transform rotate-3 hover:rotate-0 transition-transform duration-300">
-                <div className="relative w-full h-full">
-                  <Image
-                    src="/p1.png"
-                    alt="Wild Botanicals Soda"
-                    fill
-                    className="object-contain drop-shadow-md"
-                  />
-                </div>
-                <span className="text-[9px] font-black uppercase text-brand-terracotta tracking-tight -mt-1 bg-brand-terracotta/10 px-2 py-0.5 rounded-full">
-                  Live Soda
-                </span>
-              </div>
-
               {/* Bottom Overlay Info */}
               <div className="absolute bottom-4 left-4 right-28 z-10 text-white">
                 <p className="text-[11px] font-black tracking-widest uppercase text-amber-300">
-                  72-Hour Cold Ferment
+                  12–24 Hour Ferment
                 </p>
                 <p className="text-sm font-serif font-bold text-white/95 leading-snug">
-                  Artisanal Sourdough &amp; Live Cultures
+                  Artisan Sourdough, Baked to Order
                 </p>
               </div>
             </div>
@@ -504,10 +485,29 @@ function ProductCard({
 
         {/* Description */}
         {product.description && (
-          <p className="text-xs sm:text-sm text-brand-brown/60 font-medium leading-relaxed mb-6 line-clamp-3">
+          <p className="text-xs sm:text-sm text-brand-brown/60 font-medium leading-relaxed mb-4 line-clamp-3">
             {product.description}
           </p>
         )}
+
+        {/* Legal Metrology declarations (P3-1) */}
+        <details className="mb-4 text-xs font-bold text-brand-brown/60">
+          <summary className="cursor-pointer list-none text-[10px] font-black tracking-[0.18em] uppercase text-brand-brown/50 hover:text-brand-terracotta">
+            Product details
+          </summary>
+          <dl className="mt-3 flex flex-col gap-1.5 leading-relaxed">
+            <div><dt className="inline font-black text-brand-brown/80">MRP: </dt><dd className="inline">{fmt(product.price_paise)} (incl. all taxes)</dd></div>
+            <div><dt className="inline font-black text-brand-brown/80">Type: </dt><dd className="inline">Vegetarian</dd></div>
+            {product.ingredients && <div><dt className="inline font-black text-brand-brown/80">Ingredients: </dt><dd className="inline">{product.ingredients}</dd></div>}
+            {product.allergens && <div><dt className="inline font-black text-brand-brown/80">Allergens: </dt><dd className="inline">{product.allergens}</dd></div>}
+            {product.net_quantity && <div><dt className="inline font-black text-brand-brown/80">Net quantity: </dt><dd className="inline">{product.net_quantity}</dd></div>}
+            {product.best_before && <div><dt className="inline font-black text-brand-brown/80">Best before: </dt><dd className="inline">{product.best_before}</dd></div>}
+            {product.storage && <div><dt className="inline font-black text-brand-brown/80">Storage: </dt><dd className="inline">{product.storage}</dd></div>}
+            {product.manufacturer_name && (
+              <div><dt className="inline font-black text-brand-brown/80">Manufactured by: </dt><dd className="inline">{product.manufacturer_name}{product.manufacturer_address ? `, ${product.manufacturer_address}` : ""}{product.manufacturer_fssai ? `. FSSAI ${product.manufacturer_fssai}` : ""}</dd></div>
+            )}
+          </dl>
+        </details>
       </div>
 
       {/* Action Footer */}
