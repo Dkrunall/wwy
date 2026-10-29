@@ -19,7 +19,7 @@ import {
   X,
   Loader2,
 } from "lucide-react";
-import { CartItem } from "@/lib/supabase";
+import { CartItem, supabase } from "@/lib/supabase";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { FREE_SHIPPING_THRESHOLD_PAISE, calculateShippingFee } from "@/lib/shipping";
@@ -63,7 +63,6 @@ export default function CartPage() {
   const [loading, setLoading] = useState(false);
   const [flat, setFlat] = useState("");
   const [customerId, setCustomerId] = useState("");
-  const [customerName, setCustomerName] = useState("");
   const [error, setError] = useState("");
   const [discountInfo, setDiscountInfo] = useState<{
     discountPercent: number;
@@ -94,12 +93,11 @@ export default function CartPage() {
   useEffect(() => {
     const storedFlat = localStorage.getItem("wwy_flat");
     if (!storedFlat) {
-      router.replace("/order/login");
+      router.replace("/order/login?next=/order/cart");
       return;
     }
     setFlat(storedFlat);
     setCustomerId(localStorage.getItem("wwy_customer_id") || "");
-    setCustomerName(localStorage.getItem("wwy_name") || "");
     setCart(getCart());
 
     fetch("/api/orders/delivery-slots")
@@ -210,14 +208,17 @@ export default function CartPage() {
     setLoading(true);
 
     try {
+      // The server identifies the customer from the login session, so send its token.
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push("/order/login?next=/order/cart");
+        return;
+      }
       const res = await fetch("/api/orders/initiate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
         body: JSON.stringify({
           cart,
-          customerId,
-          flat,
-          customerName,
           notes,
           deliveryDate: selectedDeliveryDate,
           couponCode: appliedCoupon?.code,

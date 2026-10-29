@@ -8,6 +8,7 @@ import { calculateDeliveryDate, deliveryDateISO, formatDeliveryDate, isValidDeli
 import { DEFAULT_CUTOFF_HOUR_IST, DEFAULT_DELIVERY_DAYS } from "@/lib/schedule";
 import { CartItem } from "@/lib/supabase";
 import { isPincodeServiceable } from "@/lib/baker";
+import { getSessionCustomer } from "@/lib/customerSession";
 
 function generateOrderNumber(): string {
   const year = new Date().getFullYear();
@@ -17,10 +18,8 @@ function generateOrderNumber(): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const { cart, flat, customerName, notes, deliveryDate: chosenDate, couponCode, skipAutoCoupon } = (await req.json()) as {
+    const { cart, notes, deliveryDate: chosenDate, couponCode, skipAutoCoupon } = (await req.json()) as {
       cart: CartItem[];
-      flat: string;
-      customerName: string;
       notes?: string;
       deliveryDate?: string;
       couponCode?: string;
@@ -47,15 +46,16 @@ export async function POST(req: NextRequest) {
     const deliveryDays = settingsMap.delivery_days ? parseDeliveryDays(settingsMap.delivery_days) : DEFAULT_DELIVERY_DAYS;
     const cutoffHour = settingsMap.cutoff_hour_ist ? parseInt(settingsMap.cutoff_hour_ist, 10) : DEFAULT_CUTOFF_HOUR_IST;
 
-    // Resolve customer server-side by flat number — don't trust localStorage UUID
-    const { data: customer } = await supabase
-      .from("customers")
-      .select("id, pincode")
-      .eq("flat_number", flat)
-      .single();
-    const resolvedCustomerId = customer?.id ?? null;
+    // The customer comes from the verified login session, never from the request body.
+    const customer = await getSessionCustomer(req, supabase);
+    if (!customer) {
+      return NextResponse.json({ error: "Please sign in again to place your order." }, { status: 401 });
+    }
+    const resolvedCustomerId = customer.id;
+    const flat = customer.flat_number;
+    const customerName = customer.name;
 
-    if (!(await isPincodeServiceable(supabase, customer?.pincode))) {
+    if (!(await isPincodeServiceable(supabase, customer.pincode))) {
       return NextResponse.json(
         { error: "Sorry, we don't currently deliver to your pincode. Please update your address in your account." },
         { status: 400 }
@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
     }
 
     const baseTotalPaise = pricedCart.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
-    const { finalTotal: loyaltyFinalPaise, discountPercent } = await applyDiscounts(resolvedCustomerId ?? "", baseTotalPaise);
+    const { finalTotal: loyaltyFinalPaise, discountPercent } = await applyDiscounts(resolvedCustomerId, baseTotalPaise);
     const loyaltyDiscountPaise = baseTotalPaise - loyaltyFinalPaise;
 
     const { coupon, discountPaise: couponDiscountPaise, error: couponError } =
@@ -113,7 +113,7 @@ export async function POST(req: NextRequest) {
     const rzpOrder = await razorpay.orders.create({
       amount: finalTotal,
       currency: "INR",
-      notes: { customer_id: resolvedCustomerId ?? "", flat_number: flat },
+      notes: { customer_id: resolvedCustomerId, flat_number: flat },
     });
 
     const orderNumber = generateOrderNumber();

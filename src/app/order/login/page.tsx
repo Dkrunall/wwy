@@ -8,6 +8,15 @@ import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import AnnouncementBar from "@/components/AnnouncementBar";
 
+// Length of the emailed code. Must match Supabase -> Authentication -> Email -> OTP length.
+const OTP_LENGTH = Math.min(10, Math.max(6, parseInt(process.env.NEXT_PUBLIC_OTP_LENGTH || "8", 10) || 8));
+
+// Where to go after login: only same-site /order paths, so ?next= cannot redirect off-site.
+function safeNext(raw: string | null): string {
+  if (raw && /^\/order(\/[A-Za-z0-9\-_/]*)?$/.test(raw)) return raw;
+  return "/order";
+}
+
 export default function OrderLoginPage() {
   const router = useRouter();
   const [step, setStep] = useState<"email" | "otp" | "register" | "update">("email");
@@ -27,6 +36,8 @@ export default function OrderLoginPage() {
   const [loading, setLoading] = useState(false);
   const [vacationMode, setVacationMode] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
+  const [checkingSession, setCheckingSession] = useState(true);
+  const goNext = () => router.push(safeNext(new URLSearchParams(window.location.search).get("next")));
 
   useEffect(() => {
     fetch("/api/oms/vacation")
@@ -96,22 +107,12 @@ export default function OrderLoginPage() {
     setResendTimer(60);
   };
 
-  const verifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (otp.trim().length < 6) { setError("Enter the code from your email."); return; }
-    setError(""); setLoading(true);
-    const { data, error: err } = await supabase.auth.verifyOtp({
-      email: email.trim().toLowerCase(),
-      token: otp.trim(),
-      type: "email",
-    });
-    setLoading(false);
-    if (err || !data.user) { setError("Invalid or expired code. Try again."); return; }
-
+  // After a verified login: load the customer, save the details the other pages read, then continue.
+  const finishLogin = async (loginEmail: string) => {
     const { data: customer } = await supabase
       .from("customers")
       .select("*")
-      .eq("email", email.trim().toLowerCase())
+      .eq("email", loginEmail)
       .single();
 
     if (customer) {
@@ -124,11 +125,44 @@ export default function OrderLoginPage() {
         setExistingCustomerId(customer.id);
         setStep("update");
       } else {
-        router.push("/order");
+        goNext();
       }
     } else {
+      setEmail(loginEmail);
       setStep("register");
     }
+  };
+
+  // Already signed in (valid Supabase session): skip the email code entirely.
+  useEffect(() => {
+    let cancelled = false;
+    supabase.auth.getSession().then(async ({ data }) => {
+      const sessionEmail = data.session?.user?.email?.toLowerCase();
+      if (!sessionEmail || cancelled) { if (!cancelled) setCheckingSession(false); return; }
+      await finishLogin(sessionEmail);
+      if (!cancelled) setCheckingSession(false);
+    }).catch(() => { if (!cancelled) setCheckingSession(false); });
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const verifyCode = async (code: string) => {
+    if (loading) return;
+    if (code.length < OTP_LENGTH) { setError(`Enter the ${OTP_LENGTH}-digit code from your email.`); return; }
+    setError(""); setLoading(true);
+    const { data, error: err } = await supabase.auth.verifyOtp({
+      email: email.trim().toLowerCase(),
+      token: code,
+      type: "email",
+    });
+    if (err || !data.user) { setLoading(false); setError("Invalid or expired code. Try again."); return; }
+    await finishLogin(email.trim().toLowerCase());
+    setLoading(false);
+  };
+
+  const verifyOtp = (e: React.FormEvent) => {
+    e.preventDefault();
+    return verifyCode(otp.trim());
   };
 
   const register = async (e: React.FormEvent) => {
@@ -173,7 +207,7 @@ export default function OrderLoginPage() {
     localStorage.setItem("wwy_name", data.name);
     localStorage.setItem("wwy_customer_id", data.id);
     if (data.pincode) localStorage.setItem("wwy_pincode", data.pincode);
-    router.push("/order");
+    goNext();
   };
 
   const updatePhone = async (e: React.FormEvent) => {
@@ -185,11 +219,15 @@ export default function OrderLoginPage() {
       .update({ phone: phone.replace(/\D/g,"").slice(-10) })
       .eq("id", existingCustomerId);
     setLoading(false);
-    router.push("/order");
+    goNext();
   };
 
   const inputCls = "w-full bg-white border-2 border-brand-charcoal/10 focus:border-brand-orange focus:ring-4 focus:ring-brand-orange/10 rounded-2xl px-5 py-4 font-black text-brand-charcoal text-xl placeholder:text-brand-charcoal/25 outline-none transition-all duration-300 shadow-sm focus:shadow-md";
   const btnCls = "w-full bg-brand-charcoal text-white hover:bg-brand-orange disabled:opacity-50 disabled:pointer-events-none rounded-2xl py-5 font-black text-sm tracking-[0.15em] uppercase transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] min-h-[56px] flex items-center justify-center";
+
+  if (checkingSession) {
+    return <main className="min-h-screen bg-brand-oat" aria-busy="true" />;
+  }
 
   if (vacationMode) {
     return (
@@ -226,7 +264,7 @@ export default function OrderLoginPage() {
           </h1>
           <p className="text-sm font-bold text-brand-charcoal/40">
             {step === "email" && "Enter your email, we'll send a one-time code. No password."}
-            {step === "otp" && `An 8-digit code was sent to ${email}. Check your inbox (and spam).`}
+            {step === "otp" && `A ${OTP_LENGTH}-digit code was sent to ${email}. Check your inbox (and spam).`}
             {step === "register" && "Just a few details and you're in."}
             {step === "update" && "Add your phone number so your baker can reach you."}
           </p>
@@ -241,6 +279,7 @@ export default function OrderLoginPage() {
               </label>
               <input
                 type="email"
+                autoComplete="email"
                 autoFocus
                 placeholder="you@example.com"
                 value={email}
@@ -272,10 +311,17 @@ export default function OrderLoginPage() {
                 type="text"
                 inputMode="numeric"
                 autoFocus
-                maxLength={8}
-                placeholder="12345678"
+                autoComplete="one-time-code"
+                name="otp"
+                maxLength={OTP_LENGTH}
+                placeholder={"123456789012".slice(0, OTP_LENGTH)}
                 value={otp}
-                onChange={(e) => { setOtp(e.target.value.replace(/\D/g, "")); setError(""); }}
+                onChange={(e) => {
+                  const digits = e.target.value.replace(/\D/g, "").slice(0, OTP_LENGTH);
+                  setOtp(digits);
+                  setError("");
+                  if (digits.length === OTP_LENGTH) verifyCode(digits);
+                }}
                 className={inputCls + " tracking-[0.4em] text-center"}
               />
               {error && <p className="text-xs font-bold text-brand-terracotta">{error}</p>}
@@ -308,6 +354,7 @@ export default function OrderLoginPage() {
               <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">Your Name</label>
               <input
                 type="text"
+                autoComplete="name"
                 autoFocus
                 placeholder="Arjun Mehta"
                 value={name}
@@ -329,6 +376,7 @@ export default function OrderLoginPage() {
               <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">Delivery Address</label>
               <textarea
                 rows={2}
+                autoComplete="street-address"
                 placeholder="e.g. Flat 4B, Tower C, Sunshine Apartments, Linking Road, Bandra West, Mumbai"
                 value={address}
                 onChange={(e) => { setAddress(e.target.value); setError(""); }}
@@ -338,14 +386,10 @@ export default function OrderLoginPage() {
             </div>
             <div className="flex flex-col gap-2">
               <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">Phone Number</label>
-              <input
-                type="tel"
-                inputMode="numeric"
-                placeholder="9876543210"
-                value={phone}
-                onChange={(e) => { setPhone(e.target.value); setError(""); }}
-                className={inputCls}
-              />
+              <div className="flex items-center gap-2">
+                <span className="shrink-0 font-black text-brand-charcoal/50 text-xl">+91</span>
+                <input type="tel" inputMode="numeric" autoComplete="tel-national" maxLength={10} placeholder="9876543210" value={phone} onChange={(e) => { setPhone(e.target.value); setError(""); }} className={inputCls} />
+              </div>
               <p className="text-[11px] font-bold text-brand-charcoal/30">So your baker can reach you if needed.</p>
             </div>
             <div className="flex flex-col gap-2">
@@ -353,6 +397,7 @@ export default function OrderLoginPage() {
               <input
                 type="text"
                 inputMode="numeric"
+                autoComplete="postal-code"
                 maxLength={6}
                 placeholder="400001"
                 value={pincode}
@@ -406,22 +451,17 @@ export default function OrderLoginPage() {
           <form onSubmit={updatePhone} className="w-full flex flex-col gap-4">
             <div className="flex flex-col gap-2">
               <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">Phone Number</label>
-              <input
-                type="tel"
-                inputMode="numeric"
-                autoFocus
-                placeholder="9876543210"
-                value={phone}
-                onChange={(e) => { setPhone(e.target.value); setError(""); }}
-                className={inputCls}
-              />
+              <div className="flex items-center gap-2">
+                <span className="shrink-0 font-black text-brand-charcoal/50 text-xl">+91</span>
+                <input type="tel" inputMode="numeric" autoComplete="tel-national" maxLength={10} autoFocus placeholder="9876543210" value={phone} onChange={(e) => { setPhone(e.target.value); setError(""); }} className={inputCls} />
+              </div>
               <p className="text-[11px] font-bold text-brand-charcoal/30">So your baker can reach you if needed.</p>
             </div>
             {error && <p className="text-xs font-bold text-brand-terracotta">{error}</p>}
             <button type="submit" disabled={loading} className={btnCls}>
               {loading ? "Saving..." : "Continue →"}
             </button>
-            <button type="button" onClick={() => router.push("/order")}
+            <button type="button" onClick={goNext}
               className="text-xs font-bold text-brand-charcoal/30 hover:text-brand-terracotta transition-colors text-center">
               Skip for now
             </button>

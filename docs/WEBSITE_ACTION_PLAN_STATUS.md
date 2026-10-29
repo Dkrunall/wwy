@@ -9,6 +9,7 @@ Branch: `fix/website-action-plan`. Legend: **Done** = finished in code. **Done, 
    - `OMS_SESSION_SECRET`: random string, 32+ characters. Without it nobody can log in to the OMS and the dev preview cannot be unlocked.
    - `DEV_PREVIEW_KEY`: the key for `/?dev=<key>`. There is no default any more.
    - `NEXT_PUBLIC_SITE_URL`: `https://wildwildyeast.com` (used for the sitemap, canonical and Open Graph URLs).
+   - `NEXT_PUBLIC_OTP_LENGTH`: length of the emailed login code, `6` to `10` (default `8`). It must equal Supabase, Authentication, Email, OTP length, because the code box submits itself at that length.
 2. **Deploy this branch**, then check the OMS: log in, open orders, edit a product, change a setting, open a baker link and a `/pay` link.
 3. **Run SQL in the Supabase SQL Editor, in this order:**
    1. `supabase-plan-migration.sql`: newsletter table, product declaration columns, HSN/GST columns, cutoff setting = 21.
@@ -116,3 +117,12 @@ Checkout and payment screens behind login, mobile layout, page speed, the `invoi
 - Anon-key read of customer and order tables returns nothing (P4-3).
 - Share `/` and `/shop` on WhatsApp; both show a correct card (P3-8).
 - Dev gate removed; `robots.txt` and `sitemap.xml` live (P4-1, P4-4).
+
+## 7. Easier order and login flow
+
+- The menu (`/order`) is open without login; login is asked for at the cart, and returns there (`?next=`, same-site `/order` paths only).
+- The code box submits itself at the full length, offers the emailed code to the phone keyboard, and a valid Supabase session skips the email step.
+- Sign-up has browser autofill attributes and a `+91` prefix on phone.
+- `/api/orders/initiate` now identifies the customer from the verified Supabase session (`lib/customerSession.ts`) and ignores the flat, name and id the browser sends. Without a valid session it returns 401.
+- "Order again" on `/order/history` already existed.
+- Not done: magic link in the email, custom SMTP (Supabase setting), WhatsApp/phone OTP, Google sign-in, guest checkout. The coupon preview endpoints still take `customerId` from the browser (they only compute a discount and place no order).

@@ -86,11 +86,7 @@ function OrderPageInner() {
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
 
   useEffect(() => {
-    const storedFlat = localStorage.getItem("wwy_flat");
-    if (!storedFlat) {
-      router.replace("/order/login");
-      return;
-    }
+    // The menu is open to everyone; login is asked for at checkout (/order/cart).
     setCart(getCart());
 
     (async () => {
