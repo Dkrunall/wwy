@@ -122,7 +122,8 @@ export default function ShopClient({ products }: { products: Product[] }) {
       </section>
  
       {/* ── Bottom Banner ── */}
-      <section className="w-full bg-brand-brown mx-0 px-4 sm:px-8 xl:px-16 py-16 sm:py-20 flex flex-col sm:flex-row items-center justify-between gap-8">
+      <section className="w-full bg-brand-brown px-4 sm:px-8 xl:px-16 py-16 sm:py-20">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-8">
         <div>
           <h3 className="font-serif font-normal text-brand-oat tracking-tight leading-[1.05] mb-3"
             style={{ fontSize: "clamp(2rem, 4vw, 3.2rem)" }}>
@@ -137,6 +138,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
         >
           Order Now
         </Link>
+        </div>
       </section>
  
       <Footer />
