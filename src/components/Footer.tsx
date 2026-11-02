@@ -19,32 +19,45 @@ export default function Footer() {
               className="font-black text-brand-oat tracking-tighter leading-[1.05]"
               style={{ fontSize: "clamp(1.4rem, 3.5vw, 2.2rem)" }}
             >
-              YOU DON'T BUY OUR FOOD<br />OFF A SHELF.<br />
-              <span className="text-brand-orange">YOU SET IT IN MOTION.</span>
+              WILD BY NATURE.<br />
+              <span className="text-brand-orange">CRAFTED BY TIME.</span>
             </h3>
             <p className="text-brand-oat/40 font-bold text-xs sm:text-sm max-w-xs">
-              Wild by nature. Crafted by time.
+              Small-batch sourdough and flavour-led bakes, made with curiosity in Mumbai.
             </p>
             <p className="text-brand-oat/25 font-bold text-[10px] sm:text-xs max-w-xs italic">
-              WWY food is made slowly, and only to order.
+              Freshly baked twice a week and delivered to your doorstep according to our baking and delivery schedule.
             </p>
+            <Link href="/#newsletter" className="text-brand-orange text-[10px] sm:text-xs font-black tracking-[0.2em] uppercase hover:text-white transition-colors">
+              Fresh batches. First dibs. Join the list →
+            </Link>
           </div>
 
           {/* Links */}
-          <div className="flex gap-10 sm:gap-16 text-xs sm:text-sm font-black tracking-[0.2em] uppercase text-brand-oat/60">
+          <div className="flex flex-wrap gap-10 sm:gap-14 text-xs sm:text-sm font-black tracking-[0.2em] uppercase text-brand-oat/60">
             <div className="flex flex-col gap-4 sm:gap-6">
               <span className="text-brand-orange mb-1">Shop</span>
-              <Link href="/shop" className="hover:text-white transition-colors">All Products</Link>
-              <Link href="/gifting" className="hover:text-white transition-colors">Gifting</Link>
+              <Link href="/shop" className="hover:text-white transition-colors">Shop All</Link>
               <Link href="/order?category=Crafted%20Bakes" className="hover:text-white transition-colors">Crafted Bakes</Link>
-              <Link href="/order?category=Be-Sides" className="hover:text-white transition-colors">Be-Sides</Link>
+              <Link href="/order?category=Be-Sides" className="hover:text-white transition-colors">Be-sides</Link>
+              <Link href="/gifting" className="hover:text-white transition-colors">Gifting</Link>
+              <Link href="/flavour-lab" className="hover:text-white transition-colors">Flavour Lab</Link>
             </div>
             <div className="flex flex-col gap-4 sm:gap-6">
-              <span className="text-brand-orange mb-1">Company</span>
+              <span className="text-brand-orange mb-1">Discover</span>
               <Link href="/story" className="hover:text-white transition-colors">Our Story</Link>
-              <Link href="/contact" className="hover:text-white transition-colors">Contact</Link>
-              <Link href="/delivery" className="hover:text-white transition-colors">Delivery</Link>
-              <Link href="/refund" className="hover:text-white transition-colors">Refunds</Link>
+              <Link href="/process" className="hover:text-white transition-colors">Our Process</Link>
+              <Link href="/reviews" className="hover:text-white transition-colors">Customer Reviews</Link>
+              <Link href="/faq" className="hover:text-white transition-colors">FAQs</Link>
+            </div>
+            <div className="flex flex-col gap-4 sm:gap-6">
+              <span className="text-brand-orange mb-1">Help</span>
+              <Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link>
+              <Link href="/delivery" className="hover:text-white transition-colors">Delivery Information</Link>
+              <Link href="/refund" className="hover:text-white transition-colors">Order &amp; Cancellation</Link>
+              <Link href="/refund" className="hover:text-white transition-colors">Refund &amp; Replacement</Link>
+              <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+              <Link href="/terms" className="hover:text-white transition-colors">Terms &amp; Conditions</Link>
             </div>
           </div>
 

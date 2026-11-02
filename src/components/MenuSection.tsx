@@ -167,19 +167,19 @@ export default function MenuSection() {
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8 sm:mb-12">
           <div>
             <span className="text-brand-terracotta text-xs sm:text-sm font-bold tracking-[0.2em] uppercase mb-3 block">
-              Fresh Weekly Menu
+              The latest batch has entered the chat.
             </span>
             <h2
               className="font-serif font-normal text-brand-brown tracking-tight leading-[1.05]"
               style={{ fontSize: "clamp(2.5rem, 6.5vw, 4.8rem)" }}
             >
-              This week&apos;s <span className="text-brand-terracotta italic font-light">menu.</span>
+              What&apos;s baking <span className="text-brand-terracotta italic font-light">right now?</span>
             </h2>
           </div>
 
           <div className="flex items-end justify-between lg:justify-end gap-6">
             <p className="text-xs sm:text-sm md:text-base font-bold text-brand-brown/60 leading-relaxed max-w-sm">
-              Made in small batches against paid orders.
+              Some flavours are familiar. Some are a little unexpected. All are worth a closer look.
             </p>
 
             {/* Slider Navigation Arrows */}

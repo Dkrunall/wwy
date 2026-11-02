@@ -126,3 +126,18 @@ Checkout and payment screens behind login, mobile layout, page speed, the `invoi
 - `/api/orders/initiate` now identifies the customer from the verified Supabase session (`lib/customerSession.ts`) and ignores the flat, name and id the browser sends. Without a valid session it returns 401.
 - "Order again" on `/order/history` already existed.
 - Not done: magic link in the email, custom SMTP (Supabase setting), WhatsApp/phone OTP, Google sign-in, guest checkout. The coupon preview endpoints still take `customerId` from the browser (they only compute a discount and place no order).
+
+## 8. Website copy applied (WWY - Website copies.pdf)
+
+Applied from the copy document: homepage (hero, intro, categories, featured, philosophy, Flavour Lab, freshness, reviews, newsletter, closing call to action), shop, story, delivery, contact, footer, navigation, SEO titles and descriptions. New pages: `/flavour-lab`, `/process`, `/faq` (with FAQ structured data), `/reviews`.
+
+Deliberately different from the document:
+- **Ferments, botanical sodas and Starter Kits & Bundles** are left out everywhere (no live products, decision D1). Their pages (`/ferments`, `/bundles`) were not built.
+- The process step "a **living** culture" now reads "a culture of wild yeast and bacteria" (the plan bans "living" and "alive").
+- The live order-cutoff countdown stays in place of the "Small batches. Big bread energy." announcement bar.
+- The newsletter stays a WhatsApp opt-in (D4), so the copy says "WhatsApp list", not "mailing list".
+- The FAQ vegan answer says many bakes contain dairy or eggs. Support contact, delivery area, cutoff and charge placeholders are filled from the site's own settings.
+- The contact form opens WhatsApp with the message filled in (same approach as the gifting form).
+- The story timeline (2019, 2021, 2023, 2024) was removed because it is not in the copy document and could not be verified (P2-9).
+- Two customer reviews on `/reviews` and the homepage still mention ginger ales, and some quotes contain dashes. They are customers' own words and were not edited.
+- The navbar logo image reads "FERMENTS" under the mark. That is the image file, not code.

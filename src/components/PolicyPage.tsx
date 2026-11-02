@@ -7,11 +7,15 @@ export default function PolicyPage({
   eyebrow,
   title,
   updated = "October 2026",
+  intro,
+  showUpdated = true,
   children,
 }: {
   eyebrow: string;
   title: string;
   updated?: string;
+  intro?: string;
+  showUpdated?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -23,7 +27,8 @@ export default function PolicyPage({
           <h1 className="font-serif font-normal text-brand-brown tracking-tight leading-[1.05]" style={{ fontSize: "clamp(2.4rem, 7vw, 4.5rem)" }}>
             {title}
           </h1>
-          <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-brown/30 mt-4">Last updated {updated}</p>
+          {intro && <p className="text-base sm:text-lg font-bold text-brand-brown/60 leading-relaxed mt-5 max-w-2xl">{intro}</p>}
+          {showUpdated && <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-brown/30 mt-4">Last updated {updated}</p>}
         </div>
       </section>
       <section className="w-full px-4 sm:px-8 xl:px-16 py-12 sm:py-16">

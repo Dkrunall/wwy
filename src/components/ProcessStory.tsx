@@ -3,6 +3,7 @@
 import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
+import Link from "next/link";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
  
 gsap.registerPlugin(ScrollTrigger);
@@ -85,14 +86,20 @@ export default function ProcessStory() {
         {/* Header Block */}
         <div className="max-w-xl mb-16 sm:mb-24">
           <span className="text-brand-gold text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
-            From Starter to Table
+            From starter to table
           </span>
           <h2
             className="font-serif font-normal text-brand-oat tracking-tight leading-[1.05]"
             style={{ fontSize: "clamp(2.2rem, 7vw, 4.8rem)" }}
           >
-            The whole <span className="text-brand-gold italic font-light">process.</span>
+            Good bread takes its <span className="text-brand-gold italic font-light">time.</span>
           </h2>
+          <p className="text-brand-oat/70 text-sm sm:text-base font-medium leading-relaxed mt-6">
+            We believe the best things aren&apos;t rushed. Sourdough is a lesson in patience. Time, fermentation and careful baking come together to create bread with its own distinctive character.
+          </p>
+          <Link href="/process" className="inline-block mt-6 text-xs font-black tracking-[0.2em] uppercase text-brand-gold hover:text-brand-orange transition-colors">
+            Discover our process →
+          </Link>
         </div>
  
         {/* Responsive Staggered Grid Layout */}

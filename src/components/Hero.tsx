@@ -4,7 +4,6 @@ import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import Link from "next/link";
-import WhatsAppIcon from "./WhatsAppIcon";
 
 export default function Hero() {
   const containerRef = useRef<HTMLElement>(null);
@@ -72,16 +71,20 @@ export default function Hero() {
 
           <div className="hero-text inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-2 rounded-full bg-white text-brand-brown text-[9px] sm:text-[10px] md:text-xs font-black uppercase tracking-[0.2em] mb-6 sm:mb-8 shadow-sm border border-brand-brown/5">
             <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-brand-orange animate-pulse shrink-0"></span>
-            Made to order. Never in advance.
+            Freshly baked. Delivered to your doorstep.
           </div>
 
           <h1 className="hero-text font-black tracking-tighter text-brand-brown mb-3 leading-[0.85]"
             style={{ fontSize: "clamp(2.6rem, 11vw, 6.5rem)" }}>
-            WILD BY NATURE.<br /><span className="text-brand-orange">CRAFTED BY TIME.</span>
+            GOOD BREAD.<br /><span className="text-brand-orange">WILD IDEAS.</span>
           </h1>
 
-          <p className="hero-text text-sm sm:text-base md:text-xl font-bold text-brand-brown/70 max-w-sm sm:max-w-md mb-6 sm:mb-10">
-            Bake-to-order sourdough. Mumbai only.
+          <p className="hero-text text-sm sm:text-base md:text-xl font-bold text-brand-brown/70 max-w-sm sm:max-w-md mb-3">
+            Small-batch sourdough. Unexpected flavours. A little patience, a lot of character.
+          </p>
+          <p className="hero-text text-xs sm:text-sm md:text-base font-bold text-brand-brown/55 max-w-sm sm:max-w-md mb-6 sm:mb-10 leading-relaxed">
+            Meet naturally fermented bread and flavour-led bakes made for people who like their food with a little personality.
+            We bake twice a week to bring you fresh batches worth looking forward to.
           </p>
 
           <div className="hero-text flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
@@ -89,11 +92,10 @@ export default function Hero() {
               href="/order"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-brand-brown text-brand-oat hover:bg-brand-orange hover:text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-xl active:scale-95"
             >
-              <WhatsAppIcon size={14} />
-              Order here
+              Shop all
             </Link>
-            <Link href="/story#how-it-works" className="w-full sm:w-auto inline-flex items-center justify-center bg-white text-brand-brown hover:bg-brand-oat px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-sm border border-brand-brown/5 active:scale-95">
-              How It Works
+            <Link href="/flavour-lab" className="w-full sm:w-auto inline-flex items-center justify-center bg-white text-brand-brown hover:bg-brand-oat px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-sm border border-brand-brown/5 active:scale-95">
+              Explore this week&apos;s bakes
             </Link>
           </div>
         </div>

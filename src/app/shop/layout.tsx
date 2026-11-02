@@ -4,10 +4,10 @@ import { getShopProducts } from "@/lib/shopProducts";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "Shop",
-  description: "Sourdough, croissants and bakes, baked to order and delivered across Mumbai every Wednesday and Saturday.",
+  title: "Shop Artisan Sourdough & Bakes",
+  description: "Shop Wild Wild Yeast in Mumbai. Explore naturally fermented sourdough, flavoured loaves, cookies, biscotti and crackers. Discover fresh batches baked twice a week.",
   alternates: { canonical: "/shop" },
-  openGraph: { title: "Shop | Wild Wild Yeast", url: "/shop" },
+  openGraph: { title: "Shop Artisan Sourdough & Bakes | Wild Wild Yeast", url: "/shop" },
 };
 
 export default async function ShopLayout({ children }: { children: React.ReactNode }) {

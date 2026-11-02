@@ -10,9 +10,12 @@ import type { Product } from "@/lib/products";
 import PincodeCheck from "@/components/PincodeCheck";
 import { BUSINESS } from "@/lib/business";
 import { cutoffRuleText, deliveryDaysShort } from "@/lib/schedule";
+import { FLAVOURS } from "@/lib/flavours";
 
-// Flavours customers name in their reviews (P3-2). Flavours rotate weekly.
-const FLAVOURS = ["Mango bird's eye chilli", "Paneer thecha", "Hung curd chilli oil", "Lychee chilli", "Chocolate chip cherry"];
+const CATEGORY_BLURBS: Record<string, { text: string; cta: string }> = {
+  "Crafted Bakes": { text: "Naturally fermented sourdough and flavour-led loaves for everyday eating and occasional overthinking about what to toast first.", cta: "Shop bread" },
+  "Be-Sides": { text: "Cookies, biscotti and crackers for the snack drawer, the coffee break and the board that needs one more thing.", cta: "Shop snacks" },
+};
 
 const categories = ["All", "Crafted Bakes", "Be-Sides"];
 
@@ -31,21 +34,21 @@ export default function ShopClient({ products }: { products: Product[] }) {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 max-w-full">
           <div>
             <span className="text-brand-orange text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
-              This week's menu
+              Welcome to the Wild Wild Yeast shop
             </span>
             <h1
               className="font-serif font-normal text-brand-brown tracking-tight leading-[1.05]"
               style={{ fontSize: "clamp(3rem, 9vw, 6.5rem)" }}
             >
-              Provisions.
+              The good stuff starts here.
             </h1>
             <p className="text-xs font-black tracking-[0.15em] uppercase text-brand-brown/25 mt-3">
-              Made when ordered, not before.
+              From slow-fermented sourdough to crunchy sides.
             </p>
           </div>
           <div className="flex flex-col gap-2 pb-2">
             <p className="text-sm sm:text-base font-bold text-brand-brown/40 max-w-xs leading-relaxed">
-              WWY food is made slowly, and only to order.
+              Find something to make your everyday a little more interesting. We bake twice a week, bringing you fresh batches of your favourite bakes, delivered straight to your doorstep.
             </p>
             <p className="text-[10px] font-black tracking-[0.15em] uppercase text-brand-brown/30">
               Made to order · Delivery {deliveryDaysShort()} only
@@ -87,6 +90,14 @@ export default function ShopClient({ products }: { products: Product[] }) {
           <p className="text-xs font-bold text-brand-brown/40 mt-3">Flavours rotate weekly. Check Instagram for this week&apos;s batch.</p>
         </div>
  
+        {/* Product listing intro */}
+        <div className="mt-10 max-w-2xl">
+          <h2 className="font-serif font-normal text-brand-brown text-2xl sm:text-3xl tracking-tight mb-2">Find your next favourite.</h2>
+          <p className="text-sm font-bold text-brand-brown/50 leading-relaxed">
+            Find your favourites, try something new and discover what happens when good ingredients meet a curious mind. We bake twice a week, so check the latest batch and the ordering schedule before you order.
+          </p>
+        </div>
+
         {/* Category Filter */}
         <div className="flex gap-6 sm:gap-8 mt-8 flex-wrap border-b border-brand-brown/10 pb-4">
           {categories.map(cat => (
@@ -103,6 +114,11 @@ export default function ShopClient({ products }: { products: Product[] }) {
             </button>
           ))}
         </div>
+        {CATEGORY_BLURBS[activeCategory] && (
+          <p className="mt-5 text-sm font-bold text-brand-brown/55 max-w-2xl leading-relaxed">
+            {CATEGORY_BLURBS[activeCategory].text}
+          </p>
+        )}
       </section>
  
       {/* ── Product Grid ── */}
@@ -116,9 +132,16 @@ export default function ShopClient({ products }: { products: Product[] }) {
         {filtered.length === 0 && (
           <div className="flex flex-col items-center justify-center py-32 gap-4 text-center">
             <ShoppingBag size={40} className="text-brand-brown/20" />
-            <p className="font-black text-sm tracking-[0.1em] uppercase text-brand-brown/30">
-              Nothing in this range yet.
+            <h3 className="font-serif font-normal text-2xl text-brand-brown">Nothing in this batch. Yet.</h3>
+            <p className="text-sm font-bold text-brand-brown/40 max-w-sm">
+              This collection is between batches. Check back soon for the next round of good things.
             </p>
+            <button
+              onClick={() => setActiveCategory("All")}
+              className="mt-2 inline-flex bg-brand-brown text-white hover:bg-brand-orange px-6 py-3 rounded-full text-[10px] font-black tracking-[0.18em] uppercase transition-colors"
+            >
+              Explore other categories
+            </button>
           </div>
         )}
       </section>

@@ -4,7 +4,6 @@ import React, { useEffect, useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import Link from "next/link";
-import WhatsAppIcon from "./WhatsAppIcon";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -62,32 +61,31 @@ export default function StorySection() {
           {/* Right: Text */}
           <div className="w-full lg:w-1/2 story-text-container flex flex-col justify-center lg:pl-10">
             <span className="story-text text-brand-gold text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
-              The Philosophy
+              Bread can be familiar without being predictable
             </span>
 
             <h2
               className="story-text font-serif font-normal tracking-tight leading-[1.05] mb-6 sm:mb-10 text-white"
               style={{ fontSize: "clamp(2.5rem, 7.5vw, 5.2rem)" }}
             >
-              Nothing made <br className="hidden sm:block" />
-              <span className="text-brand-gold italic">before you order.</span>
+              Not your <br className="hidden sm:block" />
+              <span className="text-brand-gold italic">everyday bread.</span>
             </h2>
 
             <p className="story-text text-sm sm:text-base md:text-lg text-brand-oat/75 font-bold leading-relaxed max-w-xl mb-6 sm:mb-8">
-              Every loaf begins with an order. There is no shelf, no display counter, no excess waiting to be cleared.
+              At Wild Wild Yeast, we bring together the slow art of sourdough fermentation and an appetite for unexpected flavours. From thoughtfully made loaves to crunchy sides, everything begins with curiosity and a love for the good stuff.
             </p>
 
             <p className="story-text text-sm sm:text-base md:text-lg text-brand-oat/75 font-bold leading-relaxed max-w-xl mb-10 sm:mb-16">
-              Fermentation resists urgency, so we plan around it. Time does the work. Honest ingredients do the rest.
+              We bake twice a week, bringing fresh batches to your doorstep so there&apos;s always something good to look forward to. No boring bites. No ordinary routines. Just a fresh take on what a bakery can be.
             </p>
 
             <div className="story-text flex flex-col sm:flex-row gap-3">
               <Link
-                href="/order"
+                href="/story"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-brand-gold text-brand-brown hover:bg-brand-orange hover:text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-xl active:scale-95"
               >
-                <WhatsAppIcon size={14} />
-                Order Now
+                Get to know us
               </Link>
               <p className="text-[10px] font-black tracking-[0.12em] uppercase text-brand-oat/30 self-center">
                 Wed & Sat delivery

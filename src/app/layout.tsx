@@ -19,25 +19,25 @@ const outfit = Outfit({
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://wildwildyeast.com";
 
 const DESCRIPTION =
-  "Bake-to-order sourdough, delivered across Mumbai every Wednesday and Saturday.";
+  "Discover naturally fermented sourdough bread, flavour-led bakes, artisan cookies and crackers from Wild Wild Yeast, Mumbai. Freshly baked twice a week and delivered to your doorstep.";
 
-// Title and description follow the website action plan (C1, C2) minus the ginger ale wording,
-// which returns once ferments are listed in the shop (decision D1).
+// Title and description follow the Website Copies document, minus the botanical sodas,
+// which return once ferments are listed in the shop (decision D1).
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: "Wild Wild Yeast | Sourdough, Mumbai", template: "%s | Wild Wild Yeast" },
+  title: { default: "Wild Wild Yeast | Artisan Sourdough Bakery in Mumbai", template: "%s | Wild Wild Yeast" },
   description: DESCRIPTION,
   openGraph: {
     type: "website",
     siteName: "Wild Wild Yeast",
     locale: "en_IN",
-    title: "Wild Wild Yeast | Sourdough, Mumbai",
+    title: "Wild Wild Yeast | Artisan Sourdough Bakery in Mumbai",
     description: DESCRIPTION,
     images: [{ url: "/product_img/4-dutch-oven.jpg", alt: "Sourdough loaf, straight out of the Dutch oven" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Wild Wild Yeast | Sourdough, Mumbai",
+    title: "Wild Wild Yeast | Artisan Sourdough Bakery in Mumbai",
     description: DESCRIPTION,
     images: ["/product_img/4-dutch-oven.jpg"],
   },

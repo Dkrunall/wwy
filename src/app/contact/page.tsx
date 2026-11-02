@@ -1,26 +1,42 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PolicyPage from "@/components/PolicyPage";
+import ContactForm from "@/components/ContactForm";
 import { BUSINESS, businessValue } from "@/lib/business";
-import { WHATSAPP_CONTACT_URL } from "@/lib/contact";
+import { WHATSAPP_CONTACT_URL, WHATSAPP_NUMBER } from "@/lib/contact";
 
 export const metadata: Metadata = {
-  title: "Contact Us",
-  description: "Contact Wild Wild Yeast: customer care, WhatsApp, grievance officer and registered business details.",
+  title: "Contact Wild Wild Yeast | Mumbai Bakery & Online Orders",
+  description: "Contact Wild Wild Yeast for questions about sourdough, products, online orders, baking schedules and delivery in Mumbai.",
+  alternates: { canonical: "/contact" },
 };
 
 export default function ContactPage() {
   const g = BUSINESS.grievanceOfficer;
   return (
-    <PolicyPage eyebrow="Get in touch" title="Contact Us">
-      <h2>Customer care</h2>
+    <PolicyPage
+      eyebrow="Get in touch"
+      title="Let's talk good food."
+      showUpdated={false}
+      intro="A question about a loaf? Need help with an order? Curious about what's baking next? We're here to help."
+    >
+      <h2>Order support</h2>
+      <p>Questions about existing orders, delivery updates, upcoming bake schedules or product availability.</p>
       <ul>
         <li>WhatsApp: <a href={WHATSAPP_CONTACT_URL} target="_blank" rel="noopener noreferrer">{BUSINESS.carePhone}</a></li>
-        <li>Phone: {BUSINESS.carePhone}</li>
+        <li>Email: {businessValue(BUSINESS.careEmail)}</li>
+      </ul>
+
+      <h2>General enquiries</h2>
+      <p>For collaborations, business enquiries and everything else. Gifting enquiries are on the <Link href="/gifting">Gifting page</Link>.</p>
+      <ul>
         <li>Email: {businessValue(BUSINESS.careEmail)}</li>
         <li>Instagram: <a href={BUSINESS.instagramUrl} target="_blank" rel="noopener noreferrer">@{BUSINESS.instagramHandle}</a></li>
       </ul>
-      <p>Please include your order number. For damaged or wrong items, see our <Link href="/refund">Refund and Cancellation Policy</Link>.</p>
+
+      <h2>Send us a message</h2>
+      <ContactForm whatsappNumber={WHATSAPP_NUMBER} />
+      <p>For damaged or wrong items, see our <Link href="/refund">Refund and Cancellation Policy</Link>.</p>
 
       <h2>Grievance officer</h2>
       <p>

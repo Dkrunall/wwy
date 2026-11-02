@@ -59,6 +59,7 @@ export default function Newsletter() {
   return (
     <section
       ref={sectionRef}
+      id="newsletter"
       className="w-full bg-brand-oat py-16 sm:py-32 md:py-40 relative overflow-hidden -mt-px z-20"
     >
       {/* Background Decorative */}
@@ -67,7 +68,7 @@ export default function Newsletter() {
           className="font-serif font-black italic uppercase text-brand-charcoal leading-none whitespace-nowrap"
           style={{ fontSize: "clamp(8rem, 20vw, 25rem)" }}
         >
-          THE SOCIETY
+          FRESH SCOOP
         </h2>
       </div>
 
@@ -75,7 +76,7 @@ export default function Newsletter() {
 
         {/* Badge */}
         <span className="newsletter-reveal text-brand-terracotta text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
-          Join the Society
+          Just the good stuff.
         </span>
 
         {/* Heading */}
@@ -84,11 +85,11 @@ export default function Newsletter() {
             className="font-black text-brand-charcoal tracking-tight leading-none mb-4 sm:mb-6"
             style={{ fontSize: "clamp(2.5rem, 8vw, 5.5rem)" }}
           >
-            STAY IN THE <br className="hidden sm:block" />
-            <span className="text-brand-terracotta">CULTURE.</span>
+            GET THE <br className="hidden sm:block" />
+            <span className="text-brand-terracotta">FRESH SCOOP.</span>
           </h2>
           <p className="max-w-xs sm:max-w-xl mx-auto text-brand-charcoal/70 text-sm sm:text-base font-medium leading-relaxed">
-            New flavours and menu drops, sent to your WhatsApp when we open a window.
+            New flavours. Fresh batches. First dibs. Join our WhatsApp list for new product drops, upcoming bake schedules and seasonal specials. Unsubscribe whenever you like.
           </p>
         </div>
 

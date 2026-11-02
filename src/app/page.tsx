@@ -13,6 +13,7 @@ import Testimonials from "@/components/Testimonials";
 import SocialGallery from "@/components/SocialGallery";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
+import { FlavourLabSection, FreshnessSection, FinalCtaSection } from "@/components/HomeSections";
 import CartDrawer from "@/components/CartDrawer";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -31,13 +32,16 @@ export default function Home() {
     <main className="relative bg-brand-cream">
       <Navbar />
       <Hero />
-      <ProcessStory />
       <StorySection />
-      <MenuSection />
       <EnergyBanner />
+      <MenuSection />
+      <ProcessStory />
+      <FlavourLabSection />
+      <FreshnessSection />
       <Testimonials />
       <SocialGallery />
       <Newsletter />
+      <FinalCtaSection />
       <Footer />
       <CartDrawer />
     </main>

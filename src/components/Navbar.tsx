@@ -10,6 +10,7 @@ import { supabase } from "@/lib/supabase";
 
 const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: "Shop", href: "/shop" },
+  { label: "Flavour Lab", href: "/flavour-lab" },
   { label: "Gifting", href: "/gifting" },
   { label: "Our Story", href: "/story" },
   { label: "Contact", href: "/contact" },
