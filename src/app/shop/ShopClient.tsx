@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PageBanner from "@/components/PageBanner";
 import { ShoppingBag } from "lucide-react";
 import type { Product } from "@/lib/products";
 import PincodeCheck from "@/components/PincodeCheck";
@@ -29,101 +30,75 @@ export default function ShopClient({ products }: { products: Product[] }) {
     <main className="min-h-screen bg-brand-oat">
       <Navbar />
 
-      {/* ── Hero ── */}
-      <section className="w-full bg-brand-oat px-4 sm:px-8 xl:px-16 pt-36 sm:pt-44 pb-12 sm:pb-16 border-b border-brand-brown/5">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 max-w-full">
-          <div>
-            <span className="text-brand-orange text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
-              Welcome to the Wild Wild Yeast shop
-            </span>
-            <h1
-              className="font-serif font-normal text-brand-brown tracking-tight leading-[1.05]"
-              style={{ fontSize: "clamp(3rem, 9vw, 6.5rem)" }}
-            >
-              The good stuff starts here.
-            </h1>
-            <p className="text-xs font-black tracking-[0.15em] uppercase text-brand-brown/25 mt-3">
-              From slow-fermented sourdough to crunchy sides.
+      <PageBanner
+        eyebrow="Welcome to the Wild Wild Yeast shop"
+        title="The good stuff starts here."
+        intro="From slow-fermented sourdough to crunchy sides. We bake twice a week and deliver straight to your doorstep."
+        image="/product_img/4-bloom.jpg"
+      />
+
+      {/* ── Ordering info ── */}
+      <section className="w-full px-4 sm:px-8 xl:px-16 pt-8 sm:pt-12">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-4 sm:gap-5">
+          <div className="bg-white rounded-[2rem] border border-brand-brown/5 shadow-sm p-6 sm:p-8 flex flex-col gap-3">
+            <span className="text-brand-orange text-[10px] font-black tracking-[0.2em] uppercase">Made to order</span>
+            <p className="font-serif text-xl sm:text-2xl text-brand-brown tracking-tight leading-snug">
+              Delivery {deliveryDaysShort()} only. Orders close {cutoffRuleText()}.
             </p>
+            <p className="text-sm font-bold text-brand-brown/50 leading-relaxed">
+              New flavours go up every week on Instagram, @{BUSINESS.instagramHandle}.
+            </p>
+            <div className="mt-1">
+              <PincodeCheck />
+            </div>
           </div>
-          <div className="flex flex-col gap-2 pb-2">
-            <p className="text-sm sm:text-base font-bold text-brand-brown/40 max-w-xs leading-relaxed">
-              Find something to make your everyday a little more interesting. We bake twice a week, bringing you fresh batches of your favourite bakes, delivered straight to your doorstep.
-            </p>
-            <p className="text-[10px] font-black tracking-[0.15em] uppercase text-brand-brown/30">
-              Made to order · Delivery {deliveryDaysShort()} only
-            </p>
-            <Link
-              href="/order"
-              className="mt-2 inline-flex items-center gap-2 bg-brand-brown text-white hover:bg-brand-orange px-6 py-3 rounded-full text-[10px] font-black tracking-[0.18em] uppercase transition-all duration-300 active:scale-95 w-fit shadow-md"
-            >
-              Order Now
-            </Link>
+          <div className="bg-white rounded-[2rem] border border-brand-brown/5 shadow-sm p-6 sm:p-8 flex flex-col gap-3">
+            <span className="text-brand-orange text-[10px] font-black tracking-[0.2em] uppercase">Flavours we bake</span>
+            <div className="flex flex-wrap gap-2">
+              {FLAVOURS.map((f) => (
+                <span key={f} className="px-3.5 py-1.5 rounded-full bg-brand-oat border border-brand-brown/10 text-[11px] font-black tracking-wide text-brand-brown/70">
+                  {f}
+                </span>
+              ))}
+            </div>
+            <p className="text-xs font-bold text-brand-brown/40">Flavours rotate weekly. Check Instagram for this week&apos;s batch.</p>
           </div>
         </div>
- 
-        {/* Seasonal drop note */}
-        <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-brown/25 mt-6">
-          New flavours go up every week on Instagram, @{BUSINESS.instagramHandle}.
-        </p>
+      </section>
 
-        {/* Orders close */}
-        <p className="text-[10px] font-black tracking-[0.15em] uppercase text-brand-brown/40 mt-2">
-          Orders close {cutoffRuleText()}
-        </p>
-
-        {/* Pincode check before browsing (P3-4) */}
-        <div className="mt-6">
-          <PincodeCheck />
-        </div>
-
-        {/* Flavours (P3-2) */}
-        <div className="mt-8">
-          <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-brown/40 mb-3">Flavours we bake</p>
-          <div className="flex flex-wrap gap-2">
-            {FLAVOURS.map((f) => (
-              <span key={f} className="px-4 py-2 rounded-full bg-white border border-brand-brown/10 text-[11px] font-black tracking-wide text-brand-brown/70">
-                {f}
-              </span>
+      {/* ── Filter ── */}
+      <section className="w-full px-4 sm:px-8 xl:px-16 pt-10 sm:pt-14">
+        <div className="max-w-7xl mx-auto">
+          <h2 className="font-serif font-normal text-brand-brown text-2xl sm:text-4xl tracking-tight mb-2">Find your next favourite.</h2>
+          <p className="text-sm font-bold text-brand-brown/50 leading-relaxed max-w-2xl">
+            Try something new and see what happens when good ingredients meet a curious mind.
+          </p>
+          <div className="flex gap-2 sm:gap-3 mt-6 flex-wrap">
+            {categories.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setActiveCategory(cat)}
+                className={`px-5 py-2.5 rounded-full text-[10px] sm:text-xs font-black tracking-[0.18em] uppercase transition-all duration-200 border ${
+                  activeCategory === cat
+                    ? "bg-brand-brown text-white border-brand-brown"
+                    : "bg-white text-brand-brown/60 border-brand-brown/10 hover:text-brand-brown hover:border-brand-brown/30"
+                }`}
+              >
+                {cat}
+              </button>
             ))}
           </div>
-          <p className="text-xs font-bold text-brand-brown/40 mt-3">Flavours rotate weekly. Check Instagram for this week&apos;s batch.</p>
+          {CATEGORY_BLURBS[activeCategory] && (
+            <p className="mt-4 text-sm font-bold text-brand-brown/55 max-w-2xl leading-relaxed">
+              {CATEGORY_BLURBS[activeCategory].text}
+            </p>
+          )}
         </div>
- 
-        {/* Product listing intro */}
-        <div className="mt-10 max-w-2xl">
-          <h2 className="font-serif font-normal text-brand-brown text-2xl sm:text-3xl tracking-tight mb-2">Find your next favourite.</h2>
-          <p className="text-sm font-bold text-brand-brown/50 leading-relaxed">
-            Find your favourites, try something new and discover what happens when good ingredients meet a curious mind. We bake twice a week, so check the latest batch and the ordering schedule before you order.
-          </p>
-        </div>
-
-        {/* Category Filter */}
-        <div className="flex gap-6 sm:gap-8 mt-8 flex-wrap border-b border-brand-brown/10 pb-4">
-          {categories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`text-xs font-black tracking-[0.18em] uppercase transition-all duration-200 relative pb-4 -mb-4 ${
-                activeCategory === cat
-                  ? "text-brand-brown font-black after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-brand-orange"
-                  : "text-brand-brown/40 hover:text-brand-brown"
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-        {CATEGORY_BLURBS[activeCategory] && (
-          <p className="mt-5 text-sm font-bold text-brand-brown/55 max-w-2xl leading-relaxed">
-            {CATEGORY_BLURBS[activeCategory].text}
-          </p>
-        )}
       </section>
- 
+
       {/* ── Product Grid ── */}
-      <section className="w-full px-4 sm:px-8 xl:px-16 py-12 sm:py-16">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
+      <section className="w-full px-4 sm:px-8 xl:px-16 pt-8 pb-14 sm:pb-20">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
           {filtered.map(product => (
             <ProductCard key={product.id} product={product} />
           ))}
@@ -154,7 +129,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
             Order <span className="text-brand-orange italic font-light">online.</span>
           </h3>
           <p className="text-brand-oat/40 font-bold text-sm">Browse, add to cart, pay securely. We bake and deliver.</p>
-          <p className="text-brand-oat/20 font-bold text-xs mt-1 italic">Delivery Wed &amp; Sat only.</p>
+          <p className="text-brand-oat/40 font-bold text-xs mt-1 italic">Delivery {deliveryDaysShort()} only.</p>
         </div>
         <Link
           href="/order"
