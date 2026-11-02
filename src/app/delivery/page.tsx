@@ -20,6 +20,7 @@ export default function DeliveryPage() {
       eyebrow="Delivery and ordering"
       title="From our batch to your table."
       updated="October 2026"
+      bannerImage="/product_img/7-from-the-oven.jpg"
       intro="Freshly baked. Thoughtfully prepared. Delivered to your doorstep."
     >
       <p>

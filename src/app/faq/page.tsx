@@ -132,6 +132,7 @@ export default function FaqPage() {
       eyebrow="FAQs"
       title="Good questions. Straight answers."
       showUpdated={false}
+      bannerImage="/product_img/5-crumb-sliced.jpg"
       intro="Everything you need to know about our bakes, the ordering process and getting your Wild Wild Yeast favourites delivered to your doorstep."
     >
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_JSON_LD) }} />

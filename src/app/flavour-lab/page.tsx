@@ -18,6 +18,7 @@ export default function FlavourLabPage() {
       eyebrow="Flavour Lab"
       title="Meet the latest batch."
       showUpdated={false}
+      bannerImage="/new-catelog/sweet-sourdough.png"
       intro="The classics are classics for a reason. But there's always room for something unexpected."
     >
       <p>

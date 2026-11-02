@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PageBanner from "@/components/PageBanner";
 import { REVIEWS } from "@/lib/reviews";
 
 export const metadata: Metadata = {
@@ -14,18 +15,12 @@ export default function ReviewsPage() {
   return (
     <main className="min-h-screen bg-brand-oat">
       <Navbar />
-      <section className="w-full px-4 sm:px-8 xl:px-16 pt-36 sm:pt-44 pb-12 sm:pb-16 border-b border-brand-brown/5">
-        <div className="max-w-5xl mx-auto">
-          <span className="text-brand-orange text-xs sm:text-sm font-bold tracking-[0.2em] uppercase mb-3 block">Customer reviews</span>
-          <h1 className="font-serif font-normal text-brand-brown tracking-tight leading-[1.05]" style={{ fontSize: "clamp(2.4rem, 7vw, 4.5rem)" }}>
-            Don&apos;t just take our word for it.
-          </h1>
-          <p className="text-base sm:text-lg font-bold text-brand-brown/60 leading-relaxed mt-5 max-w-2xl">
-            Good bread creates its own kind of following. Explore what customers are saying about their favourite Wild Wild Yeast bakes, from the
-            first slice to the last crumb.
-          </p>
-        </div>
-      </section>
+      <PageBanner
+        eyebrow="Customer reviews"
+        title="Don't just take our word for it."
+        intro="Good bread creates its own kind of following. Explore what customers are saying about their favourite Wild Wild Yeast bakes, from the first slice to the last crumb."
+        image="/product_img/8-the-crust.jpg"
+      />
 
       <section className="w-full px-4 sm:px-8 xl:px-16 py-12 sm:py-16">
         <div className="max-w-5xl mx-auto">

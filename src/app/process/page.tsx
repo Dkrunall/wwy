@@ -15,6 +15,7 @@ export default function ProcessPage() {
       eyebrow="Our process"
       title="Good things take their time."
       showUpdated={false}
+      bannerImage="/product_img/3-score.jpg"
       intro="Sourdough isn't a race. And that's rather the point."
     >
       <p>

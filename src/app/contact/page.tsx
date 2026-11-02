@@ -18,6 +18,7 @@ export default function ContactPage() {
       eyebrow="Get in touch"
       title="Let's talk good food."
       showUpdated={false}
+      bannerImage="/product_img/6-top-shot.jpg"
       intro="A question about a loaf? Need help with an order? Curious about what's baking next? We're here to help."
     >
       <h2>Order support</h2>
