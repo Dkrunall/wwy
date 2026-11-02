@@ -24,7 +24,7 @@ export default function GiftingPage() {
       />
 
       <section className="w-full px-4 sm:px-8 xl:px-16 py-12 sm:py-16">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {GIFT_TIERS.map((t) => (
             <div key={t.name} className="flex flex-col bg-white rounded-[2rem] border border-brand-brown/5 shadow-sm p-6 sm:p-7">
               <h2 className="font-serif font-normal text-2xl text-brand-brown tracking-tight">{t.name}</h2>
@@ -40,14 +40,14 @@ export default function GiftingPage() {
             </div>
           ))}
         </div>
-        <div className="max-w-6xl mx-auto mt-8 text-xs font-black tracking-[0.12em] uppercase text-brand-brown/40 flex flex-col sm:flex-row gap-2 sm:gap-8">
+        <div className="max-w-7xl mx-auto mt-8 text-xs font-black tracking-[0.12em] uppercase text-brand-brown/40 flex flex-col sm:flex-row gap-2 sm:gap-8">
           <span>{GIFTING_MIN_ORDER}</span>
           <span>{GIFTING_LEAD_TIME}</span>
         </div>
       </section>
 
       <section className="w-full bg-white px-4 sm:px-8 xl:px-16 py-14 sm:py-20 border-t border-brand-brown/5">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-7xl mx-auto [&>*]:max-w-3xl">
           <h2 className="font-serif font-normal text-brand-brown tracking-tight leading-[1.05] mb-2" style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)" }}>
             Send an enquiry.
           </h2>

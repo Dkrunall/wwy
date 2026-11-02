@@ -38,7 +38,7 @@ export default function StorySection() {
       ref={containerRef}
       className="w-full relative bg-brand-brown text-brand-oat py-12 sm:py-20 md:py-24 z-10 rounded-t-[2rem] sm:rounded-t-[3rem] md:rounded-t-[5rem] -mt-8 sm:-mt-12 shadow-[0_-20px_50px_rgba(0,0,0,0.1)]"
     >
-      <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
+      <div className="mx-auto w-full max-w-[88rem] px-4 sm:px-8 xl:px-16">
 
         <div className="flex flex-col lg:flex-row gap-10 sm:gap-16 md:gap-24 items-center">
 

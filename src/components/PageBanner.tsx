@@ -20,12 +20,14 @@ export default function PageBanner({
         <Image src={image} alt={alt} fill priority sizes="100vw" className="object-cover opacity-[0.3] mix-blend-luminosity" />
         <div className="absolute inset-0 bg-gradient-to-t from-brand-brown via-brand-brown/80 to-transparent"></div>
       </div>
-      <div className="relative z-10 max-w-4xl">
+      <div className="relative z-10 w-full max-w-7xl mx-auto">
+        <div className="max-w-4xl">
         <span className="text-brand-gold text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">{eyebrow}</span>
         <h1 className="font-serif font-normal text-brand-oat tracking-tight leading-[1.05] mb-4" style={{ fontSize: "clamp(2.6rem, 8vw, 6rem)" }}>
           {title}
         </h1>
         {intro && <p className="text-base sm:text-lg md:text-xl font-bold text-brand-oat/60 max-w-xl leading-relaxed">{intro}</p>}
+        </div>
       </div>
     </section>
   );

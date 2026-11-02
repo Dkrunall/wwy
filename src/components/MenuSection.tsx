@@ -163,7 +163,7 @@ export default function MenuSection() {
 
   return (
     <section className="w-full bg-brand-oat relative z-10 rounded-t-[2rem] sm:rounded-t-[3rem] md:rounded-t-[5rem] -mt-8 sm:-mt-12 pt-10 sm:pt-12 md:pt-14 pb-12 sm:pb-16 shadow-[0_-20px_50px_rgba(0,0,0,0.05)]">
-      <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
+      <div className="mx-auto w-full max-w-[88rem] px-4 sm:px-8 xl:px-16">
         {/* Section Header with Slider Navigation Controls */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8 sm:mb-12">
           <div>

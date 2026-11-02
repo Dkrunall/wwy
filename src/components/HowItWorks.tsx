@@ -125,7 +125,7 @@ export default function HowItWorks() {
     <section
       id="how-it-works"
       ref={sectionRef}
-      className="w-full bg-brand-oat py-20 sm:py-32 px-4 sm:px-6 relative overflow-hidden z-20"
+      className="w-full bg-brand-oat py-20 sm:py-32 px-4 sm:px-8 xl:px-16 relative overflow-hidden z-20"
     >
       {/* Watermark */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden">
@@ -135,7 +135,7 @@ export default function HowItWorks() {
         </p>
       </div>
  
-      <div className="container mx-auto max-w-7xl relative z-10">
+      <div className="mx-auto max-w-7xl relative z-10">
         {/* ── Header ── */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-14 sm:mb-20">
           <div>

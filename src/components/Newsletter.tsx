@@ -72,7 +72,7 @@ export default function Newsletter() {
         </h2>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 relative z-10 flex flex-col items-center">
+      <div className="mx-auto w-full max-w-[88rem] px-4 sm:px-8 xl:px-16 relative z-10 flex flex-col items-center">
 
         {/* Badge */}
         <span className="newsletter-reveal text-brand-terracotta text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">

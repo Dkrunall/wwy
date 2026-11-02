@@ -6,7 +6,7 @@ const eyebrow = "text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppe
 export function FlavourFreshnessSection() {
   return (
     <section className="w-full bg-brand-oat px-4 sm:px-8 xl:px-16 py-10 sm:py-14 border-t border-brand-brown/5">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
         <div className="bg-white rounded-[2rem] border border-brand-brown/5 shadow-sm p-6 sm:p-8 flex flex-col items-start">
           <span className={`${eyebrow} text-brand-terracotta`}>Welcome to the Flavour Lab</span>
           <h2 className="font-serif font-normal tracking-tight leading-[1.05] mb-3 text-brand-brown" style={{ fontSize: "clamp(1.7rem, 3.5vw, 2.4rem)" }}>

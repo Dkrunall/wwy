@@ -23,7 +23,7 @@ export default function ReviewsPage() {
       />
 
       <section className="w-full px-4 sm:px-8 xl:px-16 py-12 sm:py-16">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <h2 className="font-serif font-normal text-2xl sm:text-3xl text-brand-brown tracking-tight mb-8">What everyone&apos;s talking about</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {REVIEWS.map((r) => (

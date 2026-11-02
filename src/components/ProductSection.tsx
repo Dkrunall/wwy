@@ -73,7 +73,7 @@ export default function ProductSection() {
       className="bg-brand-oat w-full relative z-20 flex flex-col justify-center lg:overflow-hidden py-12 sm:py-20 lg:py-12 lg:min-h-screen"
     >
       {/* Section Header */}
-      <div className="container mx-auto px-4 sm:px-6 max-w-7xl mb-8 sm:mb-12 flex-shrink-0">
+      <div className="mx-auto w-full max-w-[88rem] px-4 sm:px-8 xl:px-16 mb-8 sm:mb-12 flex-shrink-0">
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 text-center lg:text-left">
           <div>
             <span className="text-brand-orange text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">

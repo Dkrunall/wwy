@@ -90,7 +90,7 @@ export default function StoryPage() {
  
       {/* ── EDITORIAL STATEMENT & NARRATIVE ── */}
       <section className="w-full bg-brand-oat px-4 sm:px-8 xl:px-16 py-20 sm:py-32">
-        <div className="max-w-6xl mx-auto flex flex-col lg:flex-row gap-12 lg:gap-20">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-12 lg:gap-20">
           
           {/* Left Column: Big Statement */}
           <div className="w-full lg:w-5/12 flex flex-col justify-start">
@@ -128,7 +128,7 @@ export default function StoryPage() {
         </div>
  
         {/* Integrated Clean Split Images */}
-        <div className="flex gap-4 sm:gap-6 h-[45vw] sm:h-[350px] md:h-[420px] mt-16 max-w-5xl mx-auto px-2">
+        <div className="flex gap-4 sm:gap-6 h-[45vw] sm:h-[350px] md:h-[420px] mt-16 max-w-7xl mx-auto px-2">
           <div className="w-1/2 rounded-[2rem] overflow-hidden shadow-xl border border-brand-brown/5">
             <div className="relative w-full h-full">
               <Image src="/product_img/1-starter-top.jpg" alt="Our wild yeast starter in a jar, bubbling" fill className="object-cover hover:scale-105 transition-transform duration-700" />
@@ -144,7 +144,7 @@ export default function StoryPage() {
  
       {/* ── HOW WE THINK ── */}
       <section className="w-full bg-brand-oat px-4 sm:px-8 xl:px-16 py-20 sm:py-32">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <span className="text-brand-orange text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block text-center">
             Our philosophy
           </span>

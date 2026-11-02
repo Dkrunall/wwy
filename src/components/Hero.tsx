@@ -64,7 +64,7 @@ export default function Hero() {
         <h1 className="font-serif font-black tracking-tighter whitespace-nowrap" style={{ fontSize: "clamp(10rem, 25vw, 30rem)", lineHeight: 0.8 }}>WILD<br/>YEAST</h1>
       </div>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-12 relative z-10 flex flex-col lg:flex-row items-center gap-8 sm:gap-12 lg:gap-8 w-full">
+      <div className="mx-auto w-full max-w-[88rem] px-4 sm:px-8 xl:px-16 relative z-10 flex flex-col lg:flex-row items-center gap-8 sm:gap-12 lg:gap-8 w-full">
 
         {/* Left: Typography & Actions */}
         <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left">
