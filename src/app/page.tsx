@@ -8,12 +8,11 @@ import Hero from "@/components/Hero";
 import ProcessStory from "@/components/ProcessStory";
 import StorySection from "@/components/StorySection";
 import MenuSection from "@/components/MenuSection";
-import EnergyBanner from "@/components/EnergyBanner";
 import Testimonials from "@/components/Testimonials";
 import SocialGallery from "@/components/SocialGallery";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
-import { FlavourLabSection, FreshnessSection, FinalCtaSection } from "@/components/HomeSections";
+import { FlavourFreshnessSection, FinalCtaSection } from "@/components/HomeSections";
 import CartDrawer from "@/components/CartDrawer";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -32,12 +31,10 @@ export default function Home() {
     <main className="relative bg-brand-cream">
       <Navbar />
       <Hero />
-      <StorySection />
-      <EnergyBanner />
       <MenuSection />
+      <StorySection />
       <ProcessStory />
-      <FlavourLabSection />
-      <FreshnessSection />
+      <FlavourFreshnessSection />
       <Testimonials />
       <SocialGallery />
       <Newsletter />

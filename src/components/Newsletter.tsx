@@ -60,7 +60,7 @@ export default function Newsletter() {
     <section
       ref={sectionRef}
       id="newsletter"
-      className="w-full bg-brand-oat py-16 sm:py-32 md:py-40 relative overflow-hidden -mt-px z-20"
+      className="w-full bg-brand-oat py-12 sm:py-16 md:py-20 relative overflow-hidden -mt-px z-20"
     >
       {/* Background Decorative */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-full opacity-[0.02] pointer-events-none select-none overflow-hidden">
@@ -80,10 +80,10 @@ export default function Newsletter() {
         </span>
 
         {/* Heading */}
-        <div className="newsletter-reveal text-center mb-10 sm:mb-16">
+        <div className="newsletter-reveal text-center mb-6 sm:mb-8">
           <h2
             className="font-black text-brand-charcoal tracking-tight leading-none mb-4 sm:mb-6"
-            style={{ fontSize: "clamp(2.5rem, 8vw, 5.5rem)" }}
+            style={{ fontSize: "clamp(2rem, 6vw, 3.6rem)" }}
           >
             GET THE <br className="hidden sm:block" />
             <span className="text-brand-terracotta">FRESH SCOOP.</span>

@@ -161,7 +161,7 @@ export default function MenuSection() {
   if (!loading && products.length === 0) return null;
 
   return (
-    <section className="w-full bg-brand-oat relative z-10 rounded-t-[2rem] sm:rounded-t-[3rem] md:rounded-t-[5rem] -mt-8 sm:-mt-12 pt-16 sm:pt-24 md:pt-28 pb-20 sm:pb-28 shadow-[0_-20px_50px_rgba(0,0,0,0.05)]">
+    <section className="w-full bg-brand-oat relative z-10 rounded-t-[2rem] sm:rounded-t-[3rem] md:rounded-t-[5rem] -mt-8 sm:-mt-12 pt-10 sm:pt-12 md:pt-14 pb-12 sm:pb-16 shadow-[0_-20px_50px_rgba(0,0,0,0.05)]">
       <div className="container mx-auto px-4 sm:px-6 max-w-7xl">
         {/* Section Header with Slider Navigation Controls */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-8 sm:mb-12">
@@ -171,7 +171,7 @@ export default function MenuSection() {
             </span>
             <h2
               className="font-serif font-normal text-brand-brown tracking-tight leading-[1.05]"
-              style={{ fontSize: "clamp(2.5rem, 6.5vw, 4.8rem)" }}
+              style={{ fontSize: "clamp(2rem, 5vw, 3.4rem)" }}
             >
               What&apos;s baking <span className="text-brand-terracotta italic font-light">right now?</span>
             </h2>

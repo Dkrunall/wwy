@@ -75,7 +75,7 @@ export default function ProcessStory() {
   return (
     <section
       ref={containerRef}
-      className="w-full bg-brand-charcoal px-4 sm:px-8 xl:px-16 py-20 sm:py-36 overflow-hidden relative"
+      className="w-full bg-brand-charcoal px-4 sm:px-8 xl:px-16 py-12 sm:py-20 overflow-hidden relative"
     >
       {/* Noise overlay */}
       <div className="absolute inset-0 opacity-[0.04] mix-blend-overlay pointer-events-none"
@@ -84,13 +84,13 @@ export default function ProcessStory() {
       <div className="max-w-7xl mx-auto relative z-10">
         
         {/* Header Block */}
-        <div className="max-w-xl mb-16 sm:mb-24">
+        <div className="max-w-xl mb-8 sm:mb-12">
           <span className="text-brand-gold text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
             From starter to table
           </span>
           <h2
             className="font-serif font-normal text-brand-oat tracking-tight leading-[1.05]"
-            style={{ fontSize: "clamp(2.2rem, 7vw, 4.8rem)" }}
+            style={{ fontSize: "clamp(1.9rem, 5vw, 3.4rem)" }}
           >
             Good bread takes its <span className="text-brand-gold italic font-light">time.</span>
           </h2>
@@ -103,15 +103,15 @@ export default function ProcessStory() {
         </div>
  
         {/* Responsive Staggered Grid Layout */}
-        <div ref={gridRef} className="process-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-x-12 sm:gap-y-16 pb-12">
-          {STAGES.map((s, i) => {
+        <div ref={gridRef} className="process-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 pb-0">
+          {STAGES.filter((_, i) => [0, 2, 5].includes(i)).map((s, i) => {
             // Apply vertical offsets to alternating columns on desktop
             const staggerClass = i % 2 === 1 ? "lg:translate-y-12" : "";
             
             return (
               <div
                 key={s.stage}
-                className={`process-grid-item flex flex-col group transition-all duration-500 hover:scale-[1.01] hover:-translate-y-1 ${staggerClass}`}
+                className={`process-grid-item flex-col group transition-all duration-500 hover:scale-[1.01] hover:-translate-y-1 ${staggerClass} ${i === 2 ? "hidden lg:flex" : "flex"}`}
               >
                 {/* Image Frame with Letterbox Ratio */}
                 <div className="relative w-full aspect-[1.5/1] rounded-[2rem] overflow-hidden mb-5 border border-white/5 shadow-md pointer-events-none">

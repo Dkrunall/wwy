@@ -56,15 +56,15 @@ export default function Testimonials() {
   return (
     <section
       ref={containerRef}
-      className="w-full bg-white px-4 sm:px-8 xl:px-16 py-16 sm:py-24 border-t border-brand-charcoal/5"
+      className="w-full bg-white px-4 sm:px-8 xl:px-16 py-10 sm:py-14 border-t border-brand-charcoal/5"
     >
       <div className="max-w-7xl mx-auto">
         <span className="testimonials-heading text-brand-terracotta text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block text-center">
           Good bread has a way of bringing people back.
         </span>
         <h2
-          className="testimonials-heading font-black text-brand-charcoal tracking-tight leading-none mb-12 sm:mb-16 text-center"
-          style={{ fontSize: "clamp(2.2rem, 7vw, 4.5rem)" }}
+          className="testimonials-heading font-black text-brand-charcoal tracking-tight leading-none mb-6 sm:mb-8 text-center"
+          style={{ fontSize: "clamp(1.8rem, 5vw, 3rem)" }}
         >
           THE WORD ON THE <span className="text-brand-terracotta">WILD SIDE.</span>
         </h2>
@@ -89,7 +89,9 @@ export default function Testimonials() {
             {items.map((review, i) => (
               <div
                 key={`${page}-${i}`}
-                className="testimonial-card min-h-[220px] flex flex-col bg-brand-oat/40 rounded-[1.5rem] p-5 border border-brand-charcoal/5"
+                className={`testimonial-card min-h-[200px] flex-col bg-brand-oat/40 rounded-[1.5rem] p-5 border border-brand-charcoal/5 ${
+                  i === 0 ? "flex" : i === 1 ? "hidden sm:flex" : i === 2 ? "hidden lg:flex" : "hidden xl:flex"
+                }`}
               >
                 <span className="text-brand-terracotta text-3xl font-serif leading-none block mb-2">&quot;</span>
                 <p className="text-brand-charcoal/70 text-xs sm:text-[13px] font-bold leading-relaxed mb-4 line-clamp-6">

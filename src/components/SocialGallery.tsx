@@ -50,17 +50,17 @@ export default function SocialGallery() {
   return (
     <section
       ref={containerRef}
-      className="w-full relative flex flex-col bg-[#FFF6EC] pt-16 sm:pt-32 overflow-hidden border-t-4 border-brand-charcoal/10 -mt-8 z-20 rounded-t-[2rem] sm:rounded-t-[3rem] md:rounded-t-[5rem]"
+      className="w-full relative flex flex-col bg-[#FFF6EC] pt-10 sm:pt-14 overflow-hidden border-t-4 border-brand-charcoal/10 -mt-8 z-20 rounded-t-[2rem] sm:rounded-t-[3rem] md:rounded-t-[5rem]"
     >
       {/* Header Row */}
-      <div className="container mx-auto px-4 sm:px-6 mb-10 sm:mb-16 flex flex-col md:flex-row justify-between items-center gap-6 sm:gap-12 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 mb-6 sm:mb-8 flex flex-col md:flex-row justify-between items-center gap-6 sm:gap-12 relative z-10">
         <div className="social-text-container text-center md:text-left">
           <span className="social-text text-brand-terracotta text-xs sm:text-sm md:text-base font-bold tracking-[0.2em] uppercase mb-3 sm:mb-4 block">
             On Instagram
           </span>
           <h2
             className="social-text font-black text-brand-charcoal tracking-tight leading-none"
-            style={{ fontSize: "clamp(2.5rem, 8vw, 5.5rem)" }}
+            style={{ fontSize: "clamp(2rem, 5vw, 3.4rem)" }}
           >
             FROM OUR <br className="hidden sm:block" />
             <span className="text-brand-terracotta">OVEN.</span>
@@ -78,8 +78,8 @@ export default function SocialGallery() {
       </div>
 
       {/* Photo grid: six of our own photos */}
-      <div className="container mx-auto px-4 sm:px-6 mb-12 sm:mb-20 grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5 relative z-10">
-        {PHOTOS.map((p) => (
+      <div className="container mx-auto px-4 sm:px-6 mb-8 sm:mb-10 grid grid-cols-3 gap-2 sm:gap-5 relative z-10">
+        {PHOTOS.slice(0, 3).map((p) => (
           <a
             key={p.img}
             href={BUSINESS.instagramUrl}
