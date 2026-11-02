@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import PageBanner from "@/components/PageBanner";
 import GiftingForm from "@/components/GiftingForm";
 import { WHATSAPP_NUMBER } from "@/lib/contact";
 import { GIFT_TIERS, GIFTING_LEAD_TIME, GIFTING_MIN_ORDER } from "@/lib/gifting";
@@ -15,17 +16,12 @@ export default function GiftingPage() {
     <main className="min-h-screen bg-brand-oat">
       <Navbar />
 
-      <section className="w-full px-4 sm:px-8 xl:px-16 pt-36 sm:pt-44 pb-12 sm:pb-16 border-b border-brand-brown/5">
-        <div className="max-w-6xl mx-auto">
-          <span className="text-brand-orange text-xs sm:text-sm font-bold tracking-[0.2em] uppercase mb-3 block">Gifting</span>
-          <h1 className="font-serif font-normal text-brand-brown tracking-tight leading-[1.05]" style={{ fontSize: "clamp(2.8rem, 8vw, 6rem)" }}>
-            Hampers.
-          </h1>
-          <p className="text-sm sm:text-base font-bold text-brand-brown/50 max-w-lg mt-4 leading-relaxed">
-            Four tiers of bread and bakes, packed to order. For birthdays, festivals, thank-yous and corporate gifting.
-          </p>
-        </div>
-      </section>
+      <PageBanner
+        eyebrow="Gifting"
+        title="Hampers."
+        intro="Four tiers of bread and bakes, packed to order. For birthdays, festivals, thank-yous and corporate gifting."
+        image="/product_img/7-from-the-oven.jpg"
+      />
 
       <section className="w-full px-4 sm:px-8 xl:px-16 py-12 sm:py-16">
         <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
