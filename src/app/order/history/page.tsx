@@ -159,7 +159,7 @@ export default function HistoryPage() {
       <AnnouncementBar />
       {/* Header */}
       <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-brand-brown/10 shadow-sm">
-        <div className="max-w-2xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 xl:px-16 h-14 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <button
               onClick={() => router.push("/order")}
@@ -185,9 +185,9 @@ export default function HistoryPage() {
         </div>
       </header>
 
-      <div className="max-w-2xl mx-auto px-4 pt-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 xl:px-16 pt-6">
         {loading && (
-          <div className="flex flex-col gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {[1,2,3].map((n) => (
               <div key={n} className="bg-white rounded-2xl px-4 py-4 border border-brand-charcoal/5 animate-pulse">
                 <div className="h-5 bg-brand-charcoal/6 rounded-full w-28 mb-2" />
@@ -210,7 +210,7 @@ export default function HistoryPage() {
           </div>
         )}
 
-        <div className="flex flex-col gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 items-start">
           {orders.map((order) => {
             const isPending = order.payment_status !== "paid";
             const isDelivered = order.delivery_status === "delivered";
