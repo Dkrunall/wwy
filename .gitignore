@@ -61,3 +61,10 @@ prompt_dump.txt
 !public/**/*.jpeg
 
 
+
+# internal documents and one-off scripts, kept locally but never published
+WWY Brand Tone.docx
+wwy-system-design.excalidraw
+layout-check.js
+WWY_Website_Action_Plan.pdf
+Updates .odt
