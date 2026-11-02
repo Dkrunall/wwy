@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase, Product, CartItem } from "@/lib/supabase";
 
@@ -296,9 +297,10 @@ export default function MenuSection() {
         </div>
       </div>
 
-      {/* Floating Sticky Checkout Bar */}
-      {cartCount > 0 && (
-        <div className="fixed bottom-9 sm:bottom-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-xl px-4">
+      {/* Floating Sticky Checkout Bar. Rendered on document.body: inside this section (z-10) it
+          would sit below the later sections (z-20) no matter how high its own z-index is. */}
+      {cartCount > 0 && typeof document !== "undefined" && createPortal(
+        <div className="fixed bottom-9 sm:bottom-10 left-1/2 -translate-x-1/2 z-[65] w-full max-w-xl px-4">
           <Link
             href="/order/cart"
             className="w-full bg-brand-brown hover:bg-brand-terracotta text-white rounded-full py-4 px-6 flex items-center justify-between shadow-2xl shadow-brand-brown/30 transition-all duration-300 active:scale-[0.98] cursor-pointer border border-white/20"
@@ -315,7 +317,8 @@ export default function MenuSection() {
               {fmt(cartTotal)}
             </span>
           </Link>
-        </div>
+        </div>,
+        document.body
       )}
     </section>
   );

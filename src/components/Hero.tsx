@@ -51,7 +51,7 @@ export default function Hero() {
   return (
     <section
       ref={containerRef}
-      className="w-full relative min-h-[80vh] bg-brand-oat overflow-hidden flex items-center pt-28 sm:pt-32 md:pt-28 pb-14 sm:pb-16 border-b border-brand-brown/5"
+      className="w-full relative min-h-screen bg-brand-oat overflow-hidden flex items-center pt-32 sm:pt-36 md:pt-28 pb-16 sm:pb-20 border-b border-brand-brown/5"
     >
       {/* Dynamic Background Texture & Orbs */}
       <div className="absolute inset-0 opacity-[0.35] mix-blend-overlay pointer-events-none z-0" style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")' }}></div>

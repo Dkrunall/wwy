@@ -413,7 +413,7 @@ function OrderPageInner() {
 
       {/* ── Floating Sticky Checkout Bar ── */}
       {cartCount > 0 && (
-        <div className="fixed bottom-9 sm:bottom-10 left-1/2 -translate-x-1/2 z-50 w-full max-w-xl px-4">
+        <div className="fixed bottom-9 sm:bottom-10 left-1/2 -translate-x-1/2 z-[65] w-full max-w-xl px-4">
           <button
             onClick={() => router.push("/order/cart")}
             className="w-full bg-brand-brown hover:bg-brand-terracotta text-white rounded-full py-4 px-6 flex items-center justify-between shadow-2xl shadow-brand-brown/30 transition-all duration-300 active:scale-[0.98] cursor-pointer border border-white/20"
