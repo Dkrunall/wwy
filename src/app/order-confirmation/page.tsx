@@ -15,7 +15,7 @@ export default function OrderConfirmationPage() {
       <Navbar />
       <CartDrawer />
 
-      <div className="w-full max-w-5xl mx-auto px-4 sm:px-8 pt-32 sm:pt-40 pb-24 flex flex-col items-center">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-8 xl:px-16 pt-32 sm:pt-40 pb-24 flex flex-col items-center">
 
         {/* Hero Badge & Icon */}
         <div className="w-20 h-20 rounded-3xl bg-brand-olive/15 border border-brand-olive/20 flex items-center justify-center mb-6 shadow-xl shadow-brand-olive/10 animate-bounce">

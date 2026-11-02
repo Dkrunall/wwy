@@ -174,10 +174,10 @@ function OrderPageInner() {
     return (
       <main className="min-h-screen bg-brand-oat pb-36">
         <Navbar />
-        <div className="max-w-6xl mx-auto px-4 sm:px-8 pt-32 sm:pt-40 pb-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 xl:px-16 pt-32 sm:pt-40 pb-6">
           <div className="h-64 bg-brand-brown/8 rounded-3xl w-full mb-6 animate-pulse" />
         </div>
-        <div className="max-w-6xl mx-auto px-4 sm:px-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 xl:px-16 grid grid-cols-1 md:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((n) => (
             <div
               key={n}
@@ -223,7 +223,7 @@ function OrderPageInner() {
       <Navbar />
 
       {/* ── Storefront Hero Header & Visual Showcase ── */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 pt-32 sm:pt-40 pb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 xl:px-16 pt-32 sm:pt-40 pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           {/* Left Content */}
           <div className="lg:col-span-7 flex flex-col items-start">
@@ -333,7 +333,7 @@ function OrderPageInner() {
 
       {/* ── Floating Category Tab Pills (No Full-Width Bar Background) ── */}
       <div className="sticky top-24 z-30 mb-8">
-        <div className="max-w-6xl mx-auto px-4 sm:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 xl:px-16">
           <div className="flex items-center gap-2.5 overflow-x-auto scrollbar-hide py-2 px-1">
             {CATEGORIES.map((cat) => {
               const isActive = category === cat;
@@ -366,7 +366,7 @@ function OrderPageInner() {
       </div>
 
       {/* ── Products Grid (Multi-Column Layout) ── */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-8 mb-20 sm:mb-28">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 xl:px-16 mb-20 sm:mb-28">
         {filtered.length === 0 ? (
           <div className="bg-white rounded-3xl p-12 border border-brand-brown/10 text-center flex flex-col items-center gap-4 shadow-sm">
             <p className="text-base font-bold text-brand-brown/50">

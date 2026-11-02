@@ -326,7 +326,7 @@ export default function CartPage() {
     <main className="min-h-screen bg-gradient-to-b from-brand-oat/40 via-white to-brand-oat/20 pb-0">
       <Navbar />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-8 pt-32 sm:pt-40 mb-20 sm:mb-28 flex flex-col gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 xl:px-16 pt-32 sm:pt-40 mb-20 sm:mb-28 flex flex-col gap-6">
         {/* Navigation & Header Banner */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between gap-4">
