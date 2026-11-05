@@ -2,6 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
+import { canAddToCart } from "@/lib/orderLimits";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -126,6 +127,7 @@ export default function CartPage() {
 
   const updateQty = (productId: string, delta: number) => {
     setCart((prev) => {
+      if (delta > 0 && !canAddToCart(prev, productId)) return prev;
       const next = prev
         .map((i) => (i.product_id === productId ? { ...i, quantity: i.quantity + delta } : i))
         .filter((i) => i.quantity > 0);
@@ -423,8 +425,9 @@ export default function CartPage() {
                           </span>
                           <button
                             onClick={() => updateQty(item.product_id, 1)}
+                            disabled={!canAddToCart(cart, item.product_id)}
                             aria-label="Increase quantity"
-                            className="w-8 h-8 flex items-center justify-center font-black text-white bg-brand-terracotta rounded-xl shadow-xs hover:bg-brand-brown transition-colors cursor-pointer"
+                            className="w-8 h-8 flex items-center justify-center font-black text-white bg-brand-terracotta rounded-xl shadow-xs hover:bg-brand-brown transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             <Plus className="w-3.5 h-3.5" />
                           </button>

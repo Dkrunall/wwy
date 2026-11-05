@@ -6,6 +6,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
+import { BUSINESS } from "@/lib/business";
 import AnnouncementBar from "@/components/AnnouncementBar";
 
 // Length of the emailed code. Must match Supabase -> Authentication -> Email -> OTP length.
@@ -102,7 +103,12 @@ export default function OrderLoginPage() {
       options: { shouldCreateUser: true },
     });
     setLoading(false);
-    if (err) { setError(err.message); return; }
+    if (err) {
+      setError(err.status === 429
+        ? "Too many attempts. Please wait a few minutes and try again."
+        : `We couldn't send your code just now. Please try again in a minute, or WhatsApp us on ${BUSINESS.carePhone} to place your order.`);
+      return;
+    }
     setStep("otp");
     setResendTimer(60);
   };

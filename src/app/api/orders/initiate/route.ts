@@ -8,6 +8,7 @@ import { calculateDeliveryDate, deliveryDateISO, formatDeliveryDate, isValidDeli
 import { DEFAULT_CUTOFF_HOUR_IST, DEFAULT_DELIVERY_DAYS } from "@/lib/schedule";
 import { CartItem } from "@/lib/supabase";
 import { isPincodeServiceable } from "@/lib/baker";
+import { orderLimitError } from "@/lib/orderLimits";
 import { getSessionCustomer } from "@/lib/customerSession";
 
 function generateOrderNumber(): string {
@@ -86,6 +87,9 @@ export async function POST(req: NextRequest) {
         unit_price_paise: product.price_paise,
       });
     }
+
+    const limitError = orderLimitError(pricedCart);
+    if (limitError) return NextResponse.json({ error: limitError }, { status: 400 });
 
     const baseTotalPaise = pricedCart.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
     const { finalTotal: loyaltyFinalPaise, discountPercent } = await applyDiscounts(resolvedCustomerId, baseTotalPaise);

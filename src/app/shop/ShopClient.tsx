@@ -6,6 +6,8 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageBanner from "@/components/PageBanner";
+import VegMark from "@/components/VegMark";
+import { dietOf, DIET_LABEL } from "@/lib/diet";
 import { ShoppingBag } from "lucide-react";
 import type { Product } from "@/lib/products";
 import PincodeCheck from "@/components/PincodeCheck";
@@ -147,6 +149,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
 }
  
 function ProductCard({ product }: { product: Product }) {
+  const diet = dietOf(product.declarations?.ingredients, product.declarations?.allergens);
   return (
     <div className="group flex flex-col bg-white rounded-[2rem] overflow-hidden border border-brand-brown/5 shadow-sm hover:shadow-xl transition-all duration-500">
       {/* Image */}
@@ -156,6 +159,7 @@ function ProductCard({ product }: { product: Product }) {
             {product.badge}
           </span>
         )}
+        {diet && <VegMark diet={diet} className="absolute top-4 right-4 z-10" />}
         <div className="relative w-full h-full transition-transform duration-700 group-hover:scale-110">
           <Image src={product.image} alt={product.name} fill className="object-contain mix-blend-multiply drop-shadow-xl" />
         </div>
@@ -173,6 +177,11 @@ function ProductCard({ product }: { product: Product }) {
           <p className="text-xs font-bold text-brand-brown/40 mt-2 leading-relaxed line-clamp-2">
             {product.desc}
           </p>
+          {product.declarations?.allergens && (
+            <p className="text-[11px] font-bold text-brand-brown/60 mt-2 leading-relaxed">
+              <span className="font-black text-brand-brown/80">Allergens: </span>{product.declarations.allergens}
+            </p>
+          )}
         </div>
  
         <details className="group/details text-xs font-bold text-brand-brown/60">
@@ -181,7 +190,7 @@ function ProductCard({ product }: { product: Product }) {
           </summary>
           <dl className="mt-3 flex flex-col gap-1.5 leading-relaxed">
             <div><dt className="inline font-black text-brand-brown/80">MRP: </dt><dd className="inline">{product.price} (incl. all taxes)</dd></div>
-            <div><dt className="inline font-black text-brand-brown/80">Type: </dt><dd className="inline">Vegetarian</dd></div>
+            {diet && <div><dt className="inline font-black text-brand-brown/80">Type: </dt><dd className="inline">{DIET_LABEL[diet]}</dd></div>}
             {product.declarations?.ingredients && <div><dt className="inline font-black text-brand-brown/80">Ingredients: </dt><dd className="inline">{product.declarations.ingredients}</dd></div>}
             {product.declarations?.allergens && <div><dt className="inline font-black text-brand-brown/80">Allergens: </dt><dd className="inline">{product.declarations.allergens}</dd></div>}
             {product.declarations?.netQuantity && <div><dt className="inline font-black text-brand-brown/80">Net quantity: </dt><dd className="inline">{product.declarations.netQuantity}</dd></div>}

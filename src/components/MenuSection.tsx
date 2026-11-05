@@ -1,5 +1,8 @@
 "use client";
 
+import VegMark from "@/components/VegMark";
+import { dietOf } from "@/lib/diet";
+import { canAddToCart, LIMIT_HINT } from "@/lib/orderLimits";
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -85,6 +88,7 @@ export default function MenuSection() {
 
   const updateQty = useCallback((product: Product, delta: number) => {
     setCart((prev) => {
+      if (delta > 0 && !canAddToCart(prev, product.id)) return prev;
       const existing = prev.find((i) => i.product_id === product.id);
       let next: CartItem[];
       if (!existing) {
@@ -259,6 +263,7 @@ export default function MenuSection() {
                   <ProductCard
                     product={product}
                     qty={getQty(product.id)}
+                    canAdd={canAddToCart(cart, product.id)}
                     onAdd={() => updateQty(product, 1)}
                     onRemove={() => updateQty(product, -1)}
                   />
@@ -327,15 +332,18 @@ export default function MenuSection() {
 function ProductCard({
   product,
   qty,
+  canAdd,
   onAdd,
   onRemove,
 }: {
   product: Product;
   qty: number;
+  canAdd: boolean;
   onAdd: () => void;
   onRemove: () => void;
 }) {
   const imageSrc = product.image_url || getProductFallbackImage(product.name, product.category);
+  const diet = dietOf(product.ingredients, product.allergens);
 
   return (
     <div className="bg-white rounded-3xl p-5 border border-brand-brown/10 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group relative overflow-hidden h-full">
@@ -356,6 +364,8 @@ function ProductCard({
             {product.category}
           </span>
 
+          {diet && <VegMark diet={diet} className="absolute top-3 right-3 z-10" />}
+
           {/* Price Tag Overlay */}
           <span className="absolute bottom-3 right-3 z-10 font-serif font-black text-brand-brown text-sm bg-white/95 backdrop-blur-md px-3 py-1 rounded-full shadow-md border border-brand-brown/10">
             {fmt(product.price_paise)}
@@ -369,8 +379,14 @@ function ProductCard({
 
         {/* Description */}
         {product.description && (
-          <p className="text-xs sm:text-sm text-brand-brown/60 font-medium leading-relaxed mb-6 line-clamp-3">
+          <p className="text-xs sm:text-sm text-brand-brown/60 font-medium leading-relaxed mb-4 line-clamp-3">
             {product.description}
+          </p>
+        )}
+
+        {product.allergens && (
+          <p className="text-[11px] font-bold text-brand-brown/60 leading-relaxed mb-4">
+            <span className="font-black text-brand-brown/80">Allergens: </span>{product.allergens}
           </p>
         )}
       </div>
@@ -380,7 +396,8 @@ function ProductCard({
         {qty === 0 ? (
           <button
             onClick={onAdd}
-            className="w-full bg-brand-brown text-white hover:bg-brand-terracotta text-xs font-black tracking-widest uppercase py-3 rounded-2xl transition-all duration-200 active:scale-[0.97] cursor-pointer shadow-sm"
+            disabled={!canAdd}
+            className="w-full bg-brand-brown text-white hover:bg-brand-terracotta text-xs font-black tracking-widest uppercase py-3 rounded-2xl transition-all duration-200 active:scale-[0.97] cursor-pointer shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
           >
             + Add to Order
           </button>
@@ -396,7 +413,8 @@ function ProductCard({
             <span className="font-black text-brand-brown text-sm px-2">{qty}</span>
             <button
               onClick={onAdd}
-              className="w-9 h-9 flex items-center justify-center font-black text-white bg-brand-terracotta rounded-xl shadow-sm hover:bg-brand-brown transition-colors cursor-pointer"
+              disabled={!canAdd}
+              className="w-9 h-9 flex items-center justify-center font-black text-white bg-brand-terracotta rounded-xl shadow-sm hover:bg-brand-brown transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Add one"
             >
               +
@@ -404,6 +422,7 @@ function ProductCard({
           </div>
         )}
       </div>
+      {!canAdd && <p className="text-[10px] font-bold text-brand-brown/50 mt-2 text-center">{LIMIT_HINT}</p>}
     </div>
   );
 }

@@ -2,6 +2,9 @@
 
 export const dynamic = "force-dynamic";
 
+import VegMark from "@/components/VegMark";
+import { dietOf, DIET_LABEL } from "@/lib/diet";
+import { canAddToCart, LIMIT_HINT } from "@/lib/orderLimits";
 import React, { useState, useEffect, useCallback, Suspense, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
@@ -121,6 +124,7 @@ function OrderPageInner() {
 
   const updateQty = useCallback((product: Product, delta: number) => {
     setCart((prev) => {
+      if (delta > 0 && !canAddToCart(prev, product.id)) return prev;
       const existing = prev.find((i) => i.product_id === product.id);
       let next: CartItem[];
       if (!existing) {
@@ -401,6 +405,7 @@ function OrderPageInner() {
                 key={product.id}
                 product={product}
                 qty={getQty(product.id)}
+                canAdd={canAddToCart(cart, product.id)}
                 onAdd={() => updateQty(product, 1)}
                 onRemove={() => updateQty(product, -1)}
               />
@@ -439,15 +444,18 @@ function OrderPageInner() {
 function ProductCard({
   product,
   qty,
+  canAdd,
   onAdd,
   onRemove,
 }: {
   product: Product;
   qty: number;
+  canAdd: boolean;
   onAdd: () => void;
   onRemove: () => void;
 }) {
   const imageSrc = product.image_url || getProductFallbackImage(product.name, product.category);
+  const diet = dietOf(product.ingredients, product.allergens);
 
   return (
     <div className="bg-white rounded-3xl p-5 border border-brand-brown/10 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group relative overflow-hidden">
@@ -468,6 +476,8 @@ function ProductCard({
             {product.category}
           </span>
 
+          {diet && <VegMark diet={diet} className="absolute top-3 right-3 z-10" />}
+
           {/* Price Tag Overlay */}
           <span className="absolute bottom-3 right-3 z-10 font-serif font-black text-brand-brown text-sm bg-white/95 backdrop-blur-md px-3 py-1 rounded-full shadow-md border border-brand-brown/10">
             {fmt(product.price_paise)}
@@ -486,6 +496,12 @@ function ProductCard({
           </p>
         )}
 
+        {product.allergens && (
+          <p className="text-[11px] font-bold text-brand-brown/60 leading-relaxed mb-4">
+            <span className="font-black text-brand-brown/80">Allergens: </span>{product.allergens}
+          </p>
+        )}
+
         {/* Legal Metrology declarations (P3-1) */}
         <details className="mb-4 text-xs font-bold text-brand-brown/60">
           <summary className="cursor-pointer list-none text-[10px] font-black tracking-[0.18em] uppercase text-brand-brown/50 hover:text-brand-terracotta">
@@ -493,7 +509,7 @@ function ProductCard({
           </summary>
           <dl className="mt-3 flex flex-col gap-1.5 leading-relaxed">
             <div><dt className="inline font-black text-brand-brown/80">MRP: </dt><dd className="inline">{fmt(product.price_paise)} (incl. all taxes)</dd></div>
-            <div><dt className="inline font-black text-brand-brown/80">Type: </dt><dd className="inline">Vegetarian</dd></div>
+            {diet && <div><dt className="inline font-black text-brand-brown/80">Type: </dt><dd className="inline">{DIET_LABEL[diet]}</dd></div>}
             {product.ingredients && <div><dt className="inline font-black text-brand-brown/80">Ingredients: </dt><dd className="inline">{product.ingredients}</dd></div>}
             {product.allergens && <div><dt className="inline font-black text-brand-brown/80">Allergens: </dt><dd className="inline">{product.allergens}</dd></div>}
             {product.net_quantity && <div><dt className="inline font-black text-brand-brown/80">Net quantity: </dt><dd className="inline">{product.net_quantity}</dd></div>}
@@ -511,7 +527,8 @@ function ProductCard({
         {qty === 0 ? (
           <button
             onClick={onAdd}
-            className="w-full bg-brand-brown text-white hover:bg-brand-terracotta text-xs font-black tracking-widest uppercase py-3 rounded-2xl transition-all duration-200 active:scale-[0.97] cursor-pointer shadow-sm"
+            disabled={!canAdd}
+            className="w-full bg-brand-brown text-white hover:bg-brand-terracotta text-xs font-black tracking-widest uppercase py-3 rounded-2xl transition-all duration-200 active:scale-[0.97] cursor-pointer shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
           >
             + Add to Order
           </button>
@@ -527,7 +544,8 @@ function ProductCard({
             <span className="font-black text-brand-brown text-sm px-2">{qty}</span>
             <button
               onClick={onAdd}
-              className="w-9 h-9 flex items-center justify-center font-black text-white bg-brand-terracotta rounded-xl shadow-sm hover:bg-brand-brown transition-colors cursor-pointer"
+              disabled={!canAdd}
+              className="w-9 h-9 flex items-center justify-center font-black text-white bg-brand-terracotta rounded-xl shadow-sm hover:bg-brand-brown transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               aria-label="Add one"
             >
               +
@@ -535,6 +553,7 @@ function ProductCard({
           </div>
         )}
       </div>
+      {!canAdd && <p className="text-[10px] font-bold text-brand-brown/50 mt-2 text-center">{LIMIT_HINT}</p>}
     </div>
   );
 }
