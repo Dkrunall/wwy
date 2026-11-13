@@ -1,5 +1,6 @@
 "use client";
 
+import { CART_EVENT } from "@/lib/cartStorage";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -55,11 +56,16 @@ export default function Navbar() {
     };
     refresh();
     window.addEventListener("focus", refresh);
-    return () => window.removeEventListener("focus", refresh);
+    window.addEventListener(CART_EVENT, refresh);
+    return () => {
+      window.removeEventListener("focus", refresh);
+      window.removeEventListener(CART_EVENT, refresh);
+    };
   }, [pathname]);
 
   const runSearch = () => {
     const query = searchValue.trim();
+    setSearchValue("");
     setSearchOpen(false);
     setMobileMenuOpen(false);
     router.push(query ? `/order?q=${encodeURIComponent(query)}` : "/order");

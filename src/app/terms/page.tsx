@@ -3,7 +3,6 @@ import Link from "next/link";
 import PolicyPage from "@/components/PolicyPage";
 import { BUSINESS, businessValue } from "@/lib/business";
 import { cutoffRuleText, deliveryDaysLong } from "@/lib/schedule";
-import { FREE_SHIPPING_THRESHOLD_PAISE, STANDARD_SHIPPING_FEE_PAISE } from "@/lib/shipping";
 
 export const metadata: Metadata = {
   title: "Terms of Sale",
@@ -29,7 +28,7 @@ export default function TermsPage() {
       <h2>Prices and payment</h2>
       <ul>
         <li>All prices are in Indian rupees and are the maximum retail price, inclusive of all taxes.</li>
-        <li>Delivery is ₹{STANDARD_SHIPPING_FEE_PAISE / 100} on orders below ₹{FREE_SHIPPING_THRESHOLD_PAISE / 100}, and free from ₹{FREE_SHIPPING_THRESHOLD_PAISE / 100}.</li>
+        <li>Delivery charges may apply, depending on your order and location. Any charge is shown at checkout before you pay.</li>
         <li>Payment is taken online through Razorpay (card, UPI or netbanking) when you place the order. We start baking only after payment is confirmed.</li>
         <li>You will receive a GST tax invoice by email after payment.</li>
       </ul>

@@ -10,9 +10,6 @@ import {
   formatHour,
   cutoffDayName,
 } from "@/lib/schedule";
-import { FREE_SHIPPING_THRESHOLD_PAISE, STANDARD_SHIPPING_FEE_PAISE } from "@/lib/shipping";
-
-const SHIPPING = `Free shipping over ₹${FREE_SHIPPING_THRESHOLD_PAISE / 100} · ₹${STANDARD_SHIPPING_FEE_PAISE / 100} shipping below ₹${FREE_SHIPPING_THRESHOLD_PAISE / 100}`;
 
 function countdown(ms: number): string {
   const mins = Math.max(0, Math.floor(ms / 60000));
@@ -59,7 +56,7 @@ export default function AnnouncementBar() {
   return (
     <div className="fixed bottom-0 left-1/2 -translate-x-1/2 z-[60] bg-brand-terracotta text-white px-4 sm:px-6 py-1.5 rounded-t-[1rem] shadow-lg w-[95%] sm:w-auto max-w-[90vw] text-center">
       <p className="text-[7px] xs:text-[8px] sm:text-[9px] font-black tracking-[0.1em] sm:tracking-[0.15em] md:tracking-[0.2em] uppercase leading-snug">
-        {message} · {SHIPPING}
+        {message}
       </p>
     </div>
   );

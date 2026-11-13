@@ -29,7 +29,7 @@ export default function PincodeCheck({ tone = "light" }: { tone?: "light" | "dar
   const message: Record<State, string> = {
     idle: "",
     checking: "Checking...",
-    ok: "Good news, we deliver to your pincode.",
+    ok: "Good news, we deliver to your pincode. Delivery charges may apply.",
     blocked: "Sorry, we don't deliver to this pincode yet.",
     error: "Enter a valid 6-digit pincode.",
   };

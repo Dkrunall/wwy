@@ -2,6 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
+import InstaLink from "@/components/InstaLink";
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -246,7 +247,7 @@ export default function OrderLoginPage() {
             WE&apos;RE ON A<br />SHORT BREAK.
           </h1>
           <p className="text-sm font-bold text-brand-charcoal/50 leading-relaxed">
-            We&apos;re resting and will be back with fresh batches soon. Follow @wildwildyeast.wwy on Instagram for updates. 🌾
+            We&apos;re resting and will be back with fresh batches soon. Follow <InstaLink /> on Instagram for updates. 🌾
           </p>
         </div>
       </main>

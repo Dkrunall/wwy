@@ -23,7 +23,7 @@ import {
 import { CartItem, supabase } from "@/lib/supabase";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { FREE_SHIPPING_THRESHOLD_PAISE, calculateShippingFee } from "@/lib/shipping";
+import { calculateShippingFee } from "@/lib/shipping";
 
 function fmt(paise: number) {
   return `₹${(paise / 100).toFixed(0)}`;
@@ -197,7 +197,6 @@ export default function CartPage() {
   const displayTotal = discountInfo
     ? discountInfo.finalTotal
     : Math.max(0, baseTotalPaise - previewCouponDiscountPaise) + previewShippingFeePaise;
-  const amountToFreeShipping = Math.max(0, FREE_SHIPPING_THRESHOLD_PAISE - baseTotalPaise);
   const itemCount = cart.reduce((s, i) => s + i.quantity, 0);
 
   const handlePay = async () => {
@@ -558,12 +557,6 @@ export default function CartPage() {
                       <span className="font-bold text-brand-brown">{fmt(shippingFeePaise)}</span>
                     )}
                   </div>
-
-                  {shippingFeePaise > 0 && (
-                    <div className="text-[11px] font-bold text-brand-terracotta italic bg-brand-terracotta/5 p-2.5 rounded-xl border border-brand-terracotta/10">
-                      Add {fmt(amountToFreeShipping)} more to get free shipping (orders ₹599+ ship free; ₹65 standard shipping below that).
-                    </div>
-                  )}
 
                   {deliveryLabel && (
                     <div className="text-[11px] font-bold text-brand-brown/50 italic bg-brand-oat/40 p-2.5 rounded-xl border border-brand-brown/8">

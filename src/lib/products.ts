@@ -1,5 +1,7 @@
 export type Product = {
   id: number;
+  /** The products-table id, set by getShopProducts; needed to add the item to the cart. */
+  dbId?: string;
   name: string;
   category: string;
   badge?: string;

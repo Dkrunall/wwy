@@ -17,7 +17,7 @@ export default function RefundPage() {
       <h2>Cancelling an order</h2>
       <ul>
         <li>You can cancel for free until the cutoff for your delivery day: {cutoffRuleText()}.</li>
-        <li>To cancel, message us on WhatsApp or email {businessValue(BUSINESS.careEmail)} with your order number before the cutoff. We refund the full amount, including delivery.</li>
+        <li>To cancel, message us on WhatsApp or email {businessValue(BUSINESS.careEmail)} with your order number before the cutoff. We refund the full amount, including any delivery charge you paid.</li>
         <li>After the cutoff we have already started baking, so we cannot cancel or refund the order.</li>
       </ul>
 

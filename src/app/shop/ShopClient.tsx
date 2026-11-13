@@ -1,8 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import InstaLink from "@/components/InstaLink";
+import { canAddToCart, LIMIT_HINT } from "@/lib/orderLimits";
+import { readCart, writeCart, type CartLine } from "@/lib/cartStorage";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PageBanner from "@/components/PageBanner";
@@ -22,8 +26,40 @@ const CATEGORY_BLURBS: Record<string, { text: string; cta: string }> = {
 
 const categories = ["All", "Crafted Bakes", "Be-Sides"];
 
-export default function ShopClient({ products }: { products: Product[] }) {
+export type UpcomingBake = { date: string; orderBy: string; flavours: string[] };
+
+export default function ShopClient({ products, bakes }: { products: Product[]; bakes: UpcomingBake[] }) {
+  const router = useRouter();
   const [activeCategory, setActiveCategory] = useState("All");
+  const [cart, setCart] = useState<CartLine[]>([]);
+
+  useEffect(() => {
+    setCart(readCart());
+  }, []);
+
+  const qtyOf = (p: Product) => (p.dbId ? cart.find((i) => i.product_id === p.dbId)?.quantity ?? 0 : 0);
+
+  const changeQty = (p: Product, delta: number): CartLine[] => {
+    const id = p.dbId;
+    if (!id || (delta > 0 && !canAddToCart(cart, id))) return cart;
+    const existing = cart.find((i) => i.product_id === id);
+    const next = existing
+      ? cart.map((i) => (i.product_id === id ? { ...i, quantity: i.quantity + delta } : i)).filter((i) => i.quantity > 0)
+      : delta > 0
+        ? [...cart, { product_id: id, product_name: p.name, quantity: delta, unit_price_paise: Math.round(p.priceNum * 100) }]
+        : cart;
+    writeCart(next);
+    setCart(next);
+    return next;
+  };
+
+  const buyNow = (p: Product) => {
+    if (p.dbId && qtyOf(p) === 0) changeQty(p, 1);
+    router.push(p.dbId ? "/order/cart" : "/order");
+  };
+
+  const cartCount = cart.reduce((s, i) => s + i.quantity, 0);
+  const cartTotal = cart.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
   const filtered = activeCategory === "All"
     ? products
     : products.filter(p => p.category === activeCategory);
@@ -48,7 +84,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
               Delivery {deliveryDaysShort()} only. Orders close {cutoffRuleText()}.
             </p>
             <p className="text-sm font-bold text-brand-brown/50 leading-relaxed">
-              New flavours go up every week on Instagram, @{BUSINESS.instagramHandle}.
+              New flavours go up every week on Instagram, <InstaLink />.
             </p>
             <div className="mt-1">
               <PincodeCheck />
@@ -63,7 +99,9 @@ export default function ShopClient({ products }: { products: Product[] }) {
                 </span>
               ))}
             </div>
-            <p className="text-xs font-bold text-brand-brown/40">Flavours rotate weekly. Check Instagram for this week&apos;s batch.</p>
+            <p className="text-xs font-bold text-brand-brown/50">
+              Flavours rotate weekly. <InstaLink>Follow us on Insta @{BUSINESS.instagramHandle}</InstaLink>
+            </p>
           </div>
         </div>
       </section>
@@ -73,8 +111,25 @@ export default function ShopClient({ products }: { products: Product[] }) {
         <div className="max-w-7xl mx-auto">
           <h2 className="font-serif font-normal text-brand-brown text-2xl sm:text-4xl tracking-tight mb-2">Find your next favourite.</h2>
           <p className="text-sm font-bold text-brand-brown/50 leading-relaxed max-w-2xl">
-            Try something new and see what happens when good ingredients meet a curious mind.
+            Our next two weeks of bakes. Try something new and see what happens when good ingredients meet a curious mind.
           </p>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-6">
+            {bakes.map((b) => (
+              <div key={b.date} className="bg-white rounded-[1.5rem] border border-brand-brown/5 shadow-sm p-5 flex flex-col gap-2">
+                <span className="text-brand-orange text-[10px] sm:text-xs font-black tracking-[0.18em] uppercase">{b.date}</span>
+                <p className="text-[11px] font-bold text-brand-brown/45">Order by {b.orderBy}</p>
+                {b.flavours.length > 0 ? (
+                  <ul className="flex flex-col gap-1 text-sm font-bold text-brand-brown/75">
+                    {b.flavours.map((f) => <li key={f}>{f}</li>)}
+                  </ul>
+                ) : (
+                  <p className="text-sm font-bold text-brand-brown/60 leading-snug">
+                    Full range. Flavours for this bake go up on <InstaLink>Instagram</InstaLink>.
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
           <div className="flex gap-2 sm:gap-3 mt-6 flex-wrap">
             {categories.map(cat => (
               <button
@@ -102,7 +157,15 @@ export default function ShopClient({ products }: { products: Product[] }) {
       <section className="w-full px-4 sm:px-8 xl:px-16 pt-8 pb-14 sm:pb-20">
         <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
           {filtered.map(product => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              qty={qtyOf(product)}
+              canAdd={!product.dbId || canAddToCart(cart, product.dbId)}
+              onAdd={() => changeQty(product, 1)}
+              onRemove={() => changeQty(product, -1)}
+              onBuy={() => buyNow(product)}
+            />
           ))}
         </div>
  
@@ -138,17 +201,41 @@ export default function ShopClient({ products }: { products: Product[] }) {
           href="/order"
           className="shrink-0 inline-flex items-center gap-2 bg-brand-orange text-white hover:bg-brand-oat hover:text-brand-brown px-10 py-4 rounded-full font-black text-xs tracking-[0.2em] uppercase shadow-xl active:scale-95 transition-all duration-300"
         >
-          Order Now
+          Buy now
         </Link>
         </div>
       </section>
+
+      {cartCount > 0 && (
+        <Link
+          href="/order/cart"
+          className="fixed bottom-9 sm:bottom-10 left-1/2 -translate-x-1/2 z-[65] flex items-center gap-3 bg-brand-brown text-white hover:bg-brand-orange px-6 py-3.5 rounded-full shadow-2xl text-[11px] font-black tracking-[0.15em] uppercase whitespace-nowrap transition-colors"
+        >
+          <ShoppingBag size={16} />
+          View cart · {cartCount} {cartCount === 1 ? "item" : "items"} · ₹{(cartTotal / 100).toLocaleString("en-IN")}
+        </Link>
+      )}
  
       <Footer />
     </main>
   );
 }
  
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({
+  product,
+  qty,
+  canAdd,
+  onAdd,
+  onRemove,
+  onBuy,
+}: {
+  product: Product;
+  qty: number;
+  canAdd: boolean;
+  onAdd: () => void;
+  onRemove: () => void;
+  onBuy: () => void;
+}) {
   const diet = dietOf(product.declarations?.ingredients, product.declarations?.allergens);
   return (
     <div className="group flex flex-col bg-white rounded-[2rem] overflow-hidden border border-brand-brown/5 shadow-sm hover:shadow-xl transition-all duration-500">
@@ -177,8 +264,13 @@ function ProductCard({ product }: { product: Product }) {
           <p className="text-xs font-bold text-brand-brown/40 mt-2 leading-relaxed line-clamp-2">
             {product.desc}
           </p>
-          {product.declarations?.allergens && (
+          {product.declarations?.ingredients && (
             <p className="text-[11px] font-bold text-brand-brown/60 mt-2 leading-relaxed">
+              <span className="font-black text-brand-brown/80">Ingredients: </span>{product.declarations.ingredients}
+            </p>
+          )}
+          {product.declarations?.allergens && (
+            <p className="text-[11px] font-bold text-brand-brown/60 mt-1 leading-relaxed">
               <span className="font-black text-brand-brown/80">Allergens: </span>{product.declarations.allergens}
             </p>
           )}
@@ -205,14 +297,32 @@ function ProductCard({ product }: { product: Product }) {
           </dl>
         </details>
 
-        <div className="flex items-center justify-between mt-auto pt-3 border-t border-brand-brown/5">
+        <div className="mt-auto pt-3 border-t border-brand-brown/5 flex flex-col gap-3">
           <span className="font-black text-brand-orange text-lg">{product.price}</span>
-          <Link
-            href="/order"
-            className="flex items-center gap-2 px-5 py-2.5 rounded-full text-[10px] font-black tracking-[0.15em] uppercase bg-brand-brown text-white hover:bg-brand-orange transition-all duration-300 active:scale-95 shadow-sm"
-          >
-            Order Now
-          </Link>
+          <div className="grid grid-cols-2 gap-2">
+            {!product.dbId ? null : qty === 0 ? (
+              <button
+                onClick={onAdd}
+                disabled={!canAdd}
+                className="px-3 py-2.5 rounded-full text-[10px] font-black tracking-[0.12em] uppercase border border-brand-brown/20 text-brand-brown hover:border-brand-brown transition-colors active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Add to cart
+              </button>
+            ) : (
+              <div className="flex items-center justify-between rounded-full border border-brand-brown/20 px-1.5">
+                <button onClick={onRemove} aria-label="Remove one" className="w-7 h-7 rounded-full font-black text-brand-brown hover:bg-brand-oat">−</button>
+                <span className="text-sm font-black text-brand-brown">{qty}</span>
+                <button onClick={onAdd} disabled={!canAdd} aria-label="Add one" className="w-7 h-7 rounded-full font-black text-brand-brown hover:bg-brand-oat disabled:opacity-40 disabled:cursor-not-allowed">+</button>
+              </div>
+            )}
+            <button
+              onClick={onBuy}
+              className={`${product.dbId ? "" : "col-span-2 "}px-3 py-2.5 rounded-full text-[10px] font-black tracking-[0.12em] uppercase bg-brand-brown text-white hover:bg-brand-orange transition-colors active:scale-95 shadow-sm`}
+            >
+              Buy now
+            </button>
+          </div>
+          {!canAdd && <p className="text-[10px] font-bold text-brand-brown/50 text-center">{LIMIT_HINT}</p>}
         </div>
       </div>
     </div>

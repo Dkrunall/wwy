@@ -102,9 +102,6 @@ export default function StoryPage() {
               What if bread <br />
               <span className="italic text-brand-orange">were adventurous?</span>
             </h2>
-            <p className="text-sm font-bold text-brand-brown/40 uppercase tracking-widest leading-relaxed mb-6">
-              What if familiar flavours found new combinations? What if a neighbourhood bakery could keep giving you something new to look forward to?
-            </p>
             
             {/* Tag pills */}
             <div className="flex flex-wrap gap-2 mt-4">

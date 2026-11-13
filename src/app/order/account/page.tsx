@@ -2,6 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
+import { BUSINESS } from "@/lib/business";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -266,7 +267,7 @@ export default function AccountPage() {
             <div className="flex items-center gap-3">
               <ShoppingBag className="w-5 h-5 text-brand-orange" style={{ color: "#EBB41F" }} />
               <div className="text-left">
-                <p className="font-black text-sm leading-none">Order Now</p>
+                <p className="font-black text-sm leading-none">Buy now</p>
                 <p className="text-white/40 text-[11px] font-bold mt-0.5">Browse this week&apos;s menu</p>
               </div>
             </div>
@@ -582,8 +583,8 @@ export default function AccountPage() {
 
                 <div className="pt-2">
                   <p className="text-[11px] font-bold text-gray-400">
-                    To update other details, contact us at{" "}
-                    <span className="text-brand-brown font-black">dnyanesh@wildwildyeast.com</span>
+                    To update other details, message us on WhatsApp at{" "}
+                    <span className="text-brand-brown font-black">{BUSINESS.carePhone}</span>
                   </p>
                 </div>
               </div>

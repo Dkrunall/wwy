@@ -4,8 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import { ChevronDown } from "lucide-react";
-import { cutoffRuleText, deliveryDaysShort } from "@/lib/schedule";
-import { FREE_SHIPPING_THRESHOLD_PAISE, STANDARD_SHIPPING_FEE_PAISE } from "@/lib/shipping";
+import { deliveryDaysShort } from "@/lib/schedule";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -33,12 +32,6 @@ const steps = [
   },
 ];
 
-const CUTOFF_NOTE = `Order by ${cutoffRuleText()}`;
-const deliveryRules = [
-  { product: "Sourdough and breads", lead: "Baked to order", notes: CUTOFF_NOTE },
-  { product: "Croissants", lead: "Baked to order", notes: CUTOFF_NOTE },
-  { product: "Be-Sides (biscotti, macaroons, cookies, crackers)", lead: "Baked to order", notes: CUTOFF_NOTE },
-];
 
 const faqs = [
   {
@@ -110,13 +103,6 @@ export default function HowItWorks() {
           scrollTrigger: { trigger: ".hiw-grid", start: "top 82%" },
         }
       );
-      gsap.fromTo(".hiw-lead-row",
-        { x: -20, opacity: 0 },
-        {
-          x: 0, opacity: 1, stagger: 0.08, duration: 0.7, ease: "power2.out",
-          scrollTrigger: { trigger: ".hiw-leads", start: "top 85%" },
-        }
-      );
     }, sectionRef);
     return () => ctx.revert();
   }, []);
@@ -165,7 +151,7 @@ export default function HowItWorks() {
           {[
             { label: `Delivery: ${deliveryDaysShort()} only` },
             { label: "Order online, pay by card / UPI / netbanking" },
-            { label: `Free shipping over ₹${FREE_SHIPPING_THRESHOLD_PAISE / 100} · ₹${STANDARD_SHIPPING_FEE_PAISE / 100} below` },
+            { label: "Delivery charges, if any, shown at checkout" },
             { label: "Baked to order, no advance stock" },
           ].map(({ label }) => (
             <span key={label} className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white border border-brand-brown/8 text-[10px] sm:text-xs md:text-sm font-black tracking-[0.12em] uppercase text-brand-brown/60 shadow-sm">
@@ -199,28 +185,6 @@ export default function HowItWorks() {
               </p>
             </div>
           ))}
-        </div>
- 
-        {/* ── Product lead times ── */}
-        <div className="mb-16 sm:mb-24">
-          <div className="flex items-center gap-4 mb-8">
-            <div className="w-8 h-px bg-brand-orange" />
-            <span className="text-sm sm:text-base md:text-lg font-bold tracking-[0.2em] uppercase text-brand-orange">
-              Order Cutoffs by Product
-            </span>
-          </div>
-          <div className="hiw-leads bg-white/80 backdrop-blur-md rounded-[2.5rem] border border-brand-brown/5 shadow-sm overflow-hidden">
-            {deliveryRules.map((row, i) => (
-              <div key={i} className="hiw-lead-row flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0 px-6 sm:px-10 py-5 border-b border-brand-brown/5 last:border-0 hover:bg-brand-orange/5 transition-all duration-300">
-                <span className="font-serif font-normal text-base sm:text-lg md:text-xl text-brand-brown sm:w-1/3">{row.product}</span>
-                <span className="font-serif italic font-light text-brand-orange text-sm sm:text-base md:text-lg sm:w-1/6">{row.lead}</span>
-                <span className="text-xs sm:text-sm md:text-base font-bold text-brand-brown/40 sm:flex-1">{row.notes}</span>
-              </div>
-            ))}
-          </div>
-          <p className="text-xs font-bold text-brand-brown/30 mt-4 italic text-center">
-            Everything in your cart arrives together on the delivery day shown at checkout.
-          </p>
         </div>
  
         {/* ── FAQ ── */}

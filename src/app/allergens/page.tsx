@@ -25,7 +25,7 @@ export default function AllergensPage() {
       <h2>Cross-contact</h2>
       <p>
         Our products are baked in a kitchen that handles gluten, dairy, eggs, nuts and sesame. We cannot guarantee that any item is free of
-        these allergens, even if it is not on the ingredient list. If you have a severe allergy, please do not rely on our products.
+        these allergens, even if it is not on the ingredient list. If you have a severe allergy, please message us before you order so we can talk you through what goes into each bake.
       </p>
 
       <h2>Asking before you order</h2>
@@ -39,7 +39,6 @@ export default function AllergensPage() {
         <li>We bake to order and deliver on set delivery days, so nothing sits in stock.</li>
         <li>Our bakes are fresh food, so eat them within the &ldquo;best before&rdquo; time shown on the product. Storage advice is on each product page.</li>
         <li>Fermentation continues after baking, so a loaf will change slowly in texture and taste. Store it as the product page advises.</li>
-        <li>Some items, such as Be-Sides, are made for us by partner kitchens. Their manufacturer name and FSSAI number are shown on the product page.</li>
       </ul>
 
       <h2>Our licence</h2>

@@ -86,7 +86,13 @@ function OrderPageInner() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
+  const qParam = searchParams.get("q") || "";
+  const [searchQuery, setSearchQuery] = useState(qParam);
+  const [lastQParam, setLastQParam] = useState(qParam);
+  if (qParam !== lastQParam) {
+    setLastQParam(qParam);
+    setSearchQuery(qParam);
+  }
 
   useEffect(() => {
     // The menu is open to everyone; login is asked for at checkout (/order/cart).
@@ -496,6 +502,11 @@ function ProductCard({
           </p>
         )}
 
+        {product.ingredients && (
+          <p className="text-[11px] font-bold text-brand-brown/60 leading-relaxed mb-1">
+            <span className="font-black text-brand-brown/80">Ingredients: </span>{product.ingredients}
+          </p>
+        )}
         {product.allergens && (
           <p className="text-[11px] font-bold text-brand-brown/60 leading-relaxed mb-4">
             <span className="font-black text-brand-brown/80">Allergens: </span>{product.allergens}

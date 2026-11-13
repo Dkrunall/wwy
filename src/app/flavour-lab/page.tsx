@@ -1,3 +1,4 @@
+import InstaLink from "@/components/InstaLink";
 import type { Metadata } from "next";
 import Link from "next/link";
 import PolicyPage from "@/components/PolicyPage";
@@ -33,7 +34,7 @@ export default function FlavourLabPage() {
           <li key={f}>{f}</li>
         ))}
       </ul>
-      <p>New flavours go up every week on Instagram, so keep an eye out.</p>
+      <p>New flavours go up every week on Instagram, so keep an eye out: <InstaLink />.</p>
 
       <h2>Next available bake</h2>
       <ul>

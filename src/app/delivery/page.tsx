@@ -4,7 +4,6 @@ import PolicyPage from "@/components/PolicyPage";
 import PincodeCheck from "@/components/PincodeCheck";
 import { BUSINESS, businessValue } from "@/lib/business";
 import { scheduleWindows, deliveryDaysLong, cutoffRuleText } from "@/lib/schedule";
-import { FREE_SHIPPING_THRESHOLD_PAISE, STANDARD_SHIPPING_FEE_PAISE } from "@/lib/shipping";
 
 export const metadata: Metadata = {
   title: "Delivery Information & Ordering | Wild Wild Yeast Mumbai",
@@ -54,10 +53,7 @@ export default function DeliveryPage() {
       <p>Orders close {cutoffRuleText()}. An order placed after a cutoff goes into the next delivery window. At checkout you can see the delivery date your order will arrive on.</p>
 
       <h2>Delivery charges</h2>
-      <ul>
-        <li>₹{STANDARD_SHIPPING_FEE_PAISE / 100} on orders below ₹{FREE_SHIPPING_THRESHOLD_PAISE / 100}.</li>
-        <li>Free on orders of ₹{FREE_SHIPPING_THRESHOLD_PAISE / 100} and above. The threshold is measured on your cart total before any discount.</li>
-      </ul>
+      <p>Delivery charges may apply, depending on your order and location. Any charge is shown at checkout before you pay.</p>
 
       <h2>When your order arrives</h2>
       <ul>

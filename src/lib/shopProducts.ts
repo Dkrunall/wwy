@@ -2,6 +2,7 @@ import { products as staticProducts, type Product } from "@/lib/products";
 import { createServerSupabase } from "@/lib/supabase-server";
 
 type DbProduct = {
+  id: string;
   name: string;
   price_paise: number;
   available: boolean;
@@ -23,7 +24,7 @@ export async function getShopProducts(): Promise<Product[]> {
   try {
     const { data, error } = await createServerSupabase()
       .from("products")
-      .select("name,price_paise,available,image_url,ingredients,allergens,net_quantity,best_before,storage,manufacturer_name,manufacturer_address,manufacturer_fssai");
+      .select("id,name,price_paise,available,image_url,ingredients,allergens,net_quantity,best_before,storage,manufacturer_name,manufacturer_address,manufacturer_fssai");
     if (error || !data) return staticProducts;
 
     const byName = new Map((data as DbProduct[]).map((row) => [row.name, row]));
@@ -38,6 +39,7 @@ export async function getShopProducts(): Promise<Product[]> {
       return [
         {
           ...p,
+          dbId: row.id,
           price: `₹${(row.price_paise / 100).toLocaleString("en-IN")}`,
           priceNum: row.price_paise / 100,
           declarations: {

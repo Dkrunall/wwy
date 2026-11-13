@@ -88,17 +88,13 @@ export async function updateOrderDeliveryStatus(
   return { ok: true };
 }
 
+// We take orders for every valid pincode (delivery charges may apply). Bakers' pincode lists
+// are still used to pick a baker in findBestBaker.
 export async function isPincodeServiceable(
-  supabase: ReturnType<typeof createServerSupabase>,
+  _supabase: ReturnType<typeof createServerSupabase>,
   pincode?: string | null
 ): Promise<boolean> {
-  if (!pincode) return false;
-  const { data } = await supabase
-    .from("bakers")
-    .select("id")
-    .contains("pincodes", [pincode])
-    .eq("is_active", true);
-  return (data || []).length > 0;
+  return !!pincode && /^\d{6}$/.test(pincode.trim());
 }
 
 export async function findBestBaker(
