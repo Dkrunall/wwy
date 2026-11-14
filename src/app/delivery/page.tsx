@@ -1,3 +1,4 @@
+import { DELIVERY_CHARGE_TEXT } from "@/lib/shipping";
 import type { Metadata } from "next";
 import Link from "next/link";
 import PolicyPage from "@/components/PolicyPage";
@@ -36,7 +37,7 @@ export default function DeliveryPage() {
       </ul>
 
       <h2>Do we deliver to you?</h2>
-      <p>We currently serve Mumbai, on the pincodes we have partnered for delivery. Check yours here, or at checkout:</p>
+      <p>We deliver within Mumbai only. Check your pincode here, or at checkout:</p>
       <div className="bg-white rounded-[1.5rem] border border-brand-brown/5 p-5 w-fit">
         <PincodeCheck />
       </div>
@@ -53,7 +54,7 @@ export default function DeliveryPage() {
       <p>Orders close {cutoffRuleText()}. An order placed after a cutoff goes into the next delivery window. At checkout you can see the delivery date your order will arrive on.</p>
 
       <h2>Delivery charges</h2>
-      <p>Delivery charges may apply, depending on your order and location. Any charge is shown at checkout before you pay.</p>
+      <p>{DELIVERY_CHARGE_TEXT} The charge, if any, is shown at checkout before you pay.</p>
 
       <h2>When your order arrives</h2>
       <ul>

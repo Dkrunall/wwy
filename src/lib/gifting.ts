@@ -13,13 +13,13 @@ export const GIFT_TIERS: GiftTier[] = [
   {
     name: "The Loaf",
     tagline: "A single, perfect loaf.",
-    contents: ["1 Sourdough Classic Heritage", "Kraft paper bag with a handwritten note"],
+    contents: ["1 Classic Sourdough", "Kraft paper bag with a handwritten note"],
     priceRupees: null,
   },
   {
     name: "The Breakfast",
     tagline: "Everything for a slow morning.",
-    contents: ["1 Sourdough Classic Heritage", "2 Croissants", "Be-Sides cookies"],
+    contents: ["1 Classic Sourdough", "2 Croissants", "Be-Sides cookies"],
     priceRupees: null,
   },
   {

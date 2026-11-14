@@ -20,7 +20,7 @@ export const BUSINESS = {
 // Policy numbers kept in one place so the pages and checkout agree.
 export const POLICY = {
   // How long after delivery a customer can report damage or a wrong item, with a photo.
-  reportWindowHours: 24,
+  reportWindowHours: 6,
   // Typical time for a refund to reach the original payment method after approval.
   refundDays: "5 to 7 working days",
 };

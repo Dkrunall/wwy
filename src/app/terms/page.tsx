@@ -1,3 +1,4 @@
+import { DELIVERY_CHARGE_TEXT } from "@/lib/shipping";
 import type { Metadata } from "next";
 import Link from "next/link";
 import PolicyPage from "@/components/PolicyPage";
@@ -28,7 +29,7 @@ export default function TermsPage() {
       <h2>Prices and payment</h2>
       <ul>
         <li>All prices are in Indian rupees and are the maximum retail price, inclusive of all taxes.</li>
-        <li>Delivery charges may apply, depending on your order and location. Any charge is shown at checkout before you pay.</li>
+        <li>We deliver within Mumbai only. {DELIVERY_CHARGE_TEXT} The charge, if any, is shown at checkout before you pay.</li>
         <li>Payment is taken online through Razorpay (card, UPI or netbanking) when you place the order. We start baking only after payment is confirmed.</li>
         <li>You will receive a GST tax invoice by email after payment.</li>
       </ul>
@@ -45,7 +46,7 @@ export default function TermsPage() {
         If you have an allergy, contact us before ordering. Our kitchen and partner kitchens handle gluten, dairy, nuts and sesame.
       </p>
 
-      <h2>Cancellations, refunds and replacements</h2>
+      <h2>Cancellations and refunds</h2>
       <p>See our <Link href="/refund">Refund and Cancellation Policy</Link>.</p>
 
       <h2>Our responsibility</h2>

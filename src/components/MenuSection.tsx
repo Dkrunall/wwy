@@ -1,5 +1,6 @@
 "use client";
 
+import { bakeDaysLabel, isOnUpcomingMenu } from "@/lib/menu";
 import VegMark from "@/components/VegMark";
 import { dietOf } from "@/lib/diet";
 import { canAddToCart, LIMIT_HINT } from "@/lib/orderLimits";
@@ -74,7 +75,7 @@ export default function MenuSection() {
           .select("*")
           .eq("available", true)
           .order("category");
-        if (!error) setProducts(data || []);
+        if (!error) setProducts((data || []).filter((p) => isOnUpcomingMenu(p.name)));
       } finally {
         setLoading(false);
       }
@@ -344,6 +345,7 @@ function ProductCard({
 }) {
   const imageSrc = product.image_url || getProductFallbackImage(product.name, product.category);
   const diet = dietOf(product.ingredients, product.allergens);
+  const bakeDays = bakeDaysLabel(product.name);
 
   return (
     <div className="bg-white rounded-3xl p-5 border border-brand-brown/10 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group relative overflow-hidden h-full">
@@ -376,6 +378,9 @@ function ProductCard({
         <h3 className="font-black text-brand-brown text-lg sm:text-xl leading-snug tracking-tight mb-2 group-hover:text-brand-terracotta transition-colors">
           {product.name}
         </h3>
+        {bakeDays && (
+          <p className="text-[10px] font-black tracking-[0.15em] uppercase text-brand-terracotta mb-2">Baked for {bakeDays}</p>
+        )}
 
         {/* Description */}
         {product.description && (

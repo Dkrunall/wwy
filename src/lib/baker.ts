@@ -1,3 +1,4 @@
+import { isMumbaiPincode } from "@/lib/pincodes";
 import { createServerSupabase } from "./supabase-server";
 import { sendDeliveryUpdateToCustomer } from "./email";
 import { createBorzoDelivery } from "./borzo";
@@ -88,13 +89,13 @@ export async function updateOrderDeliveryStatus(
   return { ok: true };
 }
 
-// We take orders for every valid pincode (delivery charges may apply). Bakers' pincode lists
-// are still used to pick a baker in findBestBaker.
+// We take orders for any Mumbai pincode (see lib/pincodes.ts). Bakers' pincode lists are
+// still used to pick a baker in findBestBaker.
 export async function isPincodeServiceable(
   _supabase: ReturnType<typeof createServerSupabase>,
   pincode?: string | null
 ): Promise<boolean> {
-  return !!pincode && /^\d{6}$/.test(pincode.trim());
+  return isMumbaiPincode(pincode);
 }
 
 export async function findBestBaker(

@@ -355,7 +355,7 @@ async function stepConfirmOrder(
   const { data: customer } = await supabase.from("customers").select("*").eq("phone", phone).single();
 
   if (!(await isPincodeServiceable(supabase, customer?.pincode))) {
-    await send(phone, "Sorry, we don't currently deliver to your pincode. Please update your address to place an order.");
+    await send(phone, "We deliver within Mumbai only. Please update your address to a Mumbai pincode to place an order.");
     return;
   }
 
@@ -368,7 +368,7 @@ async function stepConfirmOrder(
 
   const totalDiscountPaise = Math.min(subtotal, loyaltyDiscountPaise + couponDiscountPaise);
   const finalGoodsTotal = subtotal - totalDiscountPaise;
-  const shippingFeePaise = calculateShippingFee(subtotal);
+  const shippingFeePaise = calculateShippingFee(customer?.pincode);
   const finalTotal = finalGoodsTotal + shippingFeePaise;
 
   // Use earliest delivery date across cart items

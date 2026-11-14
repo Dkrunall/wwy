@@ -26,9 +26,17 @@ const CATEGORY_BLURBS: Record<string, { text: string; cta: string }> = {
 
 const categories = ["All", "Crafted Bakes", "Be-Sides"];
 
-export type UpcomingBake = { date: string; orderBy: string; flavours: string[] };
+export type UpcomingBake = { date: string; orderBy: string; items: { name: string; price: string }[] };
 
-export default function ShopClient({ products, bakes }: { products: Product[]; bakes: UpcomingBake[] }) {
+export default function ShopClient({
+  products,
+  bakes,
+  bakeDays,
+}: {
+  products: Product[];
+  bakes: UpcomingBake[];
+  bakeDays: Record<string, string>;
+}) {
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState("All");
   const [cart, setCart] = useState<CartLine[]>([]);
@@ -118,9 +126,14 @@ export default function ShopClient({ products, bakes }: { products: Product[]; b
               <div key={b.date} className="bg-white rounded-[1.5rem] border border-brand-brown/5 shadow-sm p-5 flex flex-col gap-2">
                 <span className="text-brand-orange text-[10px] sm:text-xs font-black tracking-[0.18em] uppercase">{b.date}</span>
                 <p className="text-[11px] font-bold text-brand-brown/45">Order by {b.orderBy}</p>
-                {b.flavours.length > 0 ? (
-                  <ul className="flex flex-col gap-1 text-sm font-bold text-brand-brown/75">
-                    {b.flavours.map((f) => <li key={f}>{f}</li>)}
+                {b.items.length > 0 ? (
+                  <ul className="flex flex-col gap-1.5 text-xs sm:text-sm font-bold text-brand-brown/75">
+                    {b.items.map((i) => (
+                      <li key={i.name} className="flex justify-between gap-2">
+                        <span>{i.name}</span>
+                        <span className="text-brand-orange shrink-0">{i.price}</span>
+                      </li>
+                    ))}
                   </ul>
                 ) : (
                   <p className="text-sm font-bold text-brand-brown/60 leading-snug">
@@ -160,6 +173,7 @@ export default function ShopClient({ products, bakes }: { products: Product[]; b
             <ProductCard
               key={product.id}
               product={product}
+              bakeDays={bakeDays[product.name]}
               qty={qtyOf(product)}
               canAdd={!product.dbId || canAddToCart(cart, product.dbId)}
               onAdd={() => changeQty(product, 1)}
@@ -223,6 +237,7 @@ export default function ShopClient({ products, bakes }: { products: Product[]; b
  
 function ProductCard({
   product,
+  bakeDays,
   qty,
   canAdd,
   onAdd,
@@ -230,6 +245,7 @@ function ProductCard({
   onBuy,
 }: {
   product: Product;
+  bakeDays?: string;
   qty: number;
   canAdd: boolean;
   onAdd: () => void;
@@ -261,6 +277,9 @@ function ProductCard({
           <h3 className="font-serif font-normal text-xl tracking-tight text-brand-brown transition-colors duration-200">
             {product.name}
           </h3>
+          {bakeDays && (
+            <p className="text-[10px] font-black tracking-[0.15em] uppercase text-brand-orange mt-1">Baked for {bakeDays}</p>
+          )}
           <p className="text-xs font-bold text-brand-brown/40 mt-2 leading-relaxed line-clamp-2">
             {product.desc}
           </p>

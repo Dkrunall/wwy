@@ -30,7 +30,7 @@ export default function PrivacyPage() {
       <ul>
         <li>To take, bake, pack and deliver your order, and to send order updates and your tax invoice.</li>
         <li>To run your account, order history and repeat orders.</li>
-        <li>To prevent fraud and meet our tax, accounting and food-safety obligations.</li>
+        <li>To meet our tax, accounting and food-safety obligations.</li>
         <li>To send you news and menu updates, only if you have opted in. You can opt out at any time.</li>
       </ul>
 

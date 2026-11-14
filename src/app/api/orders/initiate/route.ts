@@ -9,6 +9,7 @@ import { DEFAULT_CUTOFF_HOUR_IST, DEFAULT_DELIVERY_DAYS } from "@/lib/schedule";
 import { CartItem } from "@/lib/supabase";
 import { isPincodeServiceable } from "@/lib/baker";
 import { orderLimitError } from "@/lib/orderLimits";
+import { bakeHasAll } from "@/lib/menu";
 import { getSessionCustomer } from "@/lib/customerSession";
 
 function generateOrderNumber(): string {
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest) {
 
     if (!(await isPincodeServiceable(supabase, customer.pincode))) {
       return NextResponse.json(
-        { error: "Sorry, we don't currently deliver to your pincode. Please update your address in your account." },
+        { error: "We deliver within Mumbai only. Please update your address to a Mumbai pincode to place an order." },
         { status: 400 }
       );
     }
@@ -103,7 +104,7 @@ export async function POST(req: NextRequest) {
 
     const totalDiscountPaise = Math.min(baseTotalPaise, loyaltyDiscountPaise + couponDiscountPaise);
     const finalGoodsPaise = baseTotalPaise - totalDiscountPaise;
-    const shippingFeePaise = calculateShippingFee(baseTotalPaise);
+    const shippingFeePaise = calculateShippingFee(customer.pincode);
     const finalTotal = finalGoodsPaise + shippingFeePaise;
 
     const deliveryDate = (chosenDate && isValidDeliveryDate(chosenDate, deliveryDays, cutoffHour))
@@ -111,6 +112,15 @@ export async function POST(req: NextRequest) {
       : calculateDeliveryDate(deliveryDays, cutoffHour);
     const deliveryISO = deliveryDateISO(deliveryDate);
     const deliveryLabel = formatDeliveryDate(deliveryDate);
+
+    // Each delivery date has its own menu; refuse items that are not baked that day.
+    const notBaked = pricedCart.filter((i) => !bakeHasAll(deliveryISO, [i.product_name])).map((i) => i.product_name);
+    if (notBaked.length > 0) {
+      return NextResponse.json(
+        { error: `${notBaked.join(", ")} ${notBaked.length === 1 ? "is" : "are"} not baked for ${deliveryLabel}. Please choose another delivery day or remove ${notBaked.length === 1 ? "it" : "them"}.` },
+        { status: 400 }
+      );
+    }
 
     // Create Razorpay order
     const razorpay = getRazorpay();

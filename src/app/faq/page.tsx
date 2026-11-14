@@ -69,7 +69,7 @@ const GROUPS: { title: string; items: Faq[] }[] = [
     items: [
       {
         q: "Where do you deliver?",
-        a: "We deliver across Mumbai, to the pincodes we currently serve. Check yours on our Delivery page or at checkout.",
+        a: "We deliver within Mumbai only. Delivery is free from Colaba and Cuffe Parade to Kandivali, and ₹65 for the rest of Mumbai.",
         link: { href: "/delivery", label: "Check your pincode" },
       },
       {
@@ -92,7 +92,7 @@ const GROUPS: { title: string; items: Faq[] }[] = [
       {
         q: "What if my order arrives damaged or incomplete?",
         a: `Contact us within ${POLICY.reportWindowHours} hours of delivery on ${SUPPORT}, with your order number and photographs, so our team can review the issue.`,
-        link: { href: "/refund", label: "Refund and replacement policy" },
+        link: { href: "/refund", label: "Refund policy" },
       },
     ],
   },

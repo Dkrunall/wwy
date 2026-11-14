@@ -2,6 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
+import { bakeHasAll } from "@/lib/menu";
 import { canAddToCart } from "@/lib/orderLimits";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -75,6 +76,7 @@ export default function CartPage() {
   const [deliveryLabel, setDeliveryLabel] = useState<string>("");
   const [deliverySlots, setDeliverySlots] = useState<{ iso: string; label: string }[]>([]);
   const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<string>("");
+  const [pincode, setPincode] = useState("");
 
   // Coupons — auto-applied (welcome / min-order) or manually entered
   const [appliedCoupon, setAppliedCoupon] = useState<{
@@ -99,6 +101,7 @@ export default function CartPage() {
     }
     setFlat(storedFlat);
     setCustomerId(localStorage.getItem("wwy_customer_id") || "");
+    setPincode(localStorage.getItem("wwy_pincode") || "");
     setCart(getCart());
 
     fetch("/api/orders/delivery-slots")
@@ -191,7 +194,11 @@ export default function CartPage() {
     setAppliedCoupon(null);
     setCouponError("");
   };
-  const previewShippingFeePaise = calculateShippingFee(baseTotalPaise);
+  const previewShippingFeePaise = calculateShippingFee(pincode);
+  // Each delivery day has its own menu: offer only the days that bake everything in the cart.
+  const cartNames = cart.map((i) => i.product_name);
+  const bakeSlots = deliverySlots.filter((s) => bakeHasAll(s.iso, cartNames));
+  const deliveryISO = bakeSlots.some((s) => s.iso === selectedDeliveryDate) ? selectedDeliveryDate : bakeSlots[0]?.iso ?? "";
   const shippingFeePaise = discountInfo ? discountInfo.shippingFeePaise : previewShippingFeePaise;
   const previewCouponDiscountPaise = appliedCoupon?.discountPaise ?? 0;
   const displayTotal = discountInfo
@@ -221,7 +228,7 @@ export default function CartPage() {
         body: JSON.stringify({
           cart,
           notes,
-          deliveryDate: selectedDeliveryDate,
+          deliveryDate: deliveryISO,
           couponCode: appliedCoupon?.code,
           skipAutoCoupon: !appliedCoupon && !!dismissedCouponCode,
         }),
@@ -442,15 +449,20 @@ export default function CartPage() {
             </div>
 
             {/* Delivery Slots Selection */}
-            {deliverySlots.length > 0 && (
+            {cart.length > 0 && deliverySlots.length > 0 && bakeSlots.length === 0 && (
+              <div className="bg-white rounded-3xl p-5 sm:p-6 border border-brand-terracotta/30 shadow-sm text-sm font-bold text-brand-terracotta">
+                The items in your cart are baked on different days, so no single delivery day has all of them. Please remove some items and order them separately.
+              </div>
+            )}
+            {bakeSlots.length > 0 && (
               <div className="bg-white rounded-3xl p-5 sm:p-6 border border-brand-brown/10 shadow-sm flex flex-col gap-3">
                 <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-brand-brown/40">
                   <Calendar className="w-3.5 h-3.5 text-brand-terracotta" />
                   <span>Select Delivery Day</span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
-                  {deliverySlots.map((slot) => {
-                    const isSelected = selectedDeliveryDate === slot.iso;
+                  {bakeSlots.map((slot) => {
+                    const isSelected = deliveryISO === slot.iso;
                     return (
                       <button
                         key={slot.iso}
@@ -577,7 +589,7 @@ export default function CartPage() {
               <div className="mt-8 flex flex-col gap-3">
                 <button
                   onClick={handlePay}
-                  disabled={loading || cart.length === 0 || !selectedDeliveryDate}
+                  disabled={loading || cart.length === 0 || !deliveryISO}
                   className="w-full bg-brand-brown hover:bg-brand-terracotta text-white rounded-2xl py-4 px-6 font-black text-xs sm:text-sm tracking-widest uppercase shadow-xl transition-all duration-300 disabled:opacity-50 cursor-pointer active:scale-98 flex items-center justify-center gap-2"
                 >
                   {loading ? (
