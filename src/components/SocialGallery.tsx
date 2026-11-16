@@ -71,7 +71,7 @@ export default function SocialGallery() {
           href={BUSINESS.instagramUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="social-text inline-flex items-center gap-2 bg-brand-charcoal text-white hover:bg-brand-terracotta px-8 py-4 rounded-full text-[10px] font-black tracking-[0.2em] uppercase transition-colors active:scale-95 shadow-lg"
+          className="social-text inline-flex items-center gap-2 bg-brand-charcoal text-white hover:bg-brand-terracotta px-8 py-4 rounded-full text-[11px] font-black tracking-[0.2em] uppercase transition-colors active:scale-95 shadow-lg"
         >
           Follow @{BUSINESS.instagramHandle}
         </a>

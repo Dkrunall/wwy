@@ -24,7 +24,7 @@ export default function ContactForm({ whatsappNumber }: { whatsappNumber: string
   };
 
   const field = "w-full bg-white border border-brand-brown/15 rounded-2xl px-4 py-3 text-sm font-bold text-brand-brown placeholder:text-brand-brown/30 outline-none focus:border-brand-orange";
-  const label = "text-[10px] font-black tracking-[0.18em] uppercase text-brand-brown/50 mb-1.5 block";
+  const label = "text-[11px] font-black tracking-[0.18em] uppercase text-brand-brown/65 mb-1.5 block";
 
   return (
     <form onSubmit={submit} className="grid grid-cols-1 sm:grid-cols-2 gap-4 not-prose">
@@ -59,7 +59,7 @@ export default function ContactForm({ whatsappNumber }: { whatsappNumber: string
         >
           Send your message
         </button>
-        <p className="text-xs font-bold text-brand-brown/40 mt-3">Please include your order number when contacting us about an existing purchase. This opens WhatsApp with your message ready to send.</p>
+        <p className="text-xs font-bold text-brand-brown/60 mt-3">Please include your order number when contacting us about an existing purchase. This opens WhatsApp with your message ready to send.</p>
       </div>
     </form>
   );

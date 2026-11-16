@@ -92,7 +92,7 @@ export default function ProductSection() {
             <Link
               href="/shop"
               className="inline-flex items-center gap-2 bg-brand-brown text-white hover:bg-brand-orange
-                px-7 py-3.5 rounded-full text-[10px] font-black tracking-[0.2em] uppercase
+                px-7 py-3.5 rounded-full text-[11px] font-black tracking-[0.2em] uppercase
                 transition-all duration-300 active:scale-95 shadow-md"
             >
               Browse All →
@@ -150,7 +150,7 @@ function ProductCard({ product }: { product: Product }) {
         <div className={`relative w-full aspect-[4/5] rounded-[2rem] sm:rounded-[3rem] ${product.bgColor} overflow-hidden mb-4 sm:mb-6 p-6 sm:p-8 flex items-center justify-center border-4 border-transparent hover:border-brand-brown/5 transition-all duration-300 shadow-[inset_0_10px_30px_rgba(0,0,0,0.08)] group-hover:shadow-[inset_0_10px_30px_rgba(0,0,0,0.08),0_25px_50px_-12px_rgba(0,0,0,0.25)]`}>
           {product.badge && (
             <div className="absolute top-4 sm:top-6 left-4 sm:left-6 z-20">
-              <span className="text-[9px] sm:text-[10px] font-black bg-brand-brown text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full uppercase tracking-widest shadow-lg rotate-[-5deg] inline-block group-hover:rotate-0 transition-transform">
+              <span className="text-[11px] sm:text-[11px] font-black bg-brand-brown text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full uppercase tracking-widest shadow-lg rotate-[-5deg] inline-block group-hover:rotate-0 transition-transform">
                 {product.badge}
               </span>
             </div>
@@ -169,7 +169,7 @@ function ProductCard({ product }: { product: Product }) {
  
       {/* Text Info — clickable */}
       <Link href={`/shop/${product.id}`} className="flex flex-col items-center text-center px-2 sm:px-4 group/text">
-        <span className="text-[10px] font-bold tracking-[0.2em] text-brand-brown/60 uppercase mb-1 sm:mb-2">
+        <span className="text-[11px] font-bold tracking-[0.2em] text-brand-brown/60 uppercase mb-1 sm:mb-2">
           {product.category}
         </span>
         <h3 className="text-xl sm:text-2xl font-serif font-normal text-brand-brown tracking-tight mb-1 sm:mb-2 group-hover/text:text-brand-orange transition-colors duration-200">

@@ -48,7 +48,7 @@ function ConfirmContent() {
   if (loading) {
     return (
       <main className="min-h-screen bg-brand-oat flex items-center justify-center">
-        <p className="font-black text-brand-charcoal/30 tracking-widest text-xs uppercase animate-pulse">Confirming...</p>
+        <p className="font-black text-brand-charcoal/55 tracking-widest text-xs uppercase animate-pulse">Confirming...</p>
       </main>
     );
   }
@@ -56,7 +56,7 @@ function ConfirmContent() {
   if (!order) {
     return (
       <main className="min-h-screen bg-brand-oat flex flex-col items-center justify-center px-5 gap-5">
-        <p className="font-black text-brand-charcoal/40 text-center text-xl">Order not found.</p>
+        <p className="font-black text-brand-charcoal/60 text-center text-xl">Order not found.</p>
         <div className="flex flex-col gap-2 w-full max-w-xs">
           <button
             onClick={() => router.push("/order/account")}
@@ -66,7 +66,7 @@ function ConfirmContent() {
           </button>
           <button
             onClick={() => router.push("/order")}
-            className="w-full text-brand-charcoal/40 hover:text-brand-terracotta font-black text-xs tracking-wider uppercase py-2 transition-colors"
+            className="w-full text-brand-charcoal/60 hover:text-brand-terracotta font-black text-xs tracking-wider uppercase py-2 transition-colors"
           >
             ← Back to Shop
           </button>
@@ -92,7 +92,7 @@ function ConfirmContent() {
             style={{ fontSize: "clamp(2rem, 9vw, 2.8rem)" }}>
             {isPaid ? "YOUR ORDER HAS\nENTERED\nFERMENTATION." : "YOUR ORDER HAS\nBEEN RECEIVED."}
           </h1>
-          <p className="text-sm font-bold text-brand-charcoal/40 leading-relaxed">
+          <p className="text-sm font-bold text-brand-charcoal/60 leading-relaxed">
             {isPaid
               ? "Payment confirmed. Baking begins soon. We'll WhatsApp you on delivery day."
               : "Complete payment to confirm your order. Details were sent to WhatsApp."}
@@ -104,18 +104,18 @@ function ConfirmContent() {
           <div className="px-5 py-4 border-b border-brand-charcoal/5">
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-charcoal/30">Order</p>
+                <p className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/55">Order</p>
                 <p className="font-black text-brand-charcoal text-sm">
                   {order.order_number || order.id.slice(0, 8).toUpperCase()}
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-charcoal/30">Flat</p>
+                <p className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/55">Flat</p>
                 <p className="font-black text-brand-charcoal text-sm">{order.flat_number}</p>
               </div>
             </div>
             {order.delivery_date && (
-              <p className="text-xs font-bold text-brand-charcoal/40 mt-2">
+              <p className="text-xs font-bold text-brand-charcoal/60 mt-2">
                 Delivery: {new Date(order.delivery_date + "T00:00:00").toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" })}
               </p>
             )}
@@ -173,7 +173,7 @@ function ConfirmContent() {
           </button>
           <button
             onClick={() => router.push("/order")}
-            className="w-full text-brand-charcoal/40 hover:text-brand-terracotta font-black text-xs tracking-wider uppercase transition-colors py-2"
+            className="w-full text-brand-charcoal/60 hover:text-brand-terracotta font-black text-xs tracking-wider uppercase transition-colors py-2"
           >
             Order more →
           </button>
@@ -188,7 +188,7 @@ export default function ConfirmPage() {
   return (
     <Suspense fallback={
       <main className="min-h-screen bg-brand-oat flex items-center justify-center">
-        <p className="font-black text-brand-charcoal/30 tracking-widest text-xs uppercase animate-pulse">Loading...</p>
+        <p className="font-black text-brand-charcoal/55 tracking-widest text-xs uppercase animate-pulse">Loading...</p>
       </main>
     }>
       <ConfirmContent />

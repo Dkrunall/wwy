@@ -103,7 +103,7 @@ export default function Navbar() {
               href={href}
               target={external ? "_blank" : undefined}
               rel={external ? "noopener noreferrer" : undefined}
-              className="relative group font-black text-[10px] tracking-[0.18em] uppercase text-brand-charcoal/60 hover:text-brand-terracotta transition-colors duration-300"
+              className="relative group font-black text-[11px] tracking-[0.18em] uppercase text-brand-charcoal/60 hover:text-brand-terracotta transition-colors duration-300"
             >
               {label}
               <span className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-brand-terracotta scale-0 group-hover:scale-100 transition-transform duration-300" />
@@ -112,7 +112,7 @@ export default function Navbar() {
         </div>
 
         {/* ── Pill 2: Logo (circle) ── */}
-        <div className={`${pillBase} rounded-full w-24 h-24 lg:w-24 lg:h-24 absolute left-1/2 -translate-x-1/2 flex items-center justify-center p-1 lg:p-1`}>
+        <div className={`${pillBase} rounded-full w-24 h-24 lg:w-24 lg:h-24 absolute left-1/2 -translate-x-1/2 flex items-center justify-center p-2.5`}>
           <Link href="/" className="flex items-center justify-center w-full h-full hover:scale-105 transition-transform duration-500">
             <Image
               src="/WWY-LOGO_White.png"
@@ -172,7 +172,7 @@ export default function Navbar() {
           >
             <ShoppingBag className="w-4 h-4" />
             {cartCount > 0 && (
-              <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-brand-terracotta text-white text-[9px] font-black flex items-center justify-center leading-none">
+              <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-brand-terracotta text-white text-[11px] font-black flex items-center justify-center leading-none">
                 {cartCount > 9 ? "9+" : cartCount}
               </span>
             )}
@@ -185,7 +185,7 @@ export default function Navbar() {
         className={`lg:hidden fixed left-1/2 -translate-x-1/2 z-50 w-[95%] transition-all duration-500 flex items-center justify-between gap-2 ${topPos}`}
       >
         {/* Logo pill — circle */}
-        <div className={`${pillBase} rounded-full w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center p-1`}>
+        <div className={`${pillBase} rounded-full w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center p-2 sm:p-2.5`}>
           <Link href="/" className="flex items-center justify-center w-full h-full hover:scale-105 transition-transform duration-500">
             <Image
               src="/WWY-LOGO_White.png"
@@ -204,7 +204,7 @@ export default function Navbar() {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"
-            className={`${pillBase} rounded-full px-4 sm:px-5 h-11 sm:h-12 flex items-center justify-center font-black text-[9px] sm:text-[10px] tracking-widest uppercase text-brand-charcoal hover:bg-brand-terracotta hover:text-white hover:border-brand-terracotta/40 transition-all duration-300 whitespace-nowrap`}
+            className={`${pillBase} rounded-full px-4 sm:px-5 h-11 sm:h-12 flex items-center justify-center font-black text-[11px] sm:text-[11px] tracking-widest uppercase text-brand-charcoal hover:bg-brand-terracotta hover:text-white hover:border-brand-terracotta/40 transition-all duration-300 whitespace-nowrap`}
           >
             {mobileMenuOpen ? "Close" : "Menu"}
           </button>
@@ -241,7 +241,7 @@ export default function Navbar() {
           >
             <ShoppingBag className="w-4 h-4" />
             {cartCount > 0 && (
-              <span className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-brand-terracotta text-white text-[9px] font-black flex items-center justify-center leading-none">
+              <span className="absolute top-0.5 right-0.5 w-4 h-4 rounded-full bg-brand-terracotta text-white text-[11px] font-black flex items-center justify-center leading-none">
                 {cartCount > 9 ? "9+" : cartCount}
               </span>
             )}
@@ -258,7 +258,7 @@ export default function Navbar() {
           >
             <div className="px-4 py-3 bg-brand-oat/60 rounded-2xl mb-1 border border-brand-charcoal/5">
               <p className="font-black text-brand-charcoal text-sm leading-none truncate">{customerName || "My Account"}</p>
-              {flat && <p className="text-xs font-bold text-brand-charcoal/40 mt-1">Flat {flat}</p>}
+              {flat && <p className="text-xs font-bold text-brand-charcoal/60 mt-1">Flat {flat}</p>}
             </div>
             <Link
               href="/order/account"
@@ -300,7 +300,7 @@ export default function Navbar() {
           }}
         >
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-charcoal/30" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-charcoal/55" />
             <input
               type="text"
               value={searchValue}

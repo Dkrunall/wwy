@@ -189,11 +189,11 @@ export default function PayPage() {
           <div className="px-5 py-4 border-b border-[#2C1A0E]/5">
             <div className="flex justify-between items-center">
               <div>
-                <p className="text-[10px] font-black tracking-[0.2em] uppercase text-[#2C1A0E]/30">Order</p>
+                <p className="text-[11px] font-black tracking-[0.2em] uppercase text-[#2C1A0E]/30">Order</p>
                 <p className="font-black text-[#2C1A0E] text-sm">{order.order_number}</p>
               </div>
               <div className="text-right">
-                <p className="text-[10px] font-black tracking-[0.2em] uppercase text-[#2C1A0E]/30">Customer</p>
+                <p className="text-[11px] font-black tracking-[0.2em] uppercase text-[#2C1A0E]/30">Customer</p>
                 <p className="font-black text-[#2C1A0E] text-sm">{order.customer_name}</p>
               </div>
             </div>

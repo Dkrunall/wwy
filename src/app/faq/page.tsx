@@ -141,7 +141,7 @@ export default function FaqPage() {
           <h2>{g.title}</h2>
           {g.items.map((f) => (
             <details key={f.q} className="group bg-white rounded-2xl border border-brand-brown/5 px-5 py-4">
-              <summary className="cursor-pointer list-none font-black text-brand-brown flex items-center justify-between gap-4">
+              <summary className="cursor-pointer list-none font-black text-brand-brown flex items-center justify-between gap-4 py-2.5">
                 {f.q}
                 <span aria-hidden className="text-brand-orange transition-transform group-open:rotate-45 text-xl leading-none">+</span>
               </summary>

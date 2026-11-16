@@ -1,5 +1,6 @@
 "use client";
 
+import { productFallbackImage } from "@/lib/productImages";
 import { bakeDaysLabel, isOnUpcomingMenu } from "@/lib/menu";
 import VegMark from "@/components/VegMark";
 import { dietOf } from "@/lib/diet";
@@ -29,19 +30,6 @@ function saveCart(cart: CartItem[]) {
   localStorage.setItem("wwy_cart", JSON.stringify(cart));
 }
 
-function getProductFallbackImage(name: string, category: string): string {
-  const n = name.toLowerCase();
-  if (n.includes("botanical") || n.includes("hibiscus")) return "/p1.png";
-  if (n.includes("starter")) return "/p2.png";
-  if (n.includes("fizz") || n.includes("turmeric") || n.includes("ginger")) return "/p3.png";
-  if (n.includes("tin") || n.includes("iron")) return "/p4.png";
-  if (n.includes("bundle") || n.includes("sampler") || n.includes("kit")) return "/p5.png";
-  if (category === "Sodas") return "/can_new.png";
-  if (category === "Breads") return "/product_img/7-from-the-oven.jpg";
-  if (category === "Starters") return "/product_img/1-starter-top.jpg";
-  if (category === "Storage") return "/tin.png";
-  return "/p1.png";
-}
 
 export default function MenuSection() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -158,6 +146,7 @@ export default function MenuSection() {
     sliderRef.current.scrollTo({ left: index * cardWidth, behavior: "smooth" });
   };
 
+  const shownCategories = CATEGORIES.filter((c) => c === "All" || products.some((p) => p.category === c));
   const cartTotal = cart.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
   const cartCount = cart.reduce((s, i) => s + i.quantity, 0);
   const filtered =
@@ -209,8 +198,8 @@ export default function MenuSection() {
         </div>
 
         {/* Category Floating Pills */}
-        <div className="flex items-center gap-2.5 overflow-x-auto scrollbar-hide py-2 px-1 mb-8">
-          {CATEGORIES.map((cat) => (
+        <div className={`${shownCategories.length > 2 ? "flex" : "hidden"} items-center gap-2.5 overflow-x-auto scrollbar-hide py-2 px-1 mb-8`}>
+          {shownCategories.map((cat) => (
             <button
               key={cat}
               onClick={() => setCategory(cat)}
@@ -242,7 +231,7 @@ export default function MenuSection() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="bg-white rounded-3xl p-12 border border-brand-brown/10 text-center shadow-sm">
-            <p className="text-base font-bold text-brand-brown/50">
+            <p className="text-base font-bold text-brand-brown/65">
               No {category} available right now.
             </p>
           </div>
@@ -280,7 +269,7 @@ export default function MenuSection() {
                     key={idx}
                     onClick={() => scrollToCard(idx)}
                     aria-label={`Go to slide ${idx + 1}`}
-                    className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
+                    className={`relative h-2.5 rounded-full transition-all duration-300 cursor-pointer after:absolute after:-inset-3 after:content-[''] ${
                       activeIndex === idx
                         ? "w-8 bg-brand-terracotta shadow-sm"
                         : "w-2.5 bg-brand-brown/20 hover:bg-brand-brown/40"
@@ -343,7 +332,7 @@ function ProductCard({
   onAdd: () => void;
   onRemove: () => void;
 }) {
-  const imageSrc = product.image_url || getProductFallbackImage(product.name, product.category);
+  const imageSrc = product.image_url || productFallbackImage(product.name);
   const diet = dietOf(product.ingredients, product.allergens);
   const bakeDays = bakeDaysLabel(product.name);
 
@@ -362,7 +351,7 @@ function ProductCard({
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
           {/* Category Badge */}
-          <span className="absolute top-3 left-3 z-10 text-[10px] font-black tracking-widest uppercase bg-white/90 backdrop-blur-md text-brand-terracotta px-3 py-1 rounded-full shadow-sm border border-brand-brown/10">
+          <span className="absolute top-3 left-3 z-10 text-[11px] font-black tracking-widest uppercase bg-white/90 backdrop-blur-md text-brand-terracotta px-3 py-1 rounded-full shadow-sm border border-brand-brown/10">
             {product.category}
           </span>
 
@@ -379,20 +368,18 @@ function ProductCard({
           {product.name}
         </h3>
         {bakeDays && (
-          <p className="text-[10px] font-black tracking-[0.15em] uppercase text-brand-terracotta mb-2">Baked for {bakeDays}</p>
+          <p className="text-[11px] font-black tracking-[0.15em] uppercase text-brand-terracotta mb-2">Baked for {bakeDays}</p>
         )}
 
         {/* Description */}
         {product.description && (
-          <p className="text-xs sm:text-sm text-brand-brown/60 font-medium leading-relaxed mb-4 line-clamp-3">
+          <p className="text-xs sm:text-sm text-brand-brown/70 font-medium leading-relaxed mb-3 line-clamp-2">
             {product.description}
           </p>
         )}
 
         {product.allergens && (
-          <p className="text-[11px] font-bold text-brand-brown/60 leading-relaxed mb-4">
-            <span className="font-black text-brand-brown/80">Allergens: </span>{product.allergens}
-          </p>
+          <p className="text-xs font-bold text-brand-brown/70 leading-snug mb-4">Contains: {product.allergens}</p>
         )}
       </div>
 
@@ -427,7 +414,7 @@ function ProductCard({
           </div>
         )}
       </div>
-      {!canAdd && <p className="text-[10px] font-bold text-brand-brown/50 mt-2 text-center">{LIMIT_HINT}</p>}
+      {!canAdd && <p className="text-[11px] font-bold text-brand-brown/65 mt-2 text-center">{LIMIT_HINT}</p>}
     </div>
   );
 }

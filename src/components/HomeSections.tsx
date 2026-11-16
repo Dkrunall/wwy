@@ -17,7 +17,7 @@ export function FlavourFreshnessSection() {
           </p>
           <Link
             href="/flavour-lab"
-            className="mt-auto inline-flex bg-brand-brown text-brand-oat hover:bg-brand-orange hover:text-white px-7 py-3.5 rounded-full text-[10px] font-black tracking-[0.2em] uppercase transition-all duration-300 active:scale-95"
+            className="mt-auto inline-flex bg-brand-brown text-brand-oat hover:bg-brand-orange hover:text-white px-7 py-3.5 rounded-full text-[11px] font-black tracking-[0.2em] uppercase transition-all duration-300 active:scale-95"
           >
             Explore the Flavour Lab
           </Link>
@@ -32,7 +32,7 @@ export function FlavourFreshnessSection() {
           </p>
           <Link
             href="/story#how-it-works"
-            className="mt-auto inline-flex bg-brand-gold text-brand-brown hover:bg-brand-orange hover:text-white px-7 py-3.5 rounded-full text-[10px] font-black tracking-[0.2em] uppercase transition-all duration-300 active:scale-95"
+            className="mt-auto inline-flex bg-brand-gold text-brand-brown hover:bg-brand-orange hover:text-white px-7 py-3.5 rounded-full text-[11px] font-black tracking-[0.2em] uppercase transition-all duration-300 active:scale-95"
           >
             How it works
           </Link>

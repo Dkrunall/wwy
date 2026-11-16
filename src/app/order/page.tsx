@@ -2,6 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
+import { productFallbackImage } from "@/lib/productImages";
 import { bakeDaysLabel, isOnUpcomingMenu } from "@/lib/menu";
 import VegMark from "@/components/VegMark";
 import { dietOf, DIET_LABEL } from "@/lib/diet";
@@ -38,19 +39,6 @@ const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   "Be-Sides": <Cookie className="w-3.5 h-3.5" />,
 };
 
-function getProductFallbackImage(name: string, category: string): string {
-  const n = name.toLowerCase();
-  if (n.includes("botanical") || n.includes("hibiscus")) return "/p1.png";
-  if (n.includes("starter")) return "/p2.png";
-  if (n.includes("fizz") || n.includes("turmeric") || n.includes("ginger")) return "/p3.png";
-  if (n.includes("tin") || n.includes("iron")) return "/p4.png";
-  if (n.includes("bundle") || n.includes("sampler") || n.includes("kit")) return "/p5.png";
-  if (category === "Sodas") return "/can_new.png";
-  if (category === "Breads") return "/product_img/7-from-the-oven.jpg";
-  if (category === "Starters") return "/product_img/1-starter-top.jpg";
-  if (category === "Storage") return "/tin.png";
-  return "/p1.png";
-}
 
 function fmt(paise: number) {
   return `₹${(paise / 100).toFixed(0)}`;
@@ -168,6 +156,7 @@ function OrderPageInner() {
     return counts;
   }, [products]);
 
+  const shownCategories = CATEGORIES.filter((c) => c === "All" || products.some((p) => p.category === c));
   const cartTotal = cart.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
   const cartCount = cart.reduce((s, i) => s + i.quantity, 0);
   const byCategory =
@@ -209,10 +198,10 @@ function OrderPageInner() {
   if (loadError) {
     return (
       <main className="min-h-screen bg-brand-oat flex flex-col items-center justify-center px-5 gap-5">
-        <p className="font-black text-brand-brown/40 text-xl tracking-tight">
+        <p className="font-black text-brand-brown/60 text-xl tracking-tight">
           Couldn&apos;t load menu.
         </p>
-        <p className="text-sm font-bold text-brand-brown/50">
+        <p className="text-sm font-bold text-brand-brown/65">
           Check your connection and try again.
         </p>
         <button
@@ -240,11 +229,11 @@ function OrderPageInner() {
           <div className="lg:col-span-7 flex flex-col items-start">
             {/* Badges Bar */}
             <div className="flex flex-wrap items-center gap-2 mb-4">
-              <span className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-800 border border-emerald-500/20 text-[10px] font-black tracking-widest uppercase px-3.5 py-1.5 rounded-full">
+              <span className="inline-flex items-center gap-1.5 bg-emerald-500/10 text-emerald-800 border border-emerald-500/20 text-[11px] font-black tracking-widest uppercase px-3.5 py-1.5 rounded-full">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 Baking Fresh This Week
               </span>
-              <span className="inline-flex items-center gap-1 bg-brand-terracotta/10 text-brand-terracotta border border-brand-terracotta/20 text-[10px] font-black tracking-widest uppercase px-3.5 py-1.5 rounded-full">
+              <span className="inline-flex items-center gap-1 bg-brand-terracotta/10 text-brand-terracotta border border-brand-terracotta/20 text-[11px] font-black tracking-widest uppercase px-3.5 py-1.5 rounded-full">
                 <Flame className="w-3 h-3 text-brand-terracotta" />
                 Fresh Weekly Menu
               </span>
@@ -284,7 +273,7 @@ function OrderPageInner() {
 
             {/* Integrated Search Bar */}
             <div className="w-full max-w-md relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-brown/40" />
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-brown/60" />
               <input
                 type="text"
                 value={searchQuery}
@@ -296,12 +285,12 @@ function OrderPageInner() {
                 <button
                   onClick={() => setSearchQuery("")}
                   aria-label="Clear search"
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-black uppercase text-brand-brown/50 hover:text-brand-brown bg-brand-oat px-2.5 py-1 rounded-full transition-colors cursor-pointer flex items-center gap-1"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-black uppercase text-brand-brown/65 hover:text-brand-brown bg-brand-oat px-2.5 py-1 rounded-full transition-colors cursor-pointer flex items-center gap-1"
                 >
                   <X className="w-3 h-3" /> Clear
                 </button>
               ) : (
-                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[10px] font-black uppercase text-brand-brown/40 bg-brand-oat/80 px-2.5 py-1 rounded-full pointer-events-none">
+                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] font-black uppercase text-brand-brown/60 bg-brand-oat/80 px-2.5 py-1 rounded-full pointer-events-none">
                   {filtered.length} {filtered.length === 1 ? "item" : "items"}
                 </span>
               )}
@@ -323,7 +312,7 @@ function OrderPageInner() {
               {/* Top Floating Badge */}
               <div className="absolute top-4 left-4 z-10 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-lg flex items-center gap-2 border border-white/50">
                 <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-                <span className="text-[10px] font-black tracking-wider uppercase text-brand-brown">
+                <span className="text-[11px] font-black tracking-wider uppercase text-brand-brown">
                   Artisan Bake
                 </span>
               </div>
@@ -345,8 +334,8 @@ function OrderPageInner() {
       {/* ── Floating Category Tab Pills (No Full-Width Bar Background) ── */}
       <div className="sticky top-24 z-30 mb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-8 xl:px-16">
-          <div className="flex items-center gap-2.5 overflow-x-auto scrollbar-hide py-2 px-1">
-            {CATEGORIES.map((cat) => {
+          <div className={`${shownCategories.length > 2 ? "flex" : "hidden"} items-center gap-2.5 overflow-x-auto scrollbar-hide py-2 px-1`}>
+            {shownCategories.map((cat) => {
               const isActive = category === cat;
               const count = categoryCounts[cat] ?? 0;
               return (
@@ -361,7 +350,7 @@ function OrderPageInner() {
                 >
                   <span>{cat}</span>
                   <span
-                    className={`text-[10px] font-black px-2 py-0.5 rounded-full transition-colors ${
+                    className={`text-[11px] font-black px-2 py-0.5 rounded-full transition-colors ${
                       isActive
                         ? "bg-white/20 text-white"
                         : "bg-brand-brown/8 text-brand-brown/60"
@@ -380,7 +369,7 @@ function OrderPageInner() {
       <div className="max-w-7xl mx-auto px-4 sm:px-8 xl:px-16 mb-20 sm:mb-28">
         {filtered.length === 0 ? (
           <div className="bg-white rounded-3xl p-12 border border-brand-brown/10 text-center flex flex-col items-center gap-4 shadow-sm">
-            <p className="text-base font-bold text-brand-brown/50">
+            <p className="text-base font-bold text-brand-brown/65">
               {q
                 ? `No products match "${searchQuery.trim()}".`
                 : category === "All"
@@ -461,7 +450,7 @@ function ProductCard({
   onAdd: () => void;
   onRemove: () => void;
 }) {
-  const imageSrc = product.image_url || getProductFallbackImage(product.name, product.category);
+  const imageSrc = product.image_url || productFallbackImage(product.name);
   const diet = dietOf(product.ingredients, product.allergens);
   const bakeDays = bakeDaysLabel(product.name);
 
@@ -480,7 +469,7 @@ function ProductCard({
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
 
           {/* Category Badge */}
-          <span className="absolute top-3 left-3 z-10 text-[10px] font-black tracking-widest uppercase bg-white/90 backdrop-blur-md text-brand-terracotta px-3 py-1 rounded-full shadow-sm border border-brand-brown/10">
+          <span className="absolute top-3 left-3 z-10 text-[11px] font-black tracking-widest uppercase bg-white/90 backdrop-blur-md text-brand-terracotta px-3 py-1 rounded-full shadow-sm border border-brand-brown/10">
             {product.category}
           </span>
 
@@ -497,7 +486,7 @@ function ProductCard({
           {product.name}
         </h3>
         {bakeDays && (
-          <p className="text-[10px] font-black tracking-[0.15em] uppercase text-brand-terracotta mb-2">Baked for {bakeDays}</p>
+          <p className="text-[11px] font-black tracking-[0.15em] uppercase text-brand-terracotta mb-2">Baked for {bakeDays}</p>
         )}
 
         {/* Description */}
@@ -507,21 +496,14 @@ function ProductCard({
           </p>
         )}
 
-        {product.ingredients && (
-          <p className="text-[11px] font-bold text-brand-brown/60 leading-relaxed mb-1">
-            <span className="font-black text-brand-brown/80">Ingredients: </span>{product.ingredients}
-          </p>
-        )}
         {product.allergens && (
-          <p className="text-[11px] font-bold text-brand-brown/60 leading-relaxed mb-4">
-            <span className="font-black text-brand-brown/80">Allergens: </span>{product.allergens}
-          </p>
+          <p className="text-xs font-bold text-brand-brown/70 leading-snug mb-3">Contains: {product.allergens}</p>
         )}
 
         {/* Legal Metrology declarations (P3-1) */}
         <details className="mb-4 text-xs font-bold text-brand-brown/60">
-          <summary className="cursor-pointer list-none text-[10px] font-black tracking-[0.18em] uppercase text-brand-brown/50 hover:text-brand-terracotta">
-            Product details
+          <summary className="cursor-pointer list-none block py-2.5 text-[11px] font-black tracking-[0.18em] uppercase text-brand-brown/65 hover:text-brand-terracotta">
+            Ingredients & details
           </summary>
           <dl className="mt-3 flex flex-col gap-1.5 leading-relaxed">
             <div><dt className="inline font-black text-brand-brown/80">MRP: </dt><dd className="inline">{fmt(product.price_paise)} (incl. all taxes)</dd></div>
@@ -569,7 +551,7 @@ function ProductCard({
           </div>
         )}
       </div>
-      {!canAdd && <p className="text-[10px] font-bold text-brand-brown/50 mt-2 text-center">{LIMIT_HINT}</p>}
+      {!canAdd && <p className="text-[11px] font-bold text-brand-brown/65 mt-2 text-center">{LIMIT_HINT}</p>}
     </div>
   );
 }

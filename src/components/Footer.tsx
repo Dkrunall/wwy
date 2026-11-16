@@ -4,122 +4,93 @@ import React from "react";
 import Link from "next/link";
 import { BUSINESS, businessValue } from "@/lib/business";
 
+const COLUMNS: { title: string; links: [string, string][] }[] = [
+  {
+    title: "Shop",
+    links: [
+      ["/shop", "Shop all"],
+      ["/order", "Order"],
+      ["/gifting", "Gifting"],
+      ["/flavour-lab", "Flavour Lab"],
+    ],
+  },
+  {
+    title: "Discover",
+    links: [
+      ["/story", "Our story"],
+      ["/process", "Our process"],
+      ["/reviews", "Reviews"],
+      ["/faq", "FAQs"],
+    ],
+  },
+  {
+    title: "Help",
+    links: [
+      ["/contact", "Contact"],
+      ["/delivery", "Delivery"],
+      ["/refund", "Refunds & cancellation"],
+      ["/allergens", "Allergens"],
+      ["/privacy", "Privacy"],
+      ["/terms", "Terms"],
+      ["/cookies", "Cookies"],
+    ],
+  },
+];
+
 export default function Footer() {
   return (
-    <footer className="bg-brand-brown text-white pt-16 sm:pt-24 md:pt-32 pb-6 sm:pb-8 overflow-hidden relative z-30 rounded-t-[2rem] sm:rounded-t-[3rem] md:rounded-t-[6rem] -mt-8 sm:-mt-12 shadow-[0_-20px_50px_rgba(0,0,0,0.05)] border-t border-brand-brown/10">
-
-      <div className="mx-auto w-full max-w-[88rem] px-4 sm:px-8 xl:px-16 relative z-10 flex flex-col items-center">
-
-        {/* Footer Grid */}
-        <div className="w-full max-w-7xl flex flex-col md:flex-row justify-between items-start gap-10 sm:gap-12 mb-12 sm:mb-20 md:mb-32">
-
-          {/* CTA & Description */}
-          <div className="flex flex-col gap-4 sm:gap-6 md:w-1/3">
-            <h3
-              className="font-black text-brand-oat tracking-tighter leading-[1.05]"
-              style={{ fontSize: "clamp(1.4rem, 3.5vw, 2.2rem)" }}
-            >
+    <footer className="bg-brand-brown text-white pt-12 sm:pt-16 md:pt-20 pb-16 sm:pb-14 overflow-hidden relative z-30 rounded-t-[2rem] sm:rounded-t-[3rem] md:rounded-t-[5rem] -mt-8 sm:-mt-12 shadow-[0_-20px_50px_rgba(0,0,0,0.05)] border-t border-brand-brown/10">
+      <div className="mx-auto w-full max-w-[88rem] px-4 sm:px-8 xl:px-16 relative z-10">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row justify-between gap-8 lg:gap-16">
+          {/* Brand */}
+          <div className="flex flex-col gap-3 lg:w-1/3">
+            <h3 className="font-black text-brand-oat tracking-tighter leading-[1.05]" style={{ fontSize: "clamp(1.3rem, 3vw, 2rem)" }}>
               WILD BY NATURE.<br />
               <span className="text-brand-orange">CRAFTED BY TIME.</span>
             </h3>
-            <p className="text-brand-oat/40 font-bold text-xs sm:text-sm max-w-xs">
-              Small-batch sourdough and flavour-led bakes, made with curiosity in Mumbai.
-            </p>
-            <p className="text-brand-oat/25 font-bold text-[10px] sm:text-xs max-w-xs italic">
-              Freshly baked twice a week and delivered to your doorstep according to our baking and delivery schedule.
-            </p>
-            <Link href="/#newsletter" className="text-brand-orange text-[10px] sm:text-xs font-black tracking-[0.2em] uppercase hover:text-white transition-colors">
-              Fresh batches. First dibs. Join the list →
-            </Link>
+            <p className="text-brand-oat/75 font-bold text-sm max-w-xs">Small-batch sourdough, baked twice a week in Mumbai.</p>
+            <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs font-black tracking-[0.15em] uppercase">
+              <Link href="/#newsletter" className="py-2 text-brand-orange hover:text-white transition-colors">Join the list →</Link>
+              <a href={BUSINESS.instagramUrl} target="_blank" rel="noopener noreferrer" className="py-2 text-brand-oat/80 hover:text-brand-orange transition-colors normal-case tracking-normal">
+                Instagram @{BUSINESS.instagramHandle}
+              </a>
+            </div>
           </div>
 
           {/* Links */}
-          <div className="flex flex-wrap gap-10 sm:gap-14 text-xs sm:text-sm font-black tracking-[0.2em] uppercase text-brand-oat/60">
-            <div className="flex flex-col gap-4 sm:gap-6">
-              <span className="text-brand-orange mb-1">Shop</span>
-              <Link href="/shop" className="hover:text-white transition-colors">Shop All</Link>
-              <Link href="/order?category=Crafted%20Bakes" className="hover:text-white transition-colors">Crafted Bakes</Link>
-              <Link href="/order?category=Be-Sides" className="hover:text-white transition-colors">Be-sides</Link>
-              <Link href="/gifting" className="hover:text-white transition-colors">Gifting</Link>
-              <Link href="/flavour-lab" className="hover:text-white transition-colors">Flavour Lab</Link>
-            </div>
-            <div className="flex flex-col gap-4 sm:gap-6">
-              <span className="text-brand-orange mb-1">Discover</span>
-              <Link href="/story" className="hover:text-white transition-colors">Our Story</Link>
-              <Link href="/process" className="hover:text-white transition-colors">Our Process</Link>
-              <Link href="/reviews" className="hover:text-white transition-colors">Customer Reviews</Link>
-              <Link href="/faq" className="hover:text-white transition-colors">FAQs</Link>
-            </div>
-            <div className="flex flex-col gap-4 sm:gap-6">
-              <span className="text-brand-orange mb-1">Help</span>
-              <Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link>
-              <Link href="/delivery" className="hover:text-white transition-colors">Delivery Information</Link>
-              <Link href="/refund" className="hover:text-white transition-colors">Order &amp; Cancellation</Link>
-              <Link href="/refund" className="hover:text-white transition-colors">Refund Policy</Link>
-              <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-              <Link href="/terms" className="hover:text-white transition-colors">Terms &amp; Conditions</Link>
-            </div>
+          <div className="grid grid-cols-3 gap-4 sm:gap-10 lg:gap-14">
+            {COLUMNS.map((col) => (
+              <div key={col.title} className="flex flex-col text-[13px] sm:text-sm font-bold text-brand-oat/80">
+                <span className="text-brand-orange text-[11px] sm:text-xs font-black tracking-[0.2em] uppercase mb-1.5">{col.title}</span>
+                {col.links.map(([href, label]) => (
+                  <Link key={href + label} href={href} className="py-2 sm:py-1.5 hover:text-white transition-colors">
+                    {label}
+                  </Link>
+                ))}
+              </div>
+            ))}
           </div>
-
         </div>
 
         {/* Legal identity (Consumer Protection (E-Commerce) Rules 2020) */}
-        <div className="w-full max-w-7xl border-t border-white/10 pt-8 mb-8 sm:mb-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-[11px] sm:text-xs font-bold text-brand-oat/45 leading-relaxed normal-case tracking-normal">
-          <div>
-            <p className="text-brand-oat/70 font-black uppercase tracking-[0.18em] text-[10px] mb-2">{BUSINESS.legalName}</p>
-            <p>Registered office: {businessValue(BUSINESS.registeredAddress)}</p>
-            <p>LLPIN: {businessValue(BUSINESS.llpin)}</p>
-            <p>GSTIN: {businessValue(BUSINESS.gstin)}</p>
-            <p>FSSAI Lic. No.: {businessValue(BUSINESS.fssai)}</p>
-          </div>
-          <div>
-            <p className="text-brand-oat/70 font-black uppercase tracking-[0.18em] text-[10px] mb-2">Customer care</p>
-            <p>Email: {businessValue(BUSINESS.careEmail)}</p>
-            <p>Phone: {BUSINESS.carePhone}</p>
-          </div>
-          <div>
-            <p className="text-brand-oat/70 font-black uppercase tracking-[0.18em] text-[10px] mb-2">Grievance officer</p>
-            <p>{businessValue(BUSINESS.grievanceOfficer.name)}</p>
-            <p>Email: {businessValue(BUSINESS.grievanceOfficer.email)}</p>
-            <p>Phone: {businessValue(BUSINESS.grievanceOfficer.phone)}</p>
-          </div>
+        <div className="max-w-7xl mx-auto border-t border-white/10 mt-8 sm:mt-12 pt-6 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-6 text-[11px] sm:text-xs font-bold text-brand-oat/65 leading-relaxed">
+          <p>
+            <span className="text-brand-oat/90 font-black">{BUSINESS.legalName}</span> · {businessValue(BUSINESS.registeredAddress)} · LLPIN {businessValue(BUSINESS.llpin)} · GSTIN{" "}
+            {businessValue(BUSINESS.gstin)} · FSSAI {businessValue(BUSINESS.fssai)}
+          </p>
+          <p>
+            <span className="text-brand-oat/90 font-black">Customer care</span> · {BUSINESS.carePhone} · {businessValue(BUSINESS.careEmail)}
+          </p>
+          <p>
+            <span className="text-brand-oat/90 font-black">Grievance officer</span> · {businessValue(BUSINESS.grievanceOfficer.name)} · {businessValue(BUSINESS.grievanceOfficer.email)} ·{" "}
+            {businessValue(BUSINESS.grievanceOfficer.phone)}
+          </p>
         </div>
 
-        {/* Bottom Legal */}
-        <div className="w-full max-w-7xl flex flex-col sm:flex-row justify-between items-center text-[10px] sm:text-xs uppercase tracking-[0.2em] font-bold text-brand-oat/40 mb-8 sm:mb-12 gap-4 sm:gap-6">
-          <div className="flex gap-6 sm:gap-8 border border-white/10 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full">
-            <Link 
-              href="https://instagram.com/wildwildyeast.wwy" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="hover:text-brand-orange transition-colors flex items-center gap-1.5"
-            >
-              <span>Instagram</span>
-              <span className="opacity-55 lowercase">@wildwildyeast.wwy</span>
-            </Link>
-          </div>
-          <div className="flex justify-center flex-1 text-center">
-            <span className="opacity-50">© 2026 WILD WILD YEAST. All Rights Reserved.</span>
-          </div>
-          <div className="flex gap-6 sm:gap-8">
-            <Link href="/privacy" className="hover:text-brand-orange transition-colors">Privacy</Link>
-            <Link href="/terms" className="hover:text-brand-orange transition-colors">Terms</Link>
-            <Link href="/allergens" className="hover:text-brand-orange transition-colors">Allergens</Link>
-            <Link href="/cookies" className="hover:text-brand-orange transition-colors">Cookies</Link>
-          </div>
-        </div>
+        <p className="max-w-7xl mx-auto mt-6 text-[11px] sm:text-xs uppercase tracking-[0.2em] font-bold text-brand-oat/70">
+          © 2026 Wild Wild Yeast. All rights reserved.
+        </p>
       </div>
-
-      {/* Gigantic bottom text */}
-      <div className="w-full overflow-hidden relative z-10 px-4 mt-4 sm:mt-8 mb-2">
-        <h1
-          className="font-black text-brand-oat/5 tracking-tighter whitespace-nowrap select-none drop-shadow-xl text-center"
-          style={{ fontSize: "clamp(2.5rem, 10vw, 12rem)", lineHeight: 0.75 }}
-        >
-          WILD WILD YEAST
-        </h1>
-      </div>
-
     </footer>
   );
 }

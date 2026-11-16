@@ -28,7 +28,7 @@ export default function GiftingPage() {
           {GIFT_TIERS.map((t) => (
             <div key={t.name} className="flex flex-col bg-white rounded-[2rem] border border-brand-brown/5 shadow-sm p-6 sm:p-7">
               <h2 className="font-serif font-normal text-2xl text-brand-brown tracking-tight">{t.name}</h2>
-              <p className="text-xs font-bold text-brand-brown/40 mt-1 mb-4">{t.tagline}</p>
+              <p className="text-xs font-bold text-brand-brown/60 mt-1 mb-4">{t.tagline}</p>
               <ul className="flex flex-col gap-1.5 text-sm font-bold text-brand-brown/70 flex-1">
                 {t.contents.map((c) => (
                   <li key={c} className="flex gap-2"><span className="text-brand-orange">•</span>{c}</li>
@@ -40,7 +40,7 @@ export default function GiftingPage() {
             </div>
           ))}
         </div>
-        <div className="max-w-7xl mx-auto mt-8 text-xs font-black tracking-[0.12em] uppercase text-brand-brown/40 flex flex-col sm:flex-row gap-2 sm:gap-8">
+        <div className="max-w-7xl mx-auto mt-8 text-xs font-black tracking-[0.12em] uppercase text-brand-brown/60 flex flex-col sm:flex-row gap-2 sm:gap-8">
           <span>{GIFTING_MIN_ORDER}</span>
           <span>{GIFTING_LEAD_TIME}</span>
         </div>
@@ -51,7 +51,7 @@ export default function GiftingPage() {
           <h2 className="font-serif font-normal text-brand-brown tracking-tight leading-[1.05] mb-2" style={{ fontSize: "clamp(2rem, 5vw, 3.2rem)" }}>
             Send an enquiry.
           </h2>
-          <p className="text-sm font-bold text-brand-brown/50 mb-8">Tell us what you have in mind. We reply on WhatsApp within one working day.</p>
+          <p className="text-sm font-bold text-brand-brown/65 mb-8">Tell us what you have in mind. We reply on WhatsApp within one working day.</p>
           <GiftingForm whatsappNumber={WHATSAPP_NUMBER} />
         </div>
       </section>

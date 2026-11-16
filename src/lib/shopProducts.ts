@@ -1,3 +1,4 @@
+import { productFallbackImage } from "@/lib/productImages";
 import { products as staticProducts, type Product } from "@/lib/products";
 import { createServerSupabase } from "@/lib/supabase-server";
 
@@ -42,7 +43,7 @@ export async function getShopProducts(): Promise<Product[]> {
         category: row.category,
         price: `₹${(row.price_paise / 100).toLocaleString("en-IN")}`,
         priceNum: row.price_paise / 100,
-        image: row.image_url || "/product_img/6-top-shot.jpg",
+        image: row.image_url || productFallbackImage(row.name),
         bgColor: "bg-[#F5EDD7]",
         desc: row.description ?? "",
         longDesc: row.description ?? "",

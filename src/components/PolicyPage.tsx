@@ -34,7 +34,7 @@ export default function PolicyPage({
               {title}
             </h1>
             {intro && <p className="text-base sm:text-lg font-bold text-brand-brown/60 leading-relaxed mt-5 max-w-2xl">{intro}</p>}
-            {showUpdated && <p className="text-[10px] font-black tracking-[0.2em] uppercase text-brand-brown/30 mt-4">Last updated {updated}</p>}
+            {showUpdated && <p className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-brown/55 mt-4">Last updated {updated}</p>}
           </div>
         </section>
       )}

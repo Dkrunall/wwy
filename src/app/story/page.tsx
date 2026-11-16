@@ -106,7 +106,7 @@ export default function StoryPage() {
             {/* Tag pills */}
             <div className="flex flex-wrap gap-2 mt-4">
               {["Veg only"].map(tag => (
-                <span key={tag} className="px-4.5 py-2 rounded-full border border-brand-brown/10 text-[9px] font-black tracking-[0.12em] uppercase text-brand-brown/40 bg-white/40">
+                <span key={tag} className="px-4.5 py-2 rounded-full border border-brand-brown/10 text-[11px] font-black tracking-[0.12em] uppercase text-brand-brown/60 bg-white/40">
                   {tag}
                 </span>
               ))}
@@ -162,7 +162,7 @@ export default function StoryPage() {
               <div key={i} className="think-card bg-white rounded-[2rem] p-8 sm:p-10 border border-brand-brown/5 shadow-sm hover:shadow-xl transition-all duration-500 hover:scale-[1.01]">
                 <span className="font-serif italic font-normal text-3xl sm:text-4xl text-brand-orange mb-4 block">{String(i + 1).padStart(2, "0")}</span>
                 <h3 className="font-serif font-normal text-2xl sm:text-3xl text-brand-brown mb-4">{v.label}</h3>
-                <p className="text-sm font-bold text-brand-brown/50 leading-relaxed">{v.body}</p>
+                <p className="text-sm font-bold text-brand-brown/65 leading-relaxed">{v.body}</p>
               </div>
             ))}
           </div>

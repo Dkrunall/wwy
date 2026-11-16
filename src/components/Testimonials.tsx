@@ -117,7 +117,7 @@ export default function Testimonials() {
               key={i}
               onClick={() => goTo(i)}
               aria-label={`Go to testimonials page ${i + 1}`}
-              className={`rounded-full transition-all duration-300 cursor-pointer ${i === page ? "w-6 h-1.5 bg-brand-terracotta" : "w-1.5 h-1.5 bg-brand-charcoal/15 hover:bg-brand-charcoal/30"
+              className={`relative rounded-full transition-all duration-300 cursor-pointer after:absolute after:-inset-3 after:content-[''] ${i === page ? "w-6 h-1.5 bg-brand-terracotta" : "w-1.5 h-1.5 bg-brand-charcoal/15 hover:bg-brand-charcoal/30"
                 }`}
             />
           ))}

@@ -45,7 +45,7 @@ export const products: Product[] = [
     bgColor: "bg-[#F5EDD7]",
     desc: "Timeless, wholesome and slow-crafted for flavour that lasts.",
     longDesc:
-      "Our founding loaf. Leavened entirely with our wild culture and given a long, slow ferment, the Classic Heritage is what everyone orders first, and keeps ordering. An open, airy crumb under a deeply scored, well-baked crust.",
+      "Our founding loaf. Leavened entirely with our wild culture and given a long, slow ferment, the Classic Sourdough is what everyone orders first, and keeps ordering. An open, airy crumb under a deeply scored, well-baked crust.",
     details: [
       "Wild-fermented with our own sourdough culture",
       "No commercial yeast · No shortcuts",
@@ -98,17 +98,16 @@ export const products: Product[] = [
     id: 4,
     name: "Plain Croissant",
     category: "Crafted Bakes",
-    badge: "BUTTER · CHOCOLATE & MORE",
+    badge: "ALL BUTTER",
     price: "₹325",
     priceNum: 325,
     image: `${SUPABASE_IMG}/product_1789026013793_11161.png`,
     bgColor: "bg-[#F5EDD7]",
     desc: "Flaky, rich and made with the finest butter.",
     longDesc:
-      "Laminated by hand, layer by layer, with the finest butter we could find. Comes in classic Butter and Chocolate, with more variants rotating through the week.",
+      "Laminated by hand, layer by layer, with plenty of butter and a little of our sourdough starter for flavour.",
     details: [
       "Hand-laminated, all-butter dough",
-      "Classic & Chocolate, more variants rotate weekly",
       "Best eaten fresh, the day of delivery",
       "Warm slightly before serving for best flake",
     ],

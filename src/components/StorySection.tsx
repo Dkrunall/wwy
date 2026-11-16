@@ -54,7 +54,7 @@ export default function StorySection() {
             {/* Floating Badge */}
             <div className="absolute top-[45%] left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#FFDDC1] text-brand-brown w-24 sm:w-32 h-24 sm:h-32 rounded-full flex flex-col justify-center items-center shadow-2xl z-20 hover:scale-110 transition-transform cursor-pointer border-4 border-brand-brown">
               <span className="font-serif italic font-normal text-2xl sm:text-3xl leading-none">0</span>
-              <span className="text-[7px] sm:text-[9px] font-black uppercase tracking-[0.18em] text-center leading-tight mt-1">Commercial<br />Yeast</span>
+              <span className="text-[11px] sm:text-[11px] font-black uppercase tracking-[0.18em] text-center leading-tight mt-1">Commercial<br />Yeast</span>
             </div>
           </div>
 
@@ -87,7 +87,7 @@ export default function StorySection() {
               >
                 Get to know us
               </Link>
-              <p className="text-[10px] font-black tracking-[0.12em] uppercase text-brand-oat/30 self-center">
+              <p className="text-[11px] font-black tracking-[0.12em] uppercase text-brand-oat/70 self-center">
                 Wed & Sat delivery
               </p>
             </div>

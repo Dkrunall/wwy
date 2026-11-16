@@ -97,13 +97,13 @@ export default function ProcessStory() {
           <p className="text-brand-oat/70 text-sm sm:text-base font-medium leading-relaxed mt-6">
             We believe the best things aren&apos;t rushed. Sourdough is a lesson in patience. Time, fermentation and careful baking come together to create bread with its own distinctive character.
           </p>
-          <Link href="/process" className="inline-block mt-6 text-xs font-black tracking-[0.2em] uppercase text-brand-gold hover:text-brand-orange transition-colors">
+          <Link href="/process" className="inline-block mt-4 py-2 text-xs font-black tracking-[0.2em] uppercase text-brand-gold hover:text-brand-orange transition-colors">
             Discover our process →
           </Link>
         </div>
  
         {/* Responsive Staggered Grid Layout */}
-        <div ref={gridRef} className="process-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 pb-0">
+        <div ref={gridRef} className="process-grid flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-8 overflow-x-auto md:overflow-visible snap-x snap-mandatory scroll-px-4 md:scroll-px-0 scrollbar-hide -mx-4 px-4 md:mx-0 md:px-0 pb-2 md:pb-0">
           {STAGES.filter((_, i) => [0, 2, 5].includes(i)).map((s, i) => {
             // Apply vertical offsets to alternating columns on desktop
             const staggerClass = i % 2 === 1 ? "lg:translate-y-12" : "";
@@ -111,7 +111,7 @@ export default function ProcessStory() {
             return (
               <div
                 key={s.stage}
-                className={`process-grid-item flex-col group transition-all duration-500 hover:scale-[1.01] hover:-translate-y-1 ${staggerClass} ${i === 2 ? "hidden lg:flex" : "flex"}`}
+                className={`process-grid-item flex-col group transition-all duration-500 hover:scale-[1.01] hover:-translate-y-1 ${staggerClass} ${i === 2 ? "flex md:hidden lg:flex" : "flex"} w-[80%] shrink-0 snap-start md:w-auto`}
               >
                 {/* Image Frame with Letterbox Ratio */}
                 <div className="relative w-full aspect-[1.5/1] rounded-[2rem] overflow-hidden mb-5 border border-white/5 shadow-md pointer-events-none">
@@ -124,11 +124,11 @@ export default function ProcessStory() {
                   
                   {/* Numeric Stage Badge */}
                   <div className="absolute bottom-4 left-4 bg-brand-charcoal/80 backdrop-blur-sm px-3.5 py-1.5 rounded-full border border-white/10 flex items-center gap-2">
-                    <span className="font-sans font-black text-[10px] tracking-wider text-brand-gold">
+                    <span className="font-sans font-black text-[11px] tracking-wider text-brand-gold">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     <span className="w-1.5 h-1.5 rounded-full bg-brand-orange" />
-                    <span className="font-sans font-black text-[9px] uppercase tracking-[0.1em] text-brand-oat/70">
+                    <span className="font-sans font-black text-[11px] uppercase tracking-[0.1em] text-brand-oat/70">
                       {s.stage}
                     </span>
                   </div>

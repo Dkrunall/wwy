@@ -53,7 +53,7 @@ export default function OrderConfirmationPage() {
                 </div>
                 <div>
                   <h3 className="font-bold text-base text-brand-charcoal">Processing Order</h3>
-                  <p className="text-xs text-brand-charcoal/50 mt-0.5">Estimated delivery: 1–2 working days</p>
+                  <p className="text-xs text-brand-charcoal/65 mt-0.5">Estimated delivery: 1–2 working days</p>
                 </div>
               </div>
 
@@ -65,21 +65,21 @@ export default function OrderConfirmationPage() {
                   { label: "Delivered fresh", done: false, desc: "Handed over warm and crusty" },
                 ].map((s, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${s.done ? "bg-brand-olive text-white shadow-sm" : "bg-brand-charcoal/10 text-brand-charcoal/30"}`}>
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 ${s.done ? "bg-brand-olive text-white shadow-sm" : "bg-brand-charcoal/10 text-brand-charcoal/55"}`}>
                       {s.done ? <CheckCircle size={14} /> : <span className="text-xs font-bold">{i + 1}</span>}
                     </div>
                     <div>
-                      <p className={`text-sm font-bold ${s.done ? "text-brand-charcoal" : "text-brand-charcoal/40"}`}>
+                      <p className={`text-sm font-bold ${s.done ? "text-brand-charcoal" : "text-brand-charcoal/60"}`}>
                         {s.label}
                       </p>
-                      <p className="text-xs text-brand-charcoal/40">{s.desc}</p>
+                      <p className="text-xs text-brand-charcoal/60">{s.desc}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="mt-8 pt-4 border-t border-brand-charcoal/5 text-xs text-brand-charcoal/50 italic">
+            <div className="mt-8 pt-4 border-t border-brand-charcoal/5 text-xs text-brand-charcoal/65 italic">
               &ldquo;Food that is still becoming.&rdquo;
             </div>
           </div>
@@ -93,7 +93,7 @@ export default function OrderConfirmationPage() {
                 </div>
                 <div>
                   <h3 className="font-bold text-base text-brand-charcoal">Delivery & Updates</h3>
-                  <p className="text-xs text-brand-charcoal/50 mt-0.5">Real-time alerts sent via WhatsApp</p>
+                  <p className="text-xs text-brand-charcoal/65 mt-0.5">Real-time alerts sent via WhatsApp</p>
                 </div>
               </div>
 

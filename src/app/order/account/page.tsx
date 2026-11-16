@@ -224,7 +224,7 @@ export default function AccountPage() {
                 </div>
                 <div className="min-w-0">
                   <p className="font-black text-white text-base leading-tight truncate">{customerName || ""}</p>
-                  <p className="text-white/50 text-[11px] font-bold mt-0.5">Flat {flat}</p>
+                  <p className="text-white/70 text-[11px] font-bold mt-0.5">Flat {flat}</p>
                 </div>
               </div>
             </div>
@@ -233,11 +233,11 @@ export default function AccountPage() {
             <div className="grid grid-cols-2 divide-x divide-gray-100 border-b border-gray-100">
               <div className="px-4 py-3 text-center">
                 <p className="font-black text-brand-brown text-lg leading-none">{recentOrders.length}</p>
-                <p className="text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">Orders</p>
+                <p className="text-[11px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">Orders</p>
               </div>
               <div className="px-4 py-3 text-center">
                 <p className="font-black text-brand-brown text-lg leading-none">{fmt(totalSpend)}</p>
-                <p className="text-[10px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">Spent</p>
+                <p className="text-[11px] font-bold text-gray-400 mt-0.5 uppercase tracking-wider">Spent</p>
               </div>
             </div>
 
@@ -268,10 +268,10 @@ export default function AccountPage() {
               <ShoppingBag className="w-5 h-5 text-brand-orange" style={{ color: "#EBB41F" }} />
               <div className="text-left">
                 <p className="font-black text-sm leading-none">Buy now</p>
-                <p className="text-white/40 text-[11px] font-bold mt-0.5">Browse this week&apos;s menu</p>
+                <p className="text-white/70 text-[11px] font-bold mt-0.5">Browse this week&apos;s menu</p>
               </div>
             </div>
-            <ChevronRight className="w-4 h-4 text-white/40" />
+            <ChevronRight className="w-4 h-4 text-white/70" />
           </button>
 
           {/* Sign out */}
@@ -294,7 +294,7 @@ export default function AccountPage() {
                 <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                   <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
                     <div>
-                      <p className="text-[10px] font-black tracking-[0.2em] uppercase text-gray-400">Active Order</p>
+                      <p className="text-[11px] font-black tracking-[0.2em] uppercase text-gray-400">Active Order</p>
                       <p className="font-black text-brand-brown text-base mt-0.5">
                         #{(activeOrder.order_number || activeOrder.id.slice(0,8)).toUpperCase()}
                         <span className="font-bold text-gray-400 ml-2 text-sm">· {fmt(activeOrder.total_paise)}</span>
@@ -302,7 +302,7 @@ export default function AccountPage() {
                     </div>
                     {activeOrder.delivery_date && (
                       <div className="text-right hidden sm:block">
-                        <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">Delivery</p>
+                        <p className="text-[11px] font-black uppercase tracking-wider text-gray-400">Delivery</p>
                         <p className="font-black text-brand-brown text-sm mt-0.5">
                           {new Date(activeOrder.delivery_date).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short" })}
                         </p>
@@ -316,7 +316,7 @@ export default function AccountPage() {
                         href={activeOrder.borzo_tracking_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="shrink-0 text-[10px] font-black tracking-wider uppercase text-sky-700 hover:text-sky-900 underline underline-offset-2"
+                        className="shrink-0 text-[11px] font-black tracking-wider uppercase text-sky-700 hover:text-sky-900 underline underline-offset-2"
                       >
                         Track courier →
                       </a>
@@ -335,7 +335,7 @@ export default function AccountPage() {
                                 ${active ? "bg-brand-brown ring-2 ring-brand-brown ring-offset-2 shadow-lg" : done ? "bg-brand-orange" : "bg-gray-100"}`}>
                                 <StepIcon className={`w-4 h-4 ${done || active ? "text-white" : "text-gray-300"}`} />
                               </div>
-                              <p className={`text-[9px] font-black tracking-wide text-center leading-tight
+                              <p className={`text-[11px] font-black tracking-wide text-center leading-tight
                                 ${active ? "text-brand-brown" : done ? "text-brand-orange" : "text-gray-300"}`}
                                 style={{ maxWidth: 48 }}>
                                 {step.label}
@@ -400,14 +400,14 @@ export default function AccountPage() {
                         className="w-full px-5 py-4 flex items-center gap-4 text-left hover:bg-gray-50/50 transition-colors"
                       >
                         <div className="w-10 h-10 rounded-xl bg-brand-oat flex items-center justify-center shrink-0">
-                          <Package className="w-5 h-5 text-brand-brown/40" />
+                          <Package className="w-5 h-5 text-brand-brown/60" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
                             <p className="font-black text-brand-brown text-sm leading-none">
                               #{(order.order_number || order.id.slice(0,8)).toUpperCase()}
                             </p>
-                            <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${badge.cls}`}>
+                            <span className={`text-[11px] font-black px-2 py-0.5 rounded-full ${badge.cls}`}>
                               {isPending ? "Pending Payment" : badge.label}
                             </span>
                           </div>
@@ -415,7 +415,7 @@ export default function AccountPage() {
                         </div>
                         <div className="text-right shrink-0">
                           <p className="font-black text-brand-brown text-sm">{fmt(order.total_paise)}</p>
-                          <p className="text-[10px] font-bold text-gray-400 mt-0.5">
+                          <p className="text-[11px] font-bold text-gray-400 mt-0.5">
                             {order.order_items?.length || 0} item{(order.order_items?.length || 0) !== 1 ? "s" : ""}
                           </p>
                         </div>
@@ -445,7 +445,7 @@ export default function AccountPage() {
                                 href={order.invoice_url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 text-xs font-black text-brand-brown/50 hover:text-brand-orange transition-colors"
+                                className="inline-flex items-center gap-1.5 text-xs font-black text-brand-brown/65 hover:text-brand-orange transition-colors"
                               >
                                 ↓ Invoice
                               </a>
@@ -481,7 +481,7 @@ export default function AccountPage() {
                   { label: "Email Address", value: email || "Not set" },
                 ].map(({ label, value }) => (
                   <div key={label} className="flex flex-col gap-1">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">{label}</p>
+                    <p className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">{label}</p>
                     <p className="font-black text-brand-brown text-sm bg-gray-50 rounded-xl px-4 py-3 border border-gray-100">{value}</p>
                   </div>
                 ))}
@@ -489,11 +489,11 @@ export default function AccountPage() {
                 {/* Phone — editable */}
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center justify-between">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Phone Number</p>
+                    <p className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">Phone Number</p>
                     {!editingPhone && (
                       <button
                         onClick={() => { setPhoneEdit(phone); setEditingPhone(true); }}
-                        className="text-[10px] font-black uppercase tracking-wider text-brand-brown/40 hover:text-brand-orange transition-colors"
+                        className="text-[11px] font-black uppercase tracking-wider text-brand-brown/60 hover:text-brand-orange transition-colors"
                       >
                         {phone ? "Edit" : "+ Add"}
                       </button>
@@ -536,11 +536,11 @@ export default function AccountPage() {
                 {/* Delivery address — editable */}
                 <div className="flex flex-col gap-1">
                   <div className="flex items-center justify-between">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Delivery Address</p>
+                    <p className="text-[11px] font-black uppercase tracking-[0.2em] text-gray-400">Delivery Address</p>
                     {!editingAddress && (
                       <button
                         onClick={() => { setAddressEdit(deliveryAddress); setEditingAddress(true); }}
-                        className="text-[10px] font-black uppercase tracking-wider text-brand-brown/40 hover:text-brand-orange transition-colors"
+                        className="text-[11px] font-black uppercase tracking-wider text-brand-brown/60 hover:text-brand-orange transition-colors"
                       >
                         {deliveryAddress ? "Edit" : "+ Add"}
                       </button>

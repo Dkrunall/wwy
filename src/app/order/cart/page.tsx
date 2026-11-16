@@ -2,6 +2,7 @@
 
 export const dynamic = "force-dynamic";
 
+import { productFallbackImage } from "@/lib/productImages";
 import { bakeHasAll } from "@/lib/menu";
 import { canAddToCart } from "@/lib/orderLimits";
 import React, { useState, useEffect } from "react";
@@ -41,15 +42,6 @@ function saveCart(cart: CartItem[]) {
   localStorage.setItem("wwy_cart", JSON.stringify(cart));
 }
 
-function getProductFallbackImage(name: string): string {
-  const n = name.toLowerCase();
-  if (n.includes("botanical") || n.includes("hibiscus")) return "/p1.png";
-  if (n.includes("starter")) return "/p2.png";
-  if (n.includes("fizz") || n.includes("turmeric") || n.includes("ginger")) return "/p3.png";
-  if (n.includes("tin") || n.includes("iron")) return "/p4.png";
-  if (n.includes("bundle") || n.includes("sampler") || n.includes("kit")) return "/p5.png";
-  return "/product_img/7-from-the-oven.jpg";
-}
 
 declare global {
   interface Window {
@@ -351,7 +343,7 @@ export default function CartPage() {
 
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-brand-brown/10 pb-4">
             <div>
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-black tracking-widest uppercase text-brand-terracotta mb-1">
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-black tracking-widest uppercase text-brand-terracotta mb-1">
                 <Sparkles className="w-3 h-3 text-amber-500" />
                 Artisanal Order Summary
               </span>
@@ -359,7 +351,7 @@ export default function CartPage() {
                 YOUR ORDER <span className="italic font-light text-brand-terracotta">CART</span>
               </h1>
             </div>
-            <span className="text-xs font-bold text-brand-brown/50">
+            <span className="text-xs font-bold text-brand-brown/65">
               {itemCount} {itemCount === 1 ? "item" : "items"} selected
             </span>
           </div>
@@ -385,15 +377,15 @@ export default function CartPage() {
             {/* Cart Items Card */}
             <div className="bg-white rounded-3xl p-5 sm:p-6 border border-brand-brown/10 shadow-sm flex flex-col gap-4">
               <div className="flex items-center justify-between border-b border-brand-brown/10 pb-3">
-                <span className="text-xs font-black uppercase tracking-widest text-brand-brown/40">
+                <span className="text-xs font-black uppercase tracking-widest text-brand-brown/60">
                   Itemized Order
                 </span>
-                <span className="text-xs font-bold text-brand-brown/50">{itemCount} items</span>
+                <span className="text-xs font-bold text-brand-brown/65">{itemCount} items</span>
               </div>
 
               <div className="flex flex-col divide-y divide-brand-brown/5">
                 {cart.map((item) => {
-                  const fallbackImg = getProductFallbackImage(item.product_name);
+                  const fallbackImg = productFallbackImage(item.product_name);
                   return (
                     <div key={item.product_id} className="flex justify-between items-center py-4 gap-4">
                       {/* Product Thumbnail */}
@@ -411,7 +403,7 @@ export default function CartPage() {
                         <p className="font-black text-brand-brown text-base tracking-tight truncate">
                           {item.product_name}
                         </p>
-                        <p className="text-xs text-brand-brown/50 font-medium">
+                        <p className="text-xs text-brand-brown/65 font-medium">
                           {fmt(item.unit_price_paise)} each
                         </p>
                       </div>
@@ -456,7 +448,7 @@ export default function CartPage() {
             )}
             {bakeSlots.length > 0 && (
               <div className="bg-white rounded-3xl p-5 sm:p-6 border border-brand-brown/10 shadow-sm flex flex-col gap-3">
-                <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-brand-brown/40">
+                <div className="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-brand-brown/60">
                   <Calendar className="w-3.5 h-3.5 text-brand-terracotta" />
                   <span>Select Delivery Day</span>
                 </div>
@@ -474,7 +466,7 @@ export default function CartPage() {
                         }`}
                       >
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-[10px] font-black uppercase tracking-wider text-brand-terracotta">
+                          <span className="text-[11px] font-black uppercase tracking-wider text-brand-terracotta">
                             {isSelected ? "Selected Slot" : "Available Slot"}
                           </span>
                           {isSelected && <CheckCircle2 className="w-4 h-4 text-brand-terracotta" />}
@@ -492,7 +484,7 @@ export default function CartPage() {
           <div className="lg:col-span-5 flex flex-col gap-6">
             <div className="bg-white rounded-3xl p-6 border border-brand-brown/10 shadow-sm flex flex-col justify-between h-full">
               <div>
-                <span className="text-xs font-black uppercase tracking-widest text-brand-brown/40 block border-b border-brand-brown/10 pb-3 mb-4">
+                <span className="text-xs font-black uppercase tracking-widest text-brand-brown/60 block border-b border-brand-brown/10 pb-3 mb-4">
                   Payment Summary
                 </span>
 
@@ -516,7 +508,7 @@ export default function CartPage() {
                     <div className="flex justify-between items-center text-brand-terracotta font-bold bg-brand-terracotta/5 p-3 rounded-2xl border border-brand-terracotta/20">
                       <span className="flex items-center gap-1.5">
                         <Tag className="w-3.5 h-3.5" /> {appliedCoupon.code}
-                        {appliedCoupon.auto && <span className="text-[9px] font-black uppercase tracking-wider bg-brand-terracotta/15 px-1.5 py-0.5 rounded-md">Auto</span>}
+                        {appliedCoupon.auto && <span className="text-[11px] font-black uppercase tracking-wider bg-brand-terracotta/15 px-1.5 py-0.5 rounded-md">Auto</span>}
                       </span>
                       <span className="flex items-center gap-2">
                         −{fmt(discountInfo ? discountInfo.couponDiscountPaise : appliedCoupon.discountPaise)}
@@ -542,7 +534,7 @@ export default function CartPage() {
                           <button
                             onClick={applyCouponCode}
                             disabled={couponLoading || !couponInput.trim()}
-                            className="px-4 py-2 rounded-xl bg-brand-brown hover:bg-brand-orange text-white text-[10px] font-black uppercase tracking-wider disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
+                            className="px-4 py-2 rounded-xl bg-brand-brown hover:bg-brand-orange text-white text-[11px] font-black uppercase tracking-wider disabled:opacity-50 cursor-pointer flex items-center gap-1.5"
                           >
                             {couponLoading && <Loader2 className="w-3 h-3 animate-spin" />}Apply
                           </button>
@@ -571,7 +563,7 @@ export default function CartPage() {
                   </div>
 
                   {deliveryLabel && (
-                    <div className="text-[11px] font-bold text-brand-brown/50 italic bg-brand-oat/40 p-2.5 rounded-xl border border-brand-brown/8">
+                    <div className="text-[11px] font-bold text-brand-brown/65 italic bg-brand-oat/40 p-2.5 rounded-xl border border-brand-brown/8">
                       Schedule: {deliveryLabel}
                     </div>
                   )}
@@ -599,7 +591,7 @@ export default function CartPage() {
                   )}
                 </button>
 
-                <div className="flex items-center justify-center gap-1.5 text-[10px] font-bold text-brand-brown/40 uppercase tracking-wider pt-1">
+                <div className="flex items-center justify-center gap-1.5 text-[11px] font-bold text-brand-brown/60 uppercase tracking-wider pt-1">
                   <Lock className="w-3 h-3 text-emerald-600" />
                   <span>Secure Payment via Razorpay</span>
                 </div>

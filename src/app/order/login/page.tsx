@@ -246,7 +246,7 @@ export default function OrderLoginPage() {
             style={{ fontSize: "clamp(1.8rem, 8vw, 2.5rem)" }}>
             WE&apos;RE ON A<br />SHORT BREAK.
           </h1>
-          <p className="text-sm font-bold text-brand-charcoal/50 leading-relaxed">
+          <p className="text-sm font-bold text-brand-charcoal/65 leading-relaxed">
             We&apos;re resting and will be back with fresh batches soon. Follow <InstaLink /> on Instagram for updates. 🌾
           </p>
         </div>
@@ -269,7 +269,7 @@ export default function OrderLoginPage() {
             {step === "register" && "FIRST TIME?\nGOOD TASTE."}
             {step === "update" && "ONE LAST\nTHING."}
           </h1>
-          <p className="text-sm font-bold text-brand-charcoal/40">
+          <p className="text-sm font-bold text-brand-charcoal/60">
             {step === "email" && "Enter your email, we'll send a one-time code. No password."}
             {step === "otp" && `A ${OTP_LENGTH}-digit code was sent to ${email}. Check your inbox (and spam).`}
             {step === "register" && "Just a few details and you're in."}
@@ -281,7 +281,7 @@ export default function OrderLoginPage() {
         {step === "email" && (
           <form onSubmit={sendOtp} className="w-full flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">
+              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/65">
                 Email Address
               </label>
               <input
@@ -311,7 +311,7 @@ export default function OrderLoginPage() {
               </p>
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">
+              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/65">
                 Login Code
               </label>
               <input
@@ -338,14 +338,14 @@ export default function OrderLoginPage() {
             </button>
             <div className="flex items-center justify-between">
               <button type="button" onClick={() => { setStep("email"); setOtp(""); setError(""); }}
-                className="text-xs font-bold text-brand-charcoal/30 hover:text-brand-terracotta transition-colors">
+                className="text-xs font-bold text-brand-charcoal/55 hover:text-brand-terracotta transition-colors">
                 ← Change email
               </button>
               {resendTimer > 0 ? (
-                <span className="text-xs font-bold text-brand-charcoal/30">Resend in {resendTimer}s</span>
+                <span className="text-xs font-bold text-brand-charcoal/55">Resend in {resendTimer}s</span>
               ) : (
                 <button type="button" onClick={sendOtp}
-                  className="text-xs font-bold text-brand-charcoal/50 hover:text-brand-terracotta transition-colors">
+                  className="text-xs font-bold text-brand-charcoal/65 hover:text-brand-terracotta transition-colors">
                   Resend code
                 </button>
               )}
@@ -356,9 +356,9 @@ export default function OrderLoginPage() {
         {/* ── Step 3: Register (new user) ── */}
         {step === "register" && (
           <form onSubmit={register} className="w-full flex flex-col gap-4">
-            <p className="text-xs font-bold text-brand-charcoal/40 -mt-2">{email}</p>
+            <p className="text-xs font-bold text-brand-charcoal/60 -mt-2">{email}</p>
             <div className="flex flex-col gap-2">
-              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">Your Name</label>
+              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/65">Your Name</label>
               <input
                 type="text"
                 autoComplete="name"
@@ -370,7 +370,7 @@ export default function OrderLoginPage() {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">Flat Number</label>
+              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/65">Flat Number</label>
               <input
                 type="text"
                 placeholder="e.g. 4B or 12A"
@@ -380,7 +380,7 @@ export default function OrderLoginPage() {
               />
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">Delivery Address</label>
+              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/65">Delivery Address</label>
               <textarea
                 rows={2}
                 autoComplete="street-address"
@@ -389,18 +389,18 @@ export default function OrderLoginPage() {
                 onChange={(e) => { setAddress(e.target.value); setError(""); }}
                 className={inputCls + " resize-none leading-snug text-base"}
               />
-              <p className="text-[11px] font-bold text-brand-charcoal/30">Full address so the courier can find you.</p>
+              <p className="text-[11px] font-bold text-brand-charcoal/55">Full address so the courier can find you.</p>
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">Phone Number</label>
+              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/65">Phone Number</label>
               <div className="flex items-center gap-2">
-                <span className="shrink-0 font-black text-brand-charcoal/50 text-xl">+91</span>
+                <span className="shrink-0 font-black text-brand-charcoal/65 text-xl">+91</span>
                 <input type="tel" inputMode="numeric" autoComplete="tel-national" maxLength={10} placeholder="9876543210" value={phone} onChange={(e) => { setPhone(e.target.value); setError(""); }} className={inputCls} />
               </div>
-              <p className="text-[11px] font-bold text-brand-charcoal/30">So your baker can reach you if needed.</p>
+              <p className="text-[11px] font-bold text-brand-charcoal/55">So your baker can reach you if needed.</p>
             </div>
             <div className="flex flex-col gap-2">
-              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">Pincode</label>
+              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/65">Pincode</label>
               <input
                 type="text"
                 inputMode="numeric"
@@ -415,17 +415,17 @@ export default function OrderLoginPage() {
                 }`}
               />
               {pincodeLookup === "loading" && (
-                <p className="text-[11px] font-bold text-brand-charcoal/30 animate-pulse">Looking up area…</p>
+                <p className="text-[11px] font-bold text-brand-charcoal/55 animate-pulse">Looking up area…</p>
               )}
               {pincodeServiceable === "checking" && (
-                <p className="text-[11px] font-bold text-brand-charcoal/30 animate-pulse">Checking delivery availability…</p>
+                <p className="text-[11px] font-bold text-brand-charcoal/55 animate-pulse">Checking delivery availability…</p>
               )}
               {pincodeServiceable === "ok" && (
                 <div className="flex items-center gap-2 bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2">
                   <span className="text-emerald-600 text-base leading-none">✓</span>
                   <div>
                     <p className="text-[11px] font-black text-emerald-700">{pincodeLocation}</p>
-                    <p className="text-[10px] font-bold text-emerald-600">We deliver to your area!</p>
+                    <p className="text-[11px] font-bold text-emerald-600">We deliver to your area!</p>
                   </div>
                 </div>
               )}
@@ -436,7 +436,7 @@ export default function OrderLoginPage() {
                 </div>
               )}
               {pincodeServiceable === "idle" && pincodeLookup === "idle" && (
-                <p className="text-[11px] font-bold text-brand-charcoal/30">Enter your 6-digit pincode to check delivery availability.</p>
+                <p className="text-[11px] font-bold text-brand-charcoal/55">Enter your 6-digit pincode to check delivery availability.</p>
               )}
             </div>
             {error && <p className="text-xs font-bold text-brand-terracotta">{error}</p>}
@@ -457,19 +457,19 @@ export default function OrderLoginPage() {
         {step === "update" && (
           <form onSubmit={updatePhone} className="w-full flex flex-col gap-4">
             <div className="flex flex-col gap-2">
-              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/50">Phone Number</label>
+              <label className="text-[11px] font-black tracking-[0.2em] uppercase text-brand-charcoal/65">Phone Number</label>
               <div className="flex items-center gap-2">
-                <span className="shrink-0 font-black text-brand-charcoal/50 text-xl">+91</span>
+                <span className="shrink-0 font-black text-brand-charcoal/65 text-xl">+91</span>
                 <input type="tel" inputMode="numeric" autoComplete="tel-national" maxLength={10} autoFocus placeholder="9876543210" value={phone} onChange={(e) => { setPhone(e.target.value); setError(""); }} className={inputCls} />
               </div>
-              <p className="text-[11px] font-bold text-brand-charcoal/30">So your baker can reach you if needed.</p>
+              <p className="text-[11px] font-bold text-brand-charcoal/55">So your baker can reach you if needed.</p>
             </div>
             {error && <p className="text-xs font-bold text-brand-terracotta">{error}</p>}
             <button type="submit" disabled={loading} className={btnCls}>
               {loading ? "Saving..." : "Continue →"}
             </button>
             <button type="button" onClick={goNext}
-              className="text-xs font-bold text-brand-charcoal/30 hover:text-brand-terracotta transition-colors text-center">
+              className="text-xs font-bold text-brand-charcoal/55 hover:text-brand-terracotta transition-colors text-center">
               Skip for now
             </button>
           </form>

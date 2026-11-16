@@ -66,6 +66,7 @@ export default function ShopClient({
     router.push(p.dbId ? "/order/cart" : "/order");
   };
 
+  const shownCategories = categories.filter((c) => c === "All" || products.some((p) => p.category === c));
   const cartCount = cart.reduce((s, i) => s + i.quantity, 0);
   const cartTotal = cart.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
   const filtered = activeCategory === "All"
@@ -87,11 +88,11 @@ export default function ShopClient({
       <section className="w-full px-4 sm:px-8 xl:px-16 pt-8 sm:pt-12">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-4 sm:gap-5">
           <div className="bg-white rounded-[2rem] border border-brand-brown/5 shadow-sm p-6 sm:p-8 flex flex-col gap-3">
-            <span className="text-brand-orange text-[10px] font-black tracking-[0.2em] uppercase">Made to order</span>
+            <span className="text-brand-orange text-[11px] font-black tracking-[0.2em] uppercase">Made to order</span>
             <p className="font-serif text-xl sm:text-2xl text-brand-brown tracking-tight leading-snug">
               Delivery {deliveryDaysShort()} only. Orders close {cutoffRuleText()}.
             </p>
-            <p className="text-sm font-bold text-brand-brown/50 leading-relaxed">
+            <p className="text-sm font-bold text-brand-brown/65 leading-relaxed">
               New flavours go up every week on Instagram, <InstaLink />.
             </p>
             <div className="mt-1">
@@ -99,7 +100,7 @@ export default function ShopClient({
             </div>
           </div>
           <div className="bg-white rounded-[2rem] border border-brand-brown/5 shadow-sm p-6 sm:p-8 flex flex-col gap-3">
-            <span className="text-brand-orange text-[10px] font-black tracking-[0.2em] uppercase">Flavours we bake</span>
+            <span className="text-brand-orange text-[11px] font-black tracking-[0.2em] uppercase">Flavours we bake</span>
             <div className="flex flex-wrap gap-2">
               {FLAVOURS.map((f) => (
                 <span key={f} className="px-3.5 py-1.5 rounded-full bg-brand-oat border border-brand-brown/10 text-[11px] font-black tracking-wide text-brand-brown/70">
@@ -107,7 +108,7 @@ export default function ShopClient({
                 </span>
               ))}
             </div>
-            <p className="text-xs font-bold text-brand-brown/50">
+            <p className="text-xs font-bold text-brand-brown/65">
               Flavours rotate weekly. <InstaLink>Follow us on Insta @{BUSINESS.instagramHandle}</InstaLink>
             </p>
           </div>
@@ -118,14 +119,14 @@ export default function ShopClient({
       <section className="w-full px-4 sm:px-8 xl:px-16 pt-10 sm:pt-14">
         <div className="max-w-7xl mx-auto">
           <h2 className="font-serif font-normal text-brand-brown text-2xl sm:text-4xl tracking-tight mb-2">Find your next favourite.</h2>
-          <p className="text-sm font-bold text-brand-brown/50 leading-relaxed max-w-2xl">
+          <p className="text-sm font-bold text-brand-brown/65 leading-relaxed max-w-2xl">
             Our next two weeks of bakes. Try something new and see what happens when good ingredients meet a curious mind.
           </p>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mt-6">
             {bakes.map((b) => (
               <div key={b.date} className="bg-white rounded-[1.5rem] border border-brand-brown/5 shadow-sm p-5 flex flex-col gap-2">
-                <span className="text-brand-orange text-[10px] sm:text-xs font-black tracking-[0.18em] uppercase">{b.date}</span>
-                <p className="text-[11px] font-bold text-brand-brown/45">Order by {b.orderBy}</p>
+                <span className="text-brand-orange text-[11px] sm:text-xs font-black tracking-[0.18em] uppercase">{b.date}</span>
+                <p className="text-[11px] font-bold text-brand-brown/60">Order by {b.orderBy}</p>
                 {b.items.length > 0 ? (
                   <ul className="flex flex-col gap-1.5 text-xs sm:text-sm font-bold text-brand-brown/75">
                     {b.items.map((i) => (
@@ -143,12 +144,12 @@ export default function ShopClient({
               </div>
             ))}
           </div>
-          <div className="flex gap-2 sm:gap-3 mt-6 flex-wrap">
-            {categories.map(cat => (
+          <div className={`${shownCategories.length > 2 ? "flex" : "hidden"} gap-2 sm:gap-3 mt-6 flex-wrap`}>
+            {shownCategories.map(cat => (
               <button
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-5 py-2.5 rounded-full text-[10px] sm:text-xs font-black tracking-[0.18em] uppercase transition-all duration-200 border ${
+                className={`px-5 py-2.5 rounded-full text-[11px] sm:text-xs font-black tracking-[0.18em] uppercase transition-all duration-200 border ${
                   activeCategory === cat
                     ? "bg-brand-brown text-white border-brand-brown"
                     : "bg-white text-brand-brown/60 border-brand-brown/10 hover:text-brand-brown hover:border-brand-brown/30"
@@ -168,7 +169,7 @@ export default function ShopClient({
 
       {/* ── Product Grid ── */}
       <section className="w-full px-4 sm:px-8 xl:px-16 pt-8 pb-14 sm:pb-20">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
+        <div className="max-w-7xl mx-auto grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
           {filtered.map(product => (
             <ProductCard
               key={product.id}
@@ -187,12 +188,12 @@ export default function ShopClient({
           <div className="flex flex-col items-center justify-center py-32 gap-4 text-center">
             <ShoppingBag size={40} className="text-brand-brown/20" />
             <h3 className="font-serif font-normal text-2xl text-brand-brown">Nothing in this batch. Yet.</h3>
-            <p className="text-sm font-bold text-brand-brown/40 max-w-sm">
+            <p className="text-sm font-bold text-brand-brown/60 max-w-sm">
               This collection is between batches. Check back soon for the next round of good things.
             </p>
             <button
               onClick={() => setActiveCategory("All")}
-              className="mt-2 inline-flex bg-brand-brown text-white hover:bg-brand-orange px-6 py-3 rounded-full text-[10px] font-black tracking-[0.18em] uppercase transition-colors"
+              className="mt-2 inline-flex bg-brand-brown text-white hover:bg-brand-orange px-6 py-3 rounded-full text-[11px] font-black tracking-[0.18em] uppercase transition-colors"
             >
               Explore other categories
             </button>
@@ -208,8 +209,8 @@ export default function ShopClient({
             style={{ fontSize: "clamp(2rem, 4vw, 3.2rem)" }}>
             Order <span className="text-brand-orange italic font-light">online.</span>
           </h3>
-          <p className="text-brand-oat/40 font-bold text-sm">Browse, add to cart, pay securely. We bake and deliver.</p>
-          <p className="text-brand-oat/40 font-bold text-xs mt-1 italic">Delivery {deliveryDaysShort()} only.</p>
+          <p className="text-brand-oat/70 font-bold text-sm">Browse, add to cart, pay securely. We bake and deliver.</p>
+          <p className="text-brand-oat/70 font-bold text-xs mt-1 italic">Delivery {deliveryDaysShort()} only.</p>
         </div>
         <Link
           href="/order"
@@ -254,50 +255,43 @@ function ProductCard({
 }) {
   const diet = dietOf(product.declarations?.ingredients, product.declarations?.allergens);
   return (
-    <div className="group flex flex-col bg-white rounded-[2rem] overflow-hidden border border-brand-brown/5 shadow-sm hover:shadow-xl transition-all duration-500">
+    <div className="group flex flex-col bg-white rounded-[1.25rem] sm:rounded-[2rem] overflow-hidden border border-brand-brown/5 shadow-sm hover:shadow-xl transition-all duration-500">
       {/* Image */}
-      <div className={`relative w-full aspect-square ${product.bgColor} p-5 sm:p-8 flex items-center justify-center`}>
+      <div className={`relative w-full aspect-square ${product.bgColor} p-3 sm:p-8 flex items-center justify-center`}>
         {product.badge && (
-          <span className="absolute top-4 left-4 z-10 text-[9px] font-black bg-brand-brown text-white px-3 py-1.5 rounded-full uppercase tracking-widest">
+          <span className="absolute top-2.5 left-2.5 sm:top-4 sm:left-4 z-10 max-w-[70%] truncate text-[11px] sm:text-[11px] font-black bg-brand-brown text-white px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full uppercase tracking-widest">
             {product.badge}
           </span>
         )}
-        {diet && <VegMark diet={diet} className="absolute top-4 right-4 z-10" />}
+        {diet && <VegMark diet={diet} className="absolute top-2.5 right-2.5 sm:top-4 sm:right-4 z-10" />}
         <div className="relative w-full h-full transition-transform duration-700 group-hover:scale-110">
           <Image src={product.image} alt={product.name} fill className="object-contain mix-blend-multiply drop-shadow-xl" />
         </div>
       </div>
 
       {/* Info */}
-      <div className="flex flex-col flex-1 p-5 sm:p-6 gap-3">
+      <div className="flex flex-col flex-1 p-3.5 sm:p-6 gap-2.5 sm:gap-3">
         <div>
-          <span className="text-[9px] font-black tracking-[0.2em] uppercase text-brand-brown/40 mb-1 block">
+          <span className="hidden sm:block text-[11px] font-black tracking-[0.2em] uppercase text-brand-brown/60 mb-1">
             {product.category}
           </span>
-          <h3 className="font-serif font-normal text-xl tracking-tight text-brand-brown transition-colors duration-200">
+          <h3 className="font-serif font-normal text-base sm:text-xl leading-snug tracking-tight text-brand-brown transition-colors duration-200">
             {product.name}
           </h3>
           {bakeDays && (
-            <p className="text-[10px] font-black tracking-[0.15em] uppercase text-brand-orange mt-1">Baked for {bakeDays}</p>
+            <p className="text-[11px] font-black tracking-[0.15em] uppercase text-brand-orange mt-1">Baked for {bakeDays}</p>
           )}
-          <p className="text-xs font-bold text-brand-brown/40 mt-2 leading-relaxed line-clamp-2">
-            {product.desc}
-          </p>
-          {product.declarations?.ingredients && (
-            <p className="text-[11px] font-bold text-brand-brown/60 mt-2 leading-relaxed">
-              <span className="font-black text-brand-brown/80">Ingredients: </span>{product.declarations.ingredients}
-            </p>
+          {product.desc && (
+            <p className="hidden sm:block text-sm font-medium text-brand-brown/70 mt-2 leading-relaxed line-clamp-2">{product.desc}</p>
           )}
           {product.declarations?.allergens && (
-            <p className="text-[11px] font-bold text-brand-brown/60 mt-1 leading-relaxed">
-              <span className="font-black text-brand-brown/80">Allergens: </span>{product.declarations.allergens}
-            </p>
+            <p className="text-[11px] sm:text-xs font-bold text-brand-brown/70 mt-1.5 leading-snug">Contains: {product.declarations.allergens}</p>
           )}
         </div>
  
-        <details className="group/details text-xs font-bold text-brand-brown/60">
-          <summary className="cursor-pointer list-none text-[10px] font-black tracking-[0.18em] uppercase text-brand-brown/50 hover:text-brand-orange">
-            Product details
+        <details className="group/details text-xs font-medium text-brand-brown/75">
+          <summary className="cursor-pointer list-none block py-2.5 text-[11px] font-black tracking-[0.18em] uppercase text-brand-brown/70 hover:text-brand-orange">
+            Ingredients & details
           </summary>
           <dl className="mt-3 flex flex-col gap-1.5 leading-relaxed">
             <div><dt className="inline font-black text-brand-brown/80">MRP: </dt><dd className="inline">{product.price} (incl. all taxes)</dd></div>
@@ -317,13 +311,13 @@ function ProductCard({
         </details>
 
         <div className="mt-auto pt-3 border-t border-brand-brown/5 flex flex-col gap-3">
-          <span className="font-black text-brand-orange text-lg">{product.price}</span>
-          <div className="grid grid-cols-2 gap-2">
+          <span className="font-black text-brand-orange text-base sm:text-lg">{product.price}</span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {!product.dbId ? null : qty === 0 ? (
               <button
                 onClick={onAdd}
                 disabled={!canAdd}
-                className="px-3 py-2.5 rounded-full text-[10px] font-black tracking-[0.12em] uppercase border border-brand-brown/20 text-brand-brown hover:border-brand-brown transition-colors active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                className="px-3 py-2.5 rounded-full text-[11px] font-black tracking-[0.12em] uppercase border border-brand-brown/20 text-brand-brown hover:border-brand-brown transition-colors active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Add to cart
               </button>
@@ -336,12 +330,12 @@ function ProductCard({
             )}
             <button
               onClick={onBuy}
-              className={`${product.dbId ? "" : "col-span-2 "}px-3 py-2.5 rounded-full text-[10px] font-black tracking-[0.12em] uppercase bg-brand-brown text-white hover:bg-brand-orange transition-colors active:scale-95 shadow-sm`}
+              className={`${product.dbId ? "" : "col-span-2 "}px-3 py-2.5 rounded-full text-[11px] font-black tracking-[0.12em] uppercase bg-brand-brown text-white hover:bg-brand-orange transition-colors active:scale-95 shadow-sm`}
             >
               Buy now
             </button>
           </div>
-          {!canAdd && <p className="text-[10px] font-bold text-brand-brown/50 text-center">{LIMIT_HINT}</p>}
+          {!canAdd && <p className="text-[11px] font-bold text-brand-brown/65 text-center">{LIMIT_HINT}</p>}
         </div>
       </div>
     </div>

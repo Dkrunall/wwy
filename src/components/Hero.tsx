@@ -69,7 +69,7 @@ export default function Hero() {
         {/* Left: Typography & Actions */}
         <div className="w-full lg:w-1/2 flex flex-col items-center lg:items-start text-center lg:text-left">
 
-          <div className="hero-text inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-2 rounded-full bg-white text-brand-brown text-[9px] sm:text-[10px] md:text-xs font-black uppercase tracking-[0.2em] mb-6 sm:mb-8 shadow-sm border border-brand-brown/5">
+          <div className="hero-text inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-5 py-2 rounded-full bg-white text-brand-brown text-[11px] sm:text-[11px] md:text-xs font-black uppercase tracking-[0.2em] mb-6 sm:mb-8 shadow-sm border border-brand-brown/5">
             <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-brand-orange animate-pulse shrink-0"></span>
             Freshly baked. Delivered to your doorstep.
           </div>
@@ -111,7 +111,7 @@ export default function Hero() {
             {/* Decorative floating badge */}
             <div className="absolute -bottom-5 sm:-bottom-6 -left-5 sm:-left-6 bg-brand-gold text-brand-brown w-20 sm:w-24 h-20 sm:h-24 rounded-full flex flex-col justify-center items-center -rotate-12 shadow-lg border-2 border-brand-oat z-30">
               <span className="font-black text-base sm:text-lg leading-none text-center">12–24 hrs</span>
-              <span className="text-[7px] sm:text-[8px] font-bold uppercase tracking-widest">Fermentation</span>
+              <span className="text-[11px] sm:text-[11px] font-bold uppercase tracking-widest">Fermentation</span>
             </div>
           </div>
 
@@ -130,7 +130,7 @@ export default function Hero() {
         className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-3 opacity-50 hover:opacity-100 transition-opacity cursor-pointer z-20"
         onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
       >
-        <span className="text-[9px] font-black uppercase tracking-[0.3em] rotate-180 [writing-mode:vertical-lr] text-brand-brown hidden sm:block">Scroll</span>
+        <span className="text-[11px] font-black uppercase tracking-[0.3em] rotate-180 [writing-mode:vertical-lr] text-brand-brown hidden sm:block">Scroll</span>
         <div className="w-[1px] h-10 bg-brand-brown/20 relative overflow-hidden">
           <div className="absolute top-0 left-0 w-full h-1/2 bg-brand-orange animate-scroll-line"></div>
         </div>

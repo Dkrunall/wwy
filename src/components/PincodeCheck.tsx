@@ -38,7 +38,7 @@ export default function PincodeCheck({ tone = "light" }: { tone?: "light" | "dar
 
   return (
     <form onSubmit={check} className="flex flex-col gap-2" aria-label="Check delivery to your pincode">
-      <label htmlFor="pincode-check" className={`text-[10px] font-black tracking-[0.18em] uppercase ${text} opacity-50`}>
+      <label htmlFor="pincode-check" className={`text-[11px] font-black tracking-[0.18em] uppercase ${text} opacity-50`}>
         Do we deliver to you?
       </label>
       <div className="flex gap-2">
@@ -56,7 +56,7 @@ export default function PincodeCheck({ tone = "light" }: { tone?: "light" | "dar
         />
         <button
           type="submit"
-          className="bg-brand-brown text-white hover:bg-brand-orange px-5 py-2.5 rounded-full text-[10px] font-black tracking-[0.15em] uppercase transition-colors active:scale-95"
+          className="bg-brand-brown text-white hover:bg-brand-orange px-5 py-2.5 rounded-full text-[11px] font-black tracking-[0.15em] uppercase transition-colors active:scale-95"
         >
           Check
         </button>

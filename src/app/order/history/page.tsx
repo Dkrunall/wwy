@@ -28,7 +28,7 @@ const DELIVERY_STATUS_CONFIG: Record<string, { label: string; color: string; bg:
   cold_proof:        { label: "Cold proofing ❄️",        color: "text-sky-700",           bg: "bg-sky-50" },
   baking:            { label: "In the oven 🔥",          color: "text-orange-700",        bg: "bg-orange-100" },
   out_for_delivery:  { label: "Out for delivery 🚗",     color: "text-blue-700",          bg: "bg-blue-100" },
-  delivered:         { label: "Delivered ✓",             color: "text-brand-charcoal/50", bg: "bg-brand-charcoal/5" },
+  delivered:         { label: "Delivered ✓",             color: "text-brand-charcoal/65", bg: "bg-brand-charcoal/5" },
 };
 
 const PAYMENT_STATUS_CONFIG: Record<string, { label: string; color: string; bg: string }> = {
@@ -169,7 +169,7 @@ export default function HistoryPage() {
             </button>
             <div className="min-w-0">
               <h1 className="font-black text-brand-brown text-sm leading-none">My Orders</h1>
-              {flat && <p className="text-[10px] font-bold text-brand-brown/30 leading-none mt-0.5">Flat {flat}</p>}
+              {flat && <p className="text-[11px] font-bold text-brand-brown/55 leading-none mt-0.5">Flat {flat}</p>}
             </div>
           </div>
           <button
@@ -178,7 +178,7 @@ export default function HistoryPage() {
               await supabase.auth.signOut();
               router.replace("/order/login");
             }}
-            className="text-[11px] font-black tracking-wider uppercase text-brand-brown/30 hover:text-rose-600 transition-colors shrink-0"
+            className="text-[11px] font-black tracking-wider uppercase text-brand-brown/55 hover:text-rose-600 transition-colors shrink-0"
           >
             Sign out
           </button>
@@ -200,7 +200,7 @@ export default function HistoryPage() {
 
         {!loading && orders.length === 0 && (
           <div className="flex flex-col items-center gap-6 py-16">
-            <p className="font-black text-brand-charcoal/20 text-2xl tracking-tight">No orders yet.</p>
+            <p className="font-black text-brand-charcoal/55 text-2xl tracking-tight">No orders yet.</p>
             <button
               onClick={() => router.push("/order")}
               className="bg-brand-brown text-white font-black text-xs tracking-wider uppercase px-6 py-3 rounded-xl hover:bg-brand-orange transition-colors"
@@ -232,18 +232,18 @@ export default function HistoryPage() {
                 >
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <span className={`text-[10px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full ${statusCfg.bg} ${statusCfg.color}`}>
+                      <span className={`text-[11px] font-black tracking-wider uppercase px-2.5 py-1 rounded-full ${statusCfg.bg} ${statusCfg.color}`}>
                         {statusCfg.label}
                       </span>
                     </div>
                     <p className="font-black text-brand-charcoal text-sm leading-none">
                       {fmt(order.total_paise)}
                     </p>
-                    <p className="text-[11px] font-bold text-brand-charcoal/30 mt-0.5">
+                    <p className="text-[11px] font-bold text-brand-charcoal/55 mt-0.5">
                       {fmtDate(order.created_at)} · #{(order.order_number || order.id.slice(0, 8)).toUpperCase()}
                     </p>
                   </div>
-                  <span className={`text-brand-charcoal/30 font-black transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}>
+                  <span className={`text-brand-charcoal/55 font-black transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}>
                     ▾
                   </span>
                 </button>
@@ -262,7 +262,7 @@ export default function HistoryPage() {
                       </div>
                     ))}
                     {order.notes && (
-                      <p className="text-xs font-medium text-brand-charcoal/40 italic border-t border-brand-charcoal/5 pt-2 mt-1">
+                      <p className="text-xs font-medium text-brand-charcoal/60 italic border-t border-brand-charcoal/5 pt-2 mt-1">
                         Note: {order.notes}
                       </p>
                     )}
@@ -272,7 +272,7 @@ export default function HistoryPage() {
                           href={order.invoice_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs font-black text-brand-charcoal/50 hover:text-brand-terracotta transition-colors underline underline-offset-2"
+                          className="text-xs font-black text-brand-charcoal/65 hover:text-brand-terracotta transition-colors underline underline-offset-2"
                         >
                           ↓ Invoice
                         </a>
@@ -280,7 +280,7 @@ export default function HistoryPage() {
                       {order.payment_status === "paid" && order.order_items && order.order_items.length > 0 && (
                         <button
                           onClick={() => reorder(order)}
-                          className="ml-auto bg-brand-brown hover:bg-brand-orange text-white text-[10px] font-black tracking-wider uppercase px-3 py-1.5 rounded-xl transition-colors"
+                          className="ml-auto bg-brand-brown hover:bg-brand-orange text-white text-[11px] font-black tracking-wider uppercase px-3 py-1.5 rounded-xl transition-colors"
                         >
                           ↺ Reorder
                         </button>
@@ -294,7 +294,7 @@ export default function HistoryPage() {
                           <p className="text-xs font-black text-green-700">✓ Thanks for your feedback!</p>
                         ) : feedbackOpen === order.id ? (
                           <div className="flex flex-col gap-3">
-                            <p className="text-[11px] font-black tracking-wider uppercase text-brand-charcoal/40">Rate your order</p>
+                            <p className="text-[11px] font-black tracking-wider uppercase text-brand-charcoal/60">Rate your order</p>
                             <StarRating
                               value={feedbackRating[order.id] || 0}
                               onChange={(v) => setFeedbackRating((prev) => ({ ...prev, [order.id]: v }))}
@@ -319,7 +319,7 @@ export default function HistoryPage() {
                               </button>
                               <button
                                 onClick={() => { setFeedbackOpen(null); setFeedbackError(null); }}
-                                className="px-4 py-2.5 text-xs font-black text-brand-charcoal/40 hover:text-brand-charcoal transition-colors"
+                                className="px-4 py-2.5 text-xs font-black text-brand-charcoal/60 hover:text-brand-charcoal transition-colors"
                               >
                                 Cancel
                               </button>
