@@ -22,37 +22,12 @@ export const REVIEWS: { quote: string; name: string }[] = [
   },
   {
     quote:
-      "Fizzy perfection! Tried the Hibiscus, Jamun, and Blueberry flavors from Wild Wild Yeast, and they are honestly so good. It's hard to find a ginger ale that gets the fizz exactly right, but these completely nail it. They're super refreshing on their own, but they also make the perfect mixers for a weekend drink. Packed with actual flavor and light enough to have anytime. Give them a try!",
-    name: "S.P.",
-  },
-  {
-    quote:
-      "I wasn't expecting much when I first tried it, but it ended up becoming one of my favourite drinks. It's refreshing, has a nice natural ginger taste, and doesn't feel overly sugary. I usually keep a few bottles in the fridge because it's great on its own or with food. My family likes it too, so it doesn't last long in our house! I've reordered it a few times now because the taste and quality have been consistently good.",
-    name: "A.M.",
-  },
-  {
-    quote:
       "The best sourdough bread I have ever had. WWY offers a variety of flavours one cannot even imagine.. so fresh and flavourful.",
     name: "Mona B",
   },
   {
     quote:
-      "Wild Wild Yeast has become a regular part of our week, and honestly, we still can't get enough. The breads are soft, flavorful, and the kind you keep going back to for \"just one more slice.\" Their ales are just as impressive — naturally fizzy, made from real ingredients and with little to no added sugar. It's rare to find something that tastes this good and still feels this wholesome.",
-    name: "Pallavi & Hriday Dalal",
-  },
-  {
-    quote:
       "WWY has created some truly amazing and unique sourdoughs! The bread arriving warm and crusty reminds of my neighbourhood bakery while growing up — a bright spot on my weekend morning.",
     name: "George Mathew",
-  },
-  {
-    quote:
-      "There are sourdough breads by the dozen and then there is the one made by WWY.. one made with passion and love .. way above the rest. Their breads come in unique flavours, never found anywhere else, like thecha flavour, honey chilli, Indore spice, Kolhapuri Masala and even Goan Masala. They also brew ales — which are excellent too. Best wishes to Wild Wild Yeast for wonderful success ahead.",
-    name: "Shraddha and Parag Gude",
-  },
-  {
-    quote:
-      "Wild Wild Yeast has completely changed how I think about ginger ales and naturally fermented foods. The range of flavours is remarkably creative, yet every bottle and loaf feels balanced, fresh and true to the craft. There's a depth and complexity here that only comes from patient, natural fermentation, without ever feeling overdone. If you're looking for authentic, small-batch ales or exceptional sourdough in Mumbai, WWY is genuinely in a class of its own.",
-    name: "Rahul M.",
   },
 ];

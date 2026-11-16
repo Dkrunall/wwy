@@ -100,7 +100,10 @@ export default function CartPage() {
       .then((r) => r.json())
       .then(({ slots }) => {
         setDeliverySlots(slots || []);
-        setSelectedDeliveryDate(slots?.[0]?.iso || "");
+        // Prefer the bake day picked on the menu, if it is still open.
+        let preferred = "";
+        try { preferred = localStorage.getItem("wwy_bake_date") || ""; } catch {}
+        setSelectedDeliveryDate((slots || []).find((s: { iso: string }) => s.iso === preferred)?.iso || slots?.[0]?.iso || "");
       })
       .catch(() => {});
 
@@ -312,7 +315,7 @@ export default function CartPage() {
             </p>
           </div>
           <button
-            onClick={() => router.push("/order")}
+            onClick={() => router.push("/shop")}
             className="bg-brand-brown text-white font-black text-xs tracking-widest uppercase px-8 py-4 rounded-2xl hover:bg-brand-terracotta transition-colors shadow-md cursor-pointer"
           >
             ← Explore Menu &amp; Order
