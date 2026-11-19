@@ -37,7 +37,8 @@ export async function sendDeliveryUpdateToCustomer(
   email: string,
   name: string,
   orderNumber: string,
-  status: string
+  status: string,
+  trackingUrl?: string | null
 ): Promise<void> {
   if (!process.env.GMAIL_USER || !email) return;
 
@@ -87,6 +88,11 @@ export async function sendDeliveryUpdateToCustomer(
       <h2 style="color:#c9a96e;margin-bottom:4px">${update.headline}</h2>
       <p style="margin-top:0;color:#888;font-size:13px">Order ${orderNumber} · Wild Wild Yeast</p>
       <p>${update.body}</p>
+      ${status === "out_for_delivery" && trackingUrl ? `<p style="margin-top:20px">
+        <a href="${trackingUrl}" style="background:#2c1a0e;color:white;padding:12px 24px;text-decoration:none;border-radius:8px;font-weight:bold;display:inline-block">
+          Track your order live →
+        </a>
+      </p>` : ""}
       <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
       <p style="font-size:12px;color:#aaa">Wild Wild Yeast · Handcrafted with love 🌾</p>
     </div>`;
@@ -148,6 +154,51 @@ export async function sendNewOrderToBaker(
     from: `Wild Wild Yeast <${process.env.GMAIL_USER}>`,
     to: email,
     subject: `New Order ${order.orderNumber}: ${order.customerName} · Flat ${order.flatNumber}`,
+    html,
+  });
+}
+
+interface RiderAssignmentData {
+  orderNumber: string;
+  customerName: string;
+  flatNumber: string;
+  address?: string | null;
+  pincode?: string | null;
+  phone?: string | null;
+  items: { product_name: string; quantity: number }[];
+  notes?: string | null;
+  riderUrl: string;
+}
+
+// To our in-house rider when an order is handed to them for delivery.
+export async function sendRiderAssignment(email: string, riderName: string, order: RiderAssignmentData): Promise<void> {
+  if (!process.env.GMAIL_USER || !email) return;
+  const itemLines = order.items.map((i) => `<li style="padding:4px 0">${i.product_name} × ${i.quantity}</li>`).join("");
+  const address = order.address || `Flat ${order.flatNumber}`;
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${address}${order.pincode ? " " + order.pincode : ""}`)}`;
+  const html = `
+    <div style="font-family:sans-serif;max-width:520px;margin:0 auto;color:#2c1a0e">
+      <h2 style="color:#c9a96e;margin-bottom:4px">New delivery 🛵</h2>
+      <p style="margin-top:0;color:#888;font-size:13px">Wild Wild Yeast · Order ${order.orderNumber}</p>
+      <p>Hi <b>${riderName}</b>, this order is ready for you to deliver.</p>
+      <p><b>Customer:</b> ${order.customerName}<br/>
+         <b>Address:</b> ${address}${order.pincode ? ", " + order.pincode : ""}<br/>
+         ${order.phone ? `<b>Phone:</b> <a href="tel:${order.phone}">${order.phone}</a>` : ""}</p>
+      <ul style="padding-left:16px;margin:12px 0">${itemLines}</ul>
+      ${order.notes ? `<p style="font-style:italic;color:#888">Note: ${order.notes}</p>` : ""}
+      <p style="margin-top:20px">
+        <a href="${order.riderUrl}" style="background:#2c1a0e;color:white;padding:12px 24px;text-decoration:none;border-radius:8px;font-weight:bold;display:inline-block">
+          Open my deliveries & share location →
+        </a>
+      </p>
+      <p><a href="${mapsUrl}">Directions in Google Maps</a></p>
+      <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
+      <p style="font-size:12px;color:#aaa">Keep the deliveries page open while you ride so the customer can see where you are.</p>
+    </div>`;
+  await createTransporter().sendMail({
+    from: `Wild Wild Yeast <${process.env.GMAIL_USER}>`,
+    to: email,
+    subject: `Deliver ${order.orderNumber}: ${order.customerName} · ${address}`,
     html,
   });
 }

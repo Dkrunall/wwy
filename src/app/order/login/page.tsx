@@ -432,7 +432,7 @@ export default function OrderLoginPage() {
               {pincodeServiceable === "blocked" && (
                 <div className="flex items-center gap-2 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2">
                   <span className="text-rose-500 text-base leading-none">✗</span>
-                  <p className="text-[11px] font-black text-rose-600">Sorry, we don&apos;t deliver to this pincode yet. We&apos;re expanding soon!</p>
+                  <p className="text-[11px] font-black text-rose-600">Sorry, we deliver within Mumbai only.</p>
                 </div>
               )}
               {pincodeServiceable === "idle" && pincodeLookup === "idle" && (

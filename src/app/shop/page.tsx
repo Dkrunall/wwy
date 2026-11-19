@@ -1,19 +1,21 @@
-import { Suspense } from "react";
-import { redirect } from "next/navigation";
-import { getMenuData } from "@/lib/menuData";
-import { createServerSupabase } from "@/lib/supabase-server";
+import { getShopProducts } from "@/lib/shopProducts";
+import { bakeDaysLabel, everydayNames, isOnUpcomingMenu, upcomingBakes } from "@/lib/menu";
 import ShopClient from "./ShopClient";
 
 export const revalidate = 60;
 
 export default async function ShopPage() {
-  const { data: vacation } = await createServerSupabase().from("settings").select("value").eq("key", "vacation_mode").maybeSingle();
-  if (vacation?.value === "true") redirect("/coming-soon");
+  const all = await getShopProducts();
+  const next = upcomingBakes(4);
+  const everyday = everydayNames(next);
 
-  const menu = await getMenuData();
-  return (
-    <Suspense>
-      <ShopClient {...menu} />
-    </Suspense>
+
+  const products = all.filter((p) => isOnUpcomingMenu(p.name, next));
+  const bakeDays = Object.fromEntries(
+    products.flatMap((p) => {
+      const label = bakeDaysLabel(p.name, next);
+      return label ? [[p.name, label]] : [];
+    })
   );
+  return <ShopClient products={products} bakeDays={bakeDays} everyday={everyday} />;
 }

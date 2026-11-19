@@ -5,6 +5,8 @@ import { sendPaymentConfirmedToCustomer, sendOwnerNotification, sendNewOrderToBa
 import { createAdminNotification, createBakerNotification } from "@/lib/notifications";
 import { generateInvoicePDF, withTaxInfo } from "@/lib/invoice";
 import { deriveLoyaltyDiscount } from "@/lib/coupons";
+import { customerOfOrder } from "@/lib/customerOfOrder";
+import { redeemCouponByCode } from "@/lib/couponResolve";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,15 +18,21 @@ export async function POST(req: NextRequest) {
 
     const supabase = createServerSupabase();
 
-    // Fetch order + items + customer
+    // The signature proves payment for razorpayOrderId only, so look the order up by that id
+    // (never by the orderId the browser sends) and make sure the two agree.
     const { data: order } = await supabase
       .from("orders")
       .select("*, order_items(*)")
-      .eq("id", orderId)
+      .eq("razorpay_order_id", razorpayOrderId)
       .single();
 
-    if (!order) {
+    if (!order || (orderId && order.id !== orderId)) {
       return NextResponse.json({ error: "Order not found" }, { status: 404 });
+    }
+
+    // The Razorpay webhook may already have confirmed it; don't send emails or invoices twice.
+    if (order.payment_status === "paid") {
+      return NextResponse.json({ ok: true, orderId: order.id });
     }
 
     // Mark as paid
@@ -36,14 +44,12 @@ export async function POST(req: NextRequest) {
         razorpay_payment_id: razorpayPaymentId,
         updated_at: new Date().toISOString(),
       })
-      .eq("id", orderId);
+      .eq("id", order.id);
 
     // Fetch customer phone
-    const { data: customer } = await supabase
-      .from("customers")
-      .select("*")
-      .eq("flat_number", order.flat_number)
-      .single();
+    if (order.coupon_code) await redeemCouponByCode(supabase, order.coupon_code).catch(console.error);
+
+    const customer = await customerOfOrder(supabase, order);
 
     // Baker assignment now happens from OMS after payment — see admin bulk-assign flow.
     const assignedBakerId = order.baker_id;
@@ -111,7 +117,7 @@ export async function POST(req: NextRequest) {
       const { data: urlData } = supabase.storage.from("invoices").getPublicUrl(fileName);
       invoiceUrl = urlData.publicUrl;
 
-      await supabase.from("orders").update({ invoice_url: invoiceUrl }).eq("id", orderId);
+      await supabase.from("orders").update({ invoice_url: invoiceUrl }).eq("id", order.id);
     } catch (invoiceErr) {
       console.error("Invoice generation failed:", invoiceErr);
     }
@@ -131,7 +137,7 @@ export async function POST(req: NextRequest) {
       notes: order.notes,
     }).catch(console.error);
 
-    return NextResponse.json({ ok: true, orderId });
+    return NextResponse.json({ ok: true, orderId: order.id });
   } catch (err) {
     console.error("verify error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

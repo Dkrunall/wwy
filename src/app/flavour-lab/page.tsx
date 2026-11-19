@@ -1,4 +1,3 @@
-import InstaLink from "@/components/InstaLink";
 import type { Metadata } from "next";
 import Link from "next/link";
 import PolicyPage from "@/components/PolicyPage";
@@ -6,7 +5,7 @@ import { FLAVOURS } from "@/lib/flavours";
 import { scheduleWindows, cutoffRuleText } from "@/lib/schedule";
 
 export const metadata: Metadata = {
-  title: "This Week's Sourdough Flavours | Wild Wild Yeast Mumbai",
+  title: { absolute: "This Week's Sourdough Flavours | Wild Wild Yeast Mumbai" },
   description:
     "Discover the latest flavoured sourdough and small-batch bakes from Wild Wild Yeast in Mumbai. Explore current flavours, check the latest batch and order fresh bakes for delivery.",
   alternates: { canonical: "/flavour-lab" },
@@ -17,7 +16,7 @@ export default function FlavourLabPage() {
   return (
     <PolicyPage
       eyebrow="Flavour Lab"
-      title="Meet the latest batch."
+      title="Meet our past heroes."
       showUpdated={false}
       bannerImage="/new-catelog/sweet-sourdough.png"
       intro="The classics are classics for a reason. But there's always room for something unexpected."
@@ -34,7 +33,7 @@ export default function FlavourLabPage() {
           <li key={f}>{f}</li>
         ))}
       </ul>
-      <p>New flavours go up every week on Instagram, so keep an eye out: <InstaLink />.</p>
+      <p>New flavours go up every week, so keep an eye out.</p>
 
       <h2>Next available bake</h2>
       <ul>

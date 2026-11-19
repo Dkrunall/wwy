@@ -5,7 +5,7 @@ import { BUSINESS, POLICY, businessValue } from "@/lib/business";
 import { cutoffRuleText, deliveryDaysLong } from "@/lib/schedule";
 
 export const metadata: Metadata = {
-  title: "Sourdough, Ordering & Delivery FAQs | Wild Wild Yeast",
+  title: { absolute: "Sourdough, Ordering & Delivery FAQs | Wild Wild Yeast" },
   description:
     "Have questions about Wild Wild Yeast sourdough, ingredients, storage, twice-weekly baking, ordering or delivery in Mumbai? Find helpful answers in our FAQs.",
   alternates: { canonical: "/faq" },
@@ -69,7 +69,7 @@ const GROUPS: { title: string; items: Faq[] }[] = [
     items: [
       {
         q: "Where do you deliver?",
-        a: "We deliver within Mumbai only. Delivery is free from Colaba and Cuffe Parade to Kandivali, and ₹65 for the rest of Mumbai.",
+        a: "We deliver within Mumbai only. Delivery is free from Colaba and Cuffe Parade to Kandivali on orders of ₹300 or more. Otherwise it is ₹65.",
         link: { href: "/delivery", label: "Check your pincode" },
       },
       {

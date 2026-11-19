@@ -36,12 +36,6 @@ export default function SocialGallery() {
         }
       );
 
-      gsap.to(".marquee-content", {
-        xPercent: -50,
-        ease: "none",
-        duration: 20,
-        repeat: -1,
-      });
     }, containerRef);
 
     return () => ctx.revert();
@@ -91,17 +85,6 @@ export default function SocialGallery() {
             <Image src={p.img} alt={p.alt} fill sizes="(max-width: 768px) 50vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-700" />
           </a>
         ))}
-      </div>
-
-      {/* Text Marquee Footer */}
-      <div className="bg-brand-charcoal w-full relative py-6 sm:py-8 overflow-hidden z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.2)]">
-        <div className="absolute top-1/2 left-0 w-full -translate-y-1/2 z-0 whitespace-nowrap">
-          <div className="flex font-black uppercase tracking-widest text-[#FEC84D] marquee-content"
-            style={{ fontSize: "clamp(1.2rem, 4vw, 2.5rem)" }}>
-            <span>SLOW FERMENTED • ROOTED IN PROCESS • HONEST INGREDIENTS • BAKED TO ORDER • NATURALLY LEAVENED • SLOW FERMENTED • ROOTED IN PROCESS •&nbsp;</span>
-            <span>SLOW FERMENTED • ROOTED IN PROCESS • HONEST INGREDIENTS • BAKED TO ORDER • NATURALLY LEAVENED • SLOW FERMENTED • ROOTED IN PROCESS •&nbsp;</span>
-          </div>
-        </div>
       </div>
 
     </section>

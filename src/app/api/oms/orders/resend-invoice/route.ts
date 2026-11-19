@@ -5,6 +5,7 @@ import { generateInvoicePDF, withTaxInfo } from "@/lib/invoice";
 import { deriveLoyaltyDiscount } from "@/lib/coupons";
 import { sendPaymentConfirmedToCustomer } from "@/lib/email";
 import { OMS_COOKIE, verifyOmsToken } from "@/lib/omsAuth";
+import { customerOfOrder } from "@/lib/customerOfOrder";
 
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
@@ -22,8 +23,7 @@ export async function POST(req: NextRequest) {
       .from("orders").select("*, order_items(*)").eq("id", orderId).single();
     if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
 
-    const { data: customer } = await supabase
-      .from("customers").select("*").eq("flat_number", order.flat_number).single();
+    const customer = await customerOfOrder(supabase, order);
 
     const itemsSubtotal = (order.order_items || []).reduce(
       (s: number, i: { quantity: number; unit_price_paise: number }) => s + i.quantity * i.unit_price_paise, 0

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { sendDeliveryUpdateToCustomer } from "@/lib/email";
+import { customerOfOrder } from "@/lib/customerOfOrder";
 
 // Borzo sends two types of callbacks:
 //   Delivery callback: { delivery_id, client_order_id, status, order_id, point_id }
@@ -15,11 +16,7 @@ async function notifyCustomer(supabase: ReturnType<typeof createServerSupabase>,
     .single();
   if (!order) return;
 
-  const { data: customer } = await supabase
-    .from("customers")
-    .select("email")
-    .eq("flat_number", order.flat_number)
-    .single();
+  const customer = await customerOfOrder(supabase, order, "email");
 
   if (customer?.email) {
     await sendDeliveryUpdateToCustomer(

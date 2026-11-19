@@ -6,7 +6,7 @@ import { BUSINESS, businessValue } from "@/lib/business";
 import { WHATSAPP_CONTACT_URL, WHATSAPP_NUMBER } from "@/lib/contact";
 
 export const metadata: Metadata = {
-  title: "Contact Wild Wild Yeast | Mumbai Bakery & Online Orders",
+  title: { absolute: "Contact Wild Wild Yeast | Mumbai Bakery & Online Orders" },
   description: "Contact Wild Wild Yeast for questions about sourdough, products, online orders, baking schedules and delivery in Mumbai.",
   alternates: { canonical: "/contact" },
 };

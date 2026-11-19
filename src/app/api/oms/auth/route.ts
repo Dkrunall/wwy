@@ -1,12 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { timingSafeEqual } from "crypto";
 import { OMS_COOKIE, OMS_SESSION_SECONDS, createOmsToken } from "@/lib/omsAuth";
 
+function samePassword(given: unknown, expected: string): boolean {
+  if (typeof given !== "string") return false;
+  const a = Buffer.from(given);
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
 export async function POST(req: NextRequest) {
-  const { password } = await req.json();
+  const { password } = await req.json().catch(() => ({}));
   const adminPassword = process.env.OMS_ADMIN_PASSWORD;
 
-  if (!adminPassword || password !== adminPassword) {
+  if (!adminPassword || !samePassword(password, adminPassword)) {
+    // Slow down password guessing.
+    await new Promise((r) => setTimeout(r, 1500));
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

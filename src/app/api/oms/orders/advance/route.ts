@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { sendDeliveryUpdateToCustomer } from "@/lib/email";
-import { createBorzoDelivery } from "@/lib/borzo";
+import { customerTrackingUrl, dispatchFields } from "@/lib/delivery";
 import { OMS_COOKIE, verifyOmsToken } from "@/lib/omsAuth";
+import { customerOfOrder } from "@/lib/customerOfOrder";
 
 const VALID_STATUSES = ["placed","mixing","stretching","resting","cold_proof","baking","out_for_delivery","delivered"];
 const EMAIL_MILESTONES = ["resting","baking","out_for_delivery","delivered"];
@@ -31,12 +32,7 @@ export async function POST(req: NextRequest) {
     const needCustomer = nextStatus === "out_for_delivery" || EMAIL_MILESTONES.includes(nextStatus);
     let customer: { email?: string | null; address?: string | null; phone?: string | null; pincode?: string | null } | null = null;
     if (needCustomer) {
-      const { data } = await supabase
-        .from("customers")
-        .select("email, address, phone, pincode")
-        .eq("flat_number", order.flat_number)
-        .single();
-      customer = data;
+      customer = await customerOfOrder(supabase, order, "email, address, phone, pincode");
     }
 
     const updatePayload: Record<string, unknown> = {
@@ -44,39 +40,12 @@ export async function POST(req: NextRequest) {
       updated_at: new Date().toISOString(),
     };
 
-    if (nextStatus === "out_for_delivery" && order.baker_id) {
-      const { data: baker } = await supabase
-        .from("bakers")
-        .select("id, name, phone, address, lat, lng")
-        .eq("id", order.baker_id)
-        .single();
-
-      if (baker?.address) {
-        const dropoffAddress =
-          customer?.address ||
-          `Flat ${order.flat_number}${customer?.pincode ? ", " + customer.pincode : ""}`;
-
-        const borzoResult = await createBorzoDelivery({
-          pickupAddress: baker.address as string,
-          pickupLat: (baker.lat as number | null) ?? undefined,
-          pickupLng: (baker.lng as number | null) ?? undefined,
-          pickupContactName: baker.name as string,
-          pickupContactPhone: baker.phone as string,
-          dropoffAddress,
-          dropoffContactName: order.customer_name,
-          dropoffContactPhone: customer?.phone || "",
-          dropoffNote: `Flat ${order.flat_number} · WWY ${order.order_number || orderId.slice(0, 8).toUpperCase()}`,
-          clientOrderId: orderId,
-        });
-
-        if (borzoResult.borzoOrderId) updatePayload.borzo_order_id = borzoResult.borzoOrderId;
-        if (borzoResult.trackingUrl) updatePayload.borzo_tracking_url = borzoResult.trackingUrl;
-        if (borzoResult.error && borzoResult.error !== "not_configured") {
-          console.error("[Borzo] OMS advance delivery error:", borzoResult.error);
-        }
-      } else {
-        console.warn(`[Borzo] Baker ${order.baker_id} has no pickup address — skipping dispatch`);
-      }
+    // Out for delivery: our in-house rider by default, or Borzo if this order is set to Borzo.
+    if (nextStatus === "out_for_delivery") {
+      const { data: baker } = order.baker_id
+        ? await supabase.from("bakers").select("id, name, phone, address, lat, lng").eq("id", order.baker_id).single()
+        : { data: null };
+      Object.assign(updatePayload, await dispatchFields(supabase, order, baker, customer));
     }
 
     await supabase.from("orders").update(updatePayload).eq("id", orderId);
@@ -86,7 +55,8 @@ export async function POST(req: NextRequest) {
         customer.email,
         order.customer_name,
         order.order_number,
-        nextStatus
+        nextStatus,
+        customerTrackingUrl(order, updatePayload)
       ).catch(console.error);
     }
 

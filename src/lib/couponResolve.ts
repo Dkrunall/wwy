@@ -78,3 +78,9 @@ export async function redeemCoupon(
 ): Promise<void> {
   await supabase.from("coupons").update({ used_count: coupon.used_count + 1 }).eq("id", coupon.id);
 }
+
+// Counts one use of a coupon when an order that used it is paid.
+export async function redeemCouponByCode(supabase: ReturnType<typeof createServerSupabase>, code: string): Promise<void> {
+  const { data } = await supabase.from("coupons").select("id, used_count").eq("code", code).maybeSingle();
+  if (data) await supabase.from("coupons").update({ used_count: (data.used_count ?? 0) + 1 }).eq("id", data.id);
+}

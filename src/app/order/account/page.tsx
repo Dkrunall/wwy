@@ -49,6 +49,13 @@ const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
 
 type Panel = "orders" | "profile";
 
+// Whose orders to show: the logged-in customer's id, or their flat if the id is missing.
+// Flat numbers are not unique across buildings, so the id is preferred.
+function orderOwner(flat: string): [string, string] {
+  const id = typeof window !== "undefined" ? localStorage.getItem("wwy_customer_id") : null;
+  return id ? ["customer_id", id] : ["flat_number", flat];
+}
+
 export default function AccountPage() {
   const router = useRouter();
   const [panel, setPanel] = useState<Panel>("orders");
@@ -99,7 +106,7 @@ export default function AccountPage() {
         const { data } = await supabase
           .from("orders")
           .select("*, order_items(*)")
-          .eq("flat_number", storedFlat)
+          .eq(...orderOwner(storedFlat))
           .order("created_at", { ascending: false })
           .limit(10);
         setRecentOrders(data || []);
@@ -117,7 +124,7 @@ export default function AccountPage() {
         const { data } = await supabase
           .from("orders")
           .select("*, order_items(*)")
-          .eq("flat_number", flat)
+          .eq(...orderOwner(flat))
           .order("created_at", { ascending: false })
           .limit(10);
         if (data) setRecentOrders(data);
@@ -309,11 +316,11 @@ export default function AccountPage() {
                       </div>
                     )}
                   </div>
-                  {activeOrder.delivery_status === "out_for_delivery" && activeOrder.borzo_tracking_url && (
+                  {activeOrder.delivery_status === "out_for_delivery" && (activeOrder.borzo_tracking_url || activeOrder.tracking_token) && (
                     <div className="px-5 py-3 bg-sky-50 border-b border-sky-100 flex items-center justify-between gap-3">
                       <p className="text-xs font-bold text-sky-700">Your bread is on its way! 🚗</p>
                       <a
-                        href={activeOrder.borzo_tracking_url}
+                        href={activeOrder.borzo_tracking_url || `/track/${activeOrder.tracking_token}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="shrink-0 text-[11px] font-black tracking-wider uppercase text-sky-700 hover:text-sky-900 underline underline-offset-2"

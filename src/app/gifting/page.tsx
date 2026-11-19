@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import PageBanner from "@/components/PageBanner";
 import GiftingForm from "@/components/GiftingForm";
 import { WHATSAPP_NUMBER } from "@/lib/contact";
-import { GIFT_TIERS, GIFTING_LEAD_TIME, GIFTING_MIN_ORDER } from "@/lib/gifting";
+import { GIFT_TIERS } from "@/lib/gifting";
 
 export const metadata: Metadata = {
   title: "Gifting and Hampers",
@@ -39,10 +39,6 @@ export default function GiftingPage() {
               </p>
             </div>
           ))}
-        </div>
-        <div className="max-w-7xl mx-auto mt-8 text-xs font-black tracking-[0.12em] uppercase text-brand-brown/60 flex flex-col sm:flex-row gap-2 sm:gap-8">
-          <span>{GIFTING_MIN_ORDER}</span>
-          <span>{GIFTING_LEAD_TIME}</span>
         </div>
       </section>
 

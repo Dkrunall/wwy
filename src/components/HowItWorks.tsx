@@ -20,8 +20,8 @@ const steps = [
     number: "02",
     day: "Order",
     title: "Order right on our website.",
-    body: "Add what you want to your cart and check out securely with Razorpay: card, UPI or netbanking. Your order is confirmed instantly, no waiting on a reply.",
-    tag: "Razorpay checkout",
+    body: "Add what you want to your cart and pay securely online by card, UPI or netbanking. Your order is confirmed instantly, no waiting on a reply.",
+    tag: "Secure checkout",
   },
   {
     number: "03",
@@ -80,7 +80,7 @@ export default function HowItWorks() {
           </div>
           <div className="max-w-sm lg:pb-2 flex flex-col gap-2">
             <p className="text-sm sm:text-base md:text-lg font-bold text-brand-brown/60 leading-relaxed">
-              Add to cart, check out with Razorpay, done. We plan batches from confirmed, paid orders: we bake to order and deliver on fixed days.
+              Add to your cart, pay securely online, done. We plan every batch from confirmed orders, so we bake to order and deliver on fixed days.
             </p>
             <p className="text-xs sm:text-sm font-black tracking-[0.15em] uppercase text-brand-brown/60 italic">
               We don't rush food. We plan for it.
@@ -93,7 +93,7 @@ export default function HowItWorks() {
           {[
             { label: `Delivery: ${deliveryDaysShort()} only` },
             { label: "Order online, pay by card / UPI / netbanking" },
-            { label: "Free delivery Colaba to Kandivali" },
+            { label: "Free delivery Colaba to Kandivali over ₹300" },
             { label: "Baked to order, no advance stock" },
           ].map(({ label }) => (
             <span key={label} className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white border border-brand-brown/8 text-[11px] sm:text-xs md:text-sm font-black tracking-[0.12em] uppercase text-brand-brown/60 shadow-sm">

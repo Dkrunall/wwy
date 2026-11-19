@@ -35,7 +35,16 @@ export function isOnUpcomingMenu(name: string, bakes = upcomingBakes()): boolean
 }
 
 // "Wed 18 Nov, Sat 21 Nov" for an item baked only on some upcoming days; null if it is on every one.
+// Only bakes that have a menu count: a day with no menu set yet says nothing about an item.
 export function bakeDaysLabel(name: string, bakes = upcomingBakes()): string | null {
-  const days = bakes.filter((b) => bakeHasAll(b.iso, [name]));
-  return days.length === bakes.length ? null : days.map((b) => b.label).join(", ") || null;
+  const planned = bakes.filter((b) => BAKE_MENU[b.iso]);
+  const days = planned.filter((b) => BAKE_MENU[b.iso].includes(name));
+  return days.length === planned.length ? null : days.map((b) => b.label).join(", ") || null;
+}
+
+// Items on every upcoming bake that has a menu ("Every bake"); the rest are flavours of the week.
+export function everydayNames(bakes = upcomingBakes()): string[] {
+  const set = bakes.filter((b) => BAKE_MENU[b.iso]).map((b) => BAKE_MENU[b.iso]);
+  if (set.length === 0) return [];
+  return set[0].filter((name) => set.every((menu) => menu.includes(name)));
 }

@@ -1,7 +1,8 @@
 import { isMumbaiPincode } from "@/lib/pincodes";
 import { createServerSupabase } from "./supabase-server";
 import { sendDeliveryUpdateToCustomer } from "./email";
-import { createBorzoDelivery } from "./borzo";
+import { customerTrackingUrl, dispatchFields } from "./delivery";
+import { customerOfOrder } from "./customerOfOrder";
 
 export const VALID_BAKER_STATUSES = ["placed", "mixing", "stretching", "resting", "cold_proof", "baking", "out_for_delivery", "delivered"];
 const EMAIL_MILESTONES = ["resting", "baking", "out_for_delivery", "delivered"];
@@ -25,16 +26,15 @@ export async function updateOrderDeliveryStatus(
   if (!order) {
     return { ok: false, error: "Order not found" };
   }
+  // A baker can only move their own orders.
+  if (order.baker_id !== baker.id) {
+    return { ok: false, error: "This order is not assigned to you" };
+  }
 
   const needCustomer = nextStatus === "out_for_delivery" || EMAIL_MILESTONES.includes(nextStatus);
   let customer: { email?: string | null; address?: string | null; phone?: string | null; pincode?: string | null } | null = null;
   if (needCustomer) {
-    const { data } = await supabase
-      .from("customers")
-      .select("email, address, phone, pincode")
-      .eq("flat_number", order.flat_number)
-      .single();
-    customer = data;
+    customer = await customerOfOrder(supabase, order, "email, address, phone, pincode");
   }
 
   const updatePayload: Record<string, unknown> = {
@@ -42,34 +42,9 @@ export async function updateOrderDeliveryStatus(
     updated_at: new Date().toISOString(),
   };
 
+  // Out for delivery: our in-house rider by default, or Borzo if the OMS set this order to Borzo.
   if (nextStatus === "out_for_delivery") {
-    if (!baker.address) {
-      console.warn(`[Borzo] Baker ${baker.id} has no pickup address set — skipping`);
-    } else {
-      const dropoffAddress =
-        customer?.address ||
-        `Flat ${order.flat_number}${customer?.pincode ? ", " + customer.pincode : ""}`;
-
-      const borzoResult = await createBorzoDelivery({
-        pickupAddress: baker.address as string,
-        pickupLat: baker.lat ?? undefined,
-        pickupLng: baker.lng ?? undefined,
-        pickupContactName: baker.name,
-        pickupContactPhone: baker.phone as string,
-        dropoffAddress,
-        dropoffContactName: order.customer_name,
-        dropoffContactPhone: customer?.phone || "",
-        dropoffNote: `Flat ${order.flat_number} · WWY ${order.order_number || orderId.slice(0, 8).toUpperCase()}`,
-        clientOrderId: orderId,
-      });
-
-      if (borzoResult.borzoOrderId) updatePayload.borzo_order_id = borzoResult.borzoOrderId;
-      if (borzoResult.trackingUrl) updatePayload.borzo_tracking_url = borzoResult.trackingUrl;
-
-      if (borzoResult.error && borzoResult.error !== "not_configured") {
-        console.error("[Borzo] Delivery creation error:", borzoResult.error);
-      }
-    }
+    Object.assign(updatePayload, await dispatchFields(supabase, order, baker, customer));
   }
 
   await supabase
@@ -82,7 +57,8 @@ export async function updateOrderDeliveryStatus(
       customer.email,
       order.customer_name,
       order.order_number,
-      nextStatus
+      nextStatus,
+      customerTrackingUrl(order, updatePayload)
     ).catch(console.error);
   }
 
@@ -96,6 +72,15 @@ export async function isPincodeServiceable(
   pincode?: string | null
 ): Promise<boolean> {
   return isMumbaiPincode(pincode);
+}
+
+// The baker every new order goes to (settings.default_baker_id, chosen in OMS > Settings).
+// Returns null if none is chosen or that baker is inactive, so the order waits for manual assignment.
+export async function defaultBakerId(supabase: ReturnType<typeof createServerSupabase>): Promise<string | null> {
+  const { data: setting } = await supabase.from("settings").select("value").eq("key", "default_baker_id").maybeSingle();
+  if (!setting?.value) return null;
+  const { data: baker } = await supabase.from("bakers").select("id").eq("id", setting.value).eq("is_active", true).maybeSingle();
+  return (baker?.id as string | undefined) ?? null;
 }
 
 export async function findBestBaker(

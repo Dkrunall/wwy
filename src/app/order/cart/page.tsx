@@ -2,12 +2,10 @@
 
 export const dynamic = "force-dynamic";
 
-import { productFallbackImage } from "@/lib/productImages";
 import { bakeHasAll } from "@/lib/menu";
 import { canAddToCart } from "@/lib/orderLimits";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import {
   ArrowLeft,
   ShoppingBag,
@@ -100,10 +98,7 @@ export default function CartPage() {
       .then((r) => r.json())
       .then(({ slots }) => {
         setDeliverySlots(slots || []);
-        // Prefer the bake day picked on the menu, if it is still open.
-        let preferred = "";
-        try { preferred = localStorage.getItem("wwy_bake_date") || ""; } catch {}
-        setSelectedDeliveryDate((slots || []).find((s: { iso: string }) => s.iso === preferred)?.iso || slots?.[0]?.iso || "");
+        setSelectedDeliveryDate(slots?.[0]?.iso || "");
       })
       .catch(() => {});
 
@@ -189,7 +184,7 @@ export default function CartPage() {
     setAppliedCoupon(null);
     setCouponError("");
   };
-  const previewShippingFeePaise = calculateShippingFee(pincode);
+  const previewShippingFeePaise = calculateShippingFee(pincode, baseTotalPaise);
   // Each delivery day has its own menu: offer only the days that bake everything in the cart.
   const cartNames = cart.map((i) => i.product_name);
   const bakeSlots = deliverySlots.filter((s) => bakeHasAll(s.iso, cartNames));
@@ -311,11 +306,11 @@ export default function CartPage() {
           <div>
             <h2 className="font-serif text-2xl font-bold text-brand-brown">Your Cart is Empty</h2>
             <p className="text-xs sm:text-sm font-medium text-brand-brown/60 mt-1">
-              Add sourdough or ginger ale to set your bake in motion.
+              Add a loaf or two to set your bake in motion.
             </p>
           </div>
           <button
-            onClick={() => router.push("/shop")}
+            onClick={() => router.push("/order")}
             className="bg-brand-brown text-white font-black text-xs tracking-widest uppercase px-8 py-4 rounded-2xl hover:bg-brand-terracotta transition-colors shadow-md cursor-pointer"
           >
             ← Explore Menu &amp; Order
@@ -388,17 +383,11 @@ export default function CartPage() {
 
               <div className="flex flex-col divide-y divide-brand-brown/5">
                 {cart.map((item) => {
-                  const fallbackImg = productFallbackImage(item.product_name);
                   return (
                     <div key={item.product_id} className="flex justify-between items-center py-4 gap-4">
                       {/* Product Thumbnail */}
-                      <div className="relative w-14 h-14 rounded-2xl bg-brand-oat/40 border border-brand-brown/10 overflow-hidden shrink-0">
-                        <Image
-                          src={fallbackImg}
-                          alt={item.product_name}
-                          fill
-                          className="object-cover"
-                        />
+                      <div className="w-14 h-14 rounded-2xl bg-[#F5EDD7] border border-brand-brown/10 shrink-0 flex items-center justify-center" aria-hidden="true">
+                        <span className="font-serif italic text-3xl text-brand-brown/70 leading-none">{item.product_name.charAt(0)}</span>
                       </div>
 
                       {/* Product Details */}

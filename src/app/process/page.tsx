@@ -3,7 +3,7 @@ import Link from "next/link";
 import PolicyPage from "@/components/PolicyPage";
 
 export const metadata: Metadata = {
-  title: "How We Make Sourdough | Wild Wild Yeast Mumbai",
+  title: { absolute: "How We Make Sourdough | Wild Wild Yeast Mumbai" },
   description:
     "Learn about sourdough fermentation, small-batch baking and the process behind Wild Wild Yeast's flavour-led bakes in Mumbai.",
   alternates: { canonical: "/process" },
@@ -47,7 +47,7 @@ export default function ProcessPage() {
 
       <h2>Curious about the results?</h2>
       <p>
-        Explore our <Link href="/shop">menu</Link> and discover what fermentation and flavour can bring to your
+        Explore our <Link href="/order?category=Crafted%20Bakes">Crafted Bakes</Link> and discover what fermentation and flavour can bring to your
         table. We bake twice a week, bringing fresh batches to your doorstep according to our baking and delivery schedule.
       </p>
     </PolicyPage>

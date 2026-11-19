@@ -127,7 +127,7 @@ export default function PayPage() {
         <p className="text-sm text-[#2C1A0E]/40 text-center">This payment link may have expired or already been used.</p>
         <div className="flex flex-col gap-2 w-full max-w-xs">
           <button
-            onClick={() => router.push("/shop")}
+            onClick={() => router.push("/order")}
             className="w-full bg-[#2C1A0E] text-white font-black text-sm tracking-wider uppercase px-6 py-3 rounded-2xl hover:bg-[#C9A96E] transition-all"
           >
             ← Back to Shop

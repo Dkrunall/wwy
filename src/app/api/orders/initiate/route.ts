@@ -3,11 +3,11 @@ import { createServerSupabase } from "@/lib/supabase-server";
 import { getRazorpay } from "@/lib/razorpay";
 import { applyDiscounts } from "@/lib/discounts";
 import { calculateShippingFee } from "@/lib/shipping";
-import { resolveCoupon, redeemCoupon } from "@/lib/couponResolve";
+import { resolveCoupon } from "@/lib/couponResolve";
 import { calculateDeliveryDate, deliveryDateISO, formatDeliveryDate, isValidDeliveryDate, parseDeliveryDays } from "@/lib/dateUtils";
 import { DEFAULT_CUTOFF_HOUR_IST, DEFAULT_DELIVERY_DAYS } from "@/lib/schedule";
 import { CartItem } from "@/lib/supabase";
-import { isPincodeServiceable } from "@/lib/baker";
+import { defaultBakerId, isPincodeServiceable } from "@/lib/baker";
 import { orderLimitError } from "@/lib/orderLimits";
 import { bakeHasAll } from "@/lib/menu";
 import { getSessionCustomer } from "@/lib/customerSession";
@@ -104,7 +104,7 @@ export async function POST(req: NextRequest) {
 
     const totalDiscountPaise = Math.min(baseTotalPaise, loyaltyDiscountPaise + couponDiscountPaise);
     const finalGoodsPaise = baseTotalPaise - totalDiscountPaise;
-    const shippingFeePaise = calculateShippingFee(customer.pincode);
+    const shippingFeePaise = calculateShippingFee(customer.pincode, baseTotalPaise);
     const finalTotal = finalGoodsPaise + shippingFeePaise;
 
     const deliveryDate = (chosenDate && isValidDeliveryDate(chosenDate, deliveryDays, cutoffHour))
@@ -136,6 +136,7 @@ export async function POST(req: NextRequest) {
     const { data: order, error: orderErr } = await supabase
       .from("orders")
       .insert({
+        baker_id: await defaultBakerId(supabase),
         customer_id: resolvedCustomerId,
         flat_number: flat,
         customer_name: customerName,
@@ -169,7 +170,7 @@ export async function POST(req: NextRequest) {
     }));
     await supabase.from("order_items").insert(items);
 
-    if (coupon) await redeemCoupon(supabase, coupon);
+    // The coupon use is counted when payment is confirmed (verify route / Razorpay webhook).
 
     // Baker assignment now happens from OMS after payment — see admin bulk-assign flow.
 

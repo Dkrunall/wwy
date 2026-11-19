@@ -23,7 +23,7 @@ interface Order {
   total_paise: number; status: string; payment_status: string | null;
   delivery_status: string | null; delivery_date: string | null; invoice_url: string | null;
   baker_id: string | null; notes: string | null; admin_notes: string | null;
-  borzo_order_id: string | null; borzo_tracking_url: string | null;
+  borzo_order_id: string | null; borzo_tracking_url: string | null; delivery_partner?: string | null; delivery_person?: string | null;
   source: string | null; created_at: string; order_items?: OrderItem[];
 }
 interface Product { id: string; name: string; category: string; description?: string | null; price_paise: number; available: boolean; image_url?: string | null; hsn_code?: string | null; gst_rate?: number | null; ingredients?: string | null; allergens?: string | null; net_quantity?: string | null; best_before?: string | null; storage?: string | null; manufacturer_name?: string | null; manufacturer_address?: string | null; manufacturer_fssai?: string | null; }
@@ -485,6 +485,25 @@ function OmsDashboardInner() {
       return exists ? p.map(s=>s.key===key?{...s,value:val}:s) : [...p,{key,value:val}];
     });
     setSavingSettingKey(null);
+  };
+
+  // ── Baker for all orders ──
+  const [defaultBakerMsg, setDefaultBakerMsg] = useState("");
+  const [assigningAll, setAssigningAll] = useState(false);
+  const saveDefaultBaker = async (bakerId: string) => {
+    await supabase.from("settings").upsert({ key: "default_baker_id", value: bakerId }, { onConflict: "key" });
+    setSettings(p => p.some(s => s.key === "default_baker_id") ? p.map(s => s.key === "default_baker_id" ? { ...s, value: bakerId } : s) : [...p, { key: "default_baker_id", value: bakerId }]);
+    setDefaultBakerMsg(bakerId ? "Saved. New orders now go to this baker." : "Saved. New orders now wait for you to assign a baker.");
+  };
+  const assignUnassignedToDefault = async () => {
+    const bakerId = settingValues["default_baker_id"];
+    if (!bakerId) return;
+    setAssigningAll(true);
+    const ids = orders.filter(o => !o.baker_id && o.status !== "cancelled" && o.delivery_status !== "delivered").map(o => o.id);
+    if (ids.length) await supabase.from("orders").update({ baker_id: bakerId }).in("id", ids);
+    setOrders(p => p.map(o => ids.includes(o.id) ? { ...o, baker_id: bakerId } : o));
+    setDefaultBakerMsg(ids.length ? `${ids.length} unassigned ${ids.length === 1 ? "order" : "orders"} assigned.` : "There are no unassigned orders.");
+    setAssigningAll(false);
   };
 
   // ── Analytics ──
@@ -1187,6 +1206,7 @@ function OmsDashboardInner() {
                               {/* Scheduled Date */}
                               <td className="px-4 py-4">
                                 <span className="text-xs font-bold text-brand-brown/70">{order.delivery_date||"—"}</span>
+                                <span className={`block mt-0.5 text-[11px] font-black uppercase tracking-wide ${order.delivery_partner==="borzo"?"text-sky-700":"text-emerald-700"}`}>{order.delivery_partner==="borzo"?"Borzo":(order.delivery_person||"In-house")}</span>
                               </td>
 
                               {/* Baker */}
@@ -1584,6 +1604,30 @@ function OmsDashboardInner() {
         {/* ── SETTINGS ── */}
         {!loading&&tab==="settings" && (
           <div className="flex flex-col gap-6 relative z-10">
+
+            {/* Baker for all orders */}
+            <div className="bg-white rounded-[2rem] border border-brand-brown/10 p-6 shadow-sm flex flex-col gap-3">
+              <p className="text-[11px] font-black uppercase tracking-widest text-brand-brown/60">Baker for all orders</p>
+              <p className="text-sm font-bold text-brand-brown/70">Every new order (website and WhatsApp) is assigned to this baker automatically. You can still change the baker on any order.</p>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <select
+                  value={settingValues["default_baker_id"] ?? ""}
+                  onChange={e => saveDefaultBaker(e.target.value)}
+                  className="flex-1 bg-brand-oat/40 border border-brand-brown/15 rounded-xl px-3 py-2.5 text-sm font-bold text-brand-brown outline-none focus:border-brand-orange cursor-pointer"
+                >
+                  <option value="">No one (assign each order by hand)</option>
+                  {bakers.filter(b => b.is_active).map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                </select>
+                <button
+                  onClick={assignUnassignedToDefault}
+                  disabled={!settingValues["default_baker_id"] || assigningAll}
+                  className="px-4 py-2.5 rounded-xl bg-brand-brown hover:bg-brand-orange text-white text-[11px] font-black uppercase disabled:opacity-40 cursor-pointer"
+                >
+                  {assigningAll ? "Assigning…" : "Assign unassigned orders too"}
+                </button>
+              </div>
+              {defaultBakerMsg && <p className="text-xs font-bold text-emerald-700">{defaultBakerMsg}</p>}
+            </div>
 
             {/* Known settings */}
             <div className="bg-white rounded-[2rem] border border-brand-brown/10 p-6 shadow-sm flex flex-col gap-4">

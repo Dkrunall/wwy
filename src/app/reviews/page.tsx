@@ -6,7 +6,7 @@ import PageBanner from "@/components/PageBanner";
 import { REVIEWS } from "@/lib/reviews";
 
 export const metadata: Metadata = {
-  title: "Customer Reviews | Wild Wild Yeast",
+  title: { absolute: "Customer Reviews | Wild Wild Yeast" },
   description: "Discover customer feedback on Wild Wild Yeast sourdough and bakes. Explore favourites from our bakery community.",
   alternates: { canonical: "/reviews" },
 };

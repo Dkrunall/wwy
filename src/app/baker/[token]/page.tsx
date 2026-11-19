@@ -83,10 +83,15 @@ const STEPS = [
 
 const ORDER_SELECT = "id, order_number, flat_number, customer_name, total_paise, delivery_date, delivery_status, payment_status, notes, created_at, order_items(product_name, quantity)";
 
+// Every status the baker can move several orders to at once, in bake order.
 const BULK_STATUS_OPTIONS: { key: string; label: string }[] = [
-  { key: "baking", label: "Baked" },
-  { key: "out_for_delivery", label: "In Transit" },
-  { key: "delivered", label: "Completed" },
+  { key: "mixing", label: "Mixing" },
+  { key: "stretching", label: "Stretch & fold" },
+  { key: "resting", label: "Bulk rest" },
+  { key: "cold_proof", label: "Cold proof" },
+  { key: "baking", label: "In the oven" },
+  { key: "out_for_delivery", label: "Ready for pickup" },
+  { key: "delivered", label: "Delivered" },
 ];
 
 type Panel = "queue" | "history" | "profile" | "settings";
@@ -111,6 +116,8 @@ export default function BakerDashboard() {
   const [deliveredCount, setDeliveredCount] = useState(0);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkUpdating, setBulkUpdating] = useState(false);
+  const [bulkTarget, setBulkTarget] = useState("");
+  const [bulkMsg, setBulkMsg] = useState("");
 
   // notifications
   interface Notif { id: string; title: string; body: string | null; read: boolean; created_at: string; }
@@ -205,23 +212,36 @@ export default function BakerDashboard() {
     });
   };
 
+  // Select every order, or every order at one status, in one tap.
+  const selectAll = () => setSelectedIds(selectedIds.size === queue.length ? new Set() : new Set(queue.map((o) => o.id)));
+  const selectStatus = (status: string) => setSelectedIds(new Set(queue.filter((o) => (o.delivery_status || "placed") === status).map((o) => o.id)));
+
   const bulkUpdateStatus = async (nextStatus: string) => {
-    if (selectedIds.size === 0) return;
+    if (selectedIds.size === 0 || !nextStatus) return;
     setBulkUpdating(true);
+    setBulkMsg("");
     const orderIds = Array.from(selectedIds);
     const res = await fetch("/api/baker/bulk-update-status", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ orderIds, token, nextStatus }),
     });
-    if (res.ok) {
-      if (nextStatus === "delivered") {
-        setQueue((p) => p.filter((o) => !selectedIds.has(o.id)));
-      } else {
-        setQueue((p) => p.map((o) => selectedIds.has(o.id) ? { ...o, delivery_status: nextStatus } : o));
-      }
-      setSelectedIds(new Set());
+    const d = await res.json().catch(() => ({}));
+    const failed = new Set<string>(Array.isArray(d.failed) ? d.failed : res.ok ? [] : orderIds);
+    const done = orderIds.filter((id) => !failed.has(id));
+    if (nextStatus === "delivered") {
+      setQueue((p) => p.filter((o) => !done.includes(o.id)));
+    } else {
+      setQueue((p) => p.map((o) => (done.includes(o.id) ? { ...o, delivery_status: nextStatus } : o)));
     }
+    const label = BULK_STATUS_OPTIONS.find((o) => o.key === nextStatus)?.label ?? nextStatus;
+    setBulkMsg(
+      failed.size === 0
+        ? `${done.length} ${done.length === 1 ? "order" : "orders"} moved to ${label}.`
+        : `${done.length} moved to ${label}. ${failed.size} could not be updated. Try those again.`
+    );
+    setSelectedIds(failed);
+    setBulkTarget("");
     setBulkUpdating(false);
   };
 
@@ -509,28 +529,25 @@ export default function BakerDashboard() {
                   <p className="text-[11px] font-bold text-gray-400">{queue.length} orders</p>
                 </div>
 
-                {selectedIds.size > 0 && (
-                  <div className="mx-5 mt-4 bg-brand-oat/70 border border-brand-brown/10 rounded-xl px-4 py-3 flex flex-wrap items-center gap-3">
-                    <p className="text-xs font-black text-brand-brown mr-1">{selectedIds.size} selected</p>
-                    {BULK_STATUS_OPTIONS.map(({ key, label }) => (
+                {/* Select several orders */}
+                {queue.length > 0 && (
+                  <div className="px-5 pt-4 flex flex-wrap items-center gap-2">
+                    <label className="flex items-center gap-2 h-9 pl-2 pr-3 rounded-lg border border-gray-200 text-xs font-black text-brand-brown cursor-pointer">
+                      <input type="checkbox" checked={selectedIds.size > 0 && selectedIds.size === queue.length} onChange={selectAll} className="w-5 h-5 accent-brand-orange" />
+                      Select all
+                    </label>
+                    {STEPS.filter((st) => queue.some((o) => (o.delivery_status || "placed") === st.key)).map((st) => (
                       <button
-                        key={key}
-                        onClick={() => bulkUpdateStatus(key)}
-                        disabled={bulkUpdating}
-                        className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider px-3 py-1.5 rounded-lg bg-brand-brown hover:bg-brand-orange text-white transition-colors disabled:opacity-50 cursor-pointer"
+                        key={st.key}
+                        onClick={() => selectStatus(st.key)}
+                        className="h-9 px-3 rounded-lg bg-gray-100 hover:bg-brand-oat text-[11px] font-black text-brand-brown cursor-pointer"
                       >
-                        {bulkUpdating ? <Loader2 className="w-3 h-3 animate-spin" /> : `Mark ${label}`}
+                        All {st.short.toLowerCase()} ({queue.filter((o) => (o.delivery_status || "placed") === st.key).length})
                       </button>
                     ))}
-                    <button
-                      onClick={() => setSelectedIds(new Set())}
-                      disabled={bulkUpdating}
-                      className="ml-auto text-[11px] font-black uppercase tracking-wider text-brand-brown/40 hover:text-brand-brown transition-colors cursor-pointer"
-                    >
-                      Clear
-                    </button>
                   </div>
                 )}
+                {bulkMsg && <p className="mx-5 mt-3 text-xs font-black text-emerald-700">{bulkMsg}</p>}
 
                 {baker.daily_capacity && queue.length >= baker.daily_capacity && (
                   <div className="mx-5 mt-4 bg-rose-50 border border-rose-200 rounded-xl px-4 py-3">
@@ -561,12 +578,14 @@ export default function BakerDashboard() {
                     <div key={order.id} className="border-b border-gray-50 last:border-0">
                       {/* Row header — tap to expand */}
                       <div className="w-full pl-5 pr-2 flex items-center gap-3 hover:bg-gray-50/50 transition-colors">
-                        <input
-                          type="checkbox"
-                          checked={selectedIds.has(order.id)}
-                          onChange={() => toggleSelected(order.id)}
-                          className="w-4 h-4 accent-brand-orange rounded shrink-0 cursor-pointer"
-                        />
+                        <label className="-ml-2 w-11 h-11 flex items-center justify-center shrink-0 cursor-pointer" aria-label={`Select ${order.customer_name}`}>
+                          <input
+                            type="checkbox"
+                            checked={selectedIds.has(order.id)}
+                            onChange={() => toggleSelected(order.id)}
+                            className="w-5 h-5 accent-brand-orange rounded cursor-pointer"
+                          />
+                        </label>
                         <button
                           onClick={() => setExpandedId(isExpanded ? null : order.id)}
                           className="flex-1 min-w-0 py-4 pr-3 flex items-center gap-4 text-left cursor-pointer"
@@ -622,6 +641,7 @@ export default function BakerDashboard() {
                                 </React.Fragment>
                               );
                             })}
+                {selectedIds.size > 0 && <div className="h-24" aria-hidden="true" />}
                           </div>
 
                           {/* Items */}
@@ -964,6 +984,34 @@ export default function BakerDashboard() {
 
         </div>
       </div>
+      {selectedIds.size > 0 && panel === "queue" && (
+        <div className="fixed inset-x-0 bottom-0 z-50 bg-white border-t border-gray-200 shadow-[0_-8px_24px_rgba(0,0,0,0.08)] px-4 py-3">
+          <div className="max-w-5xl mx-auto flex flex-wrap items-center gap-2">
+            <p className="text-sm font-black text-brand-brown mr-1">{selectedIds.size} selected</p>
+            <select
+              value={bulkTarget}
+              onChange={(e) => setBulkTarget(e.target.value)}
+              className="flex-1 min-w-[160px] h-11 rounded-xl border border-gray-200 bg-white px-3 text-sm font-bold text-brand-brown"
+              aria-label="Move selected orders to"
+            >
+              <option value="">Move selected to…</option>
+              {BULK_STATUS_OPTIONS.map(({ key, label }) => (
+                <option key={key} value={key}>{label}</option>
+              ))}
+            </select>
+            <button
+              onClick={() => bulkUpdateStatus(bulkTarget)}
+              disabled={!bulkTarget || bulkUpdating}
+              className="h-11 px-5 rounded-xl bg-brand-brown hover:bg-brand-orange text-white text-xs font-black uppercase tracking-wider disabled:opacity-40 flex items-center gap-1.5 cursor-pointer"
+            >
+              {bulkUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update"}
+            </button>
+            <button onClick={() => setSelectedIds(new Set())} disabled={bulkUpdating} className="h-11 px-3 text-xs font-black uppercase text-gray-500 cursor-pointer">
+              Clear
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

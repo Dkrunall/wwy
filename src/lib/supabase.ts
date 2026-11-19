@@ -66,6 +66,9 @@ export type Order = {
   admin_notes: string | null;
   borzo_order_id: string | null;
   borzo_tracking_url: string | null;
+  delivery_partner?: string | null;
+  delivery_person?: string | null;
+  tracking_token?: string | null;
   source: string | null;
   created_at: string;
   updated_at: string;

@@ -3,9 +3,9 @@ import { createServerSupabase } from "@/lib/supabase-server";
 import { calculateDeliveryDate, formatDeliveryDate, deliveryDateISO } from "@/lib/dateUtils";
 import { applyDiscounts } from "@/lib/discounts";
 import { calculateShippingFee } from "@/lib/shipping";
-import { resolveCoupon, redeemCoupon } from "@/lib/couponResolve";
+import { resolveCoupon } from "@/lib/couponResolve";
 import { getRazorpay } from "@/lib/razorpay";
-import { isPincodeServiceable } from "@/lib/baker";
+import { defaultBakerId, isPincodeServiceable } from "@/lib/baker";
 import Anthropic from "@anthropic-ai/sdk";
 
 import twilio from "twilio";
@@ -368,7 +368,7 @@ async function stepConfirmOrder(
 
   const totalDiscountPaise = Math.min(subtotal, loyaltyDiscountPaise + couponDiscountPaise);
   const finalGoodsTotal = subtotal - totalDiscountPaise;
-  const shippingFeePaise = calculateShippingFee(customer?.pincode);
+  const shippingFeePaise = calculateShippingFee(customer?.pincode, subtotal);
   const finalTotal = finalGoodsTotal + shippingFeePaise;
 
   // Use earliest delivery date across cart items
@@ -389,6 +389,7 @@ async function stepConfirmOrder(
     });
 
     const { data: order } = await supabase.from("orders").insert({
+      baker_id: await defaultBakerId(supabase),
       customer_id: customer?.id || null,
       flat_number: customer?.flat_number || phone.slice(-6),
       customer_name: customer?.name || "WhatsApp Customer",
@@ -415,7 +416,7 @@ async function stepConfirmOrder(
           unit_price_paise: i.price,
         }))
       );
-      if (coupon) await redeemCoupon(supabase, coupon);
+      // The coupon use is counted when payment is confirmed (Razorpay webhook).
       // Baker assignment now happens from OMS after payment — see admin bulk-assign flow.
     }
 

@@ -20,6 +20,7 @@ interface OrderDetail {
   delivery_status: string | null; delivery_date: string | null; invoice_url: string | null;
   baker_id: string | null; notes: string | null; admin_notes: string | null;
   borzo_tracking_url: string | null; source: string | null; created_at: string;
+  delivery_partner?: string | null; delivery_person?: string | null; borzo_order_id?: string | null; tracking_token?: string | null;
   order_items?: OrderItem[];
 }
 interface Customer { name: string; phone: string | null; address?: string | null; pincode?: string | null; }
@@ -51,6 +52,10 @@ export default function OrderDetailsPage() {
   const [markingPaid, setMarkingPaid] = useState(false);
   const [resendingInvoice, setResendingInvoice] = useState(false);
   const [assigningBaker, setAssigningBaker] = useState(false);
+  const [riderName, setRiderName] = useState("Nilesh");
+  const [riderToken, setRiderToken] = useState("");
+  const [savingPartner, setSavingPartner] = useState(false);
+  const [partnerNote, setPartnerNote] = useState("");
   const [editingDate, setEditingDate] = useState(false);
   const [dateInput, setDateInput] = useState("");
   const [savingDate, setSavingDate] = useState(false);
@@ -96,12 +101,17 @@ export default function OrderDetailsPage() {
     setNoteVal(o.admin_notes || "");
     setDateInput(o.delivery_date || "");
 
-    const [{ data: c }, { data: b }] = await Promise.all([
+    const [{ data: c }, { data: b }, { data: rider }] = await Promise.all([
       supabase.from("customers").select("name, phone, address, pincode").eq("flat_number", o.flat_number).maybeSingle(),
       supabase.from("bakers").select("id, name, phone, is_active, pincodes").order("name"),
+      supabase.from("settings").select("key, value").in("key", ["in_house_rider_name", "in_house_rider_token"]),
     ]);
     setCustomer(c || null);
     setBakers(b || []);
+    for (const r of (rider || []) as { key: string; value: string }[]) {
+      if (r.key === "in_house_rider_name" && r.value) setRiderName(r.value);
+      if (r.key === "in_house_rider_token") setRiderToken(r.value);
+    }
     setLoading(false);
   }, [orderId]);
 
@@ -139,6 +149,18 @@ export default function OrderDetailsPage() {
     await supabase.from("orders").update({ baker_id: bakerId }).eq("id", order.id);
     setOrder(o => o ? { ...o, baker_id: bakerId } : o);
     setAssigningBaker(false);
+  };
+
+  // Who delivers: the in-house rider (default) or Borzo.
+  const setDeliveryPartner = async (partner: "in_house" | "borzo") => {
+    if (!order || (order.delivery_partner || "in_house") === partner) return;
+    setSavingPartner(true);
+    setPartnerNote("");
+    const r = await fetch("/api/oms/orders/delivery-partner", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ orderId: order.id, partner }) });
+    const d = await r.json();
+    if (d.ok) setOrder(o => o ? { ...o, ...d.update } : o);
+    setPartnerNote(d.note || d.error || "");
+    setSavingPartner(false);
   };
 
   const saveDeliveryDate = async () => {
@@ -438,6 +460,50 @@ export default function OrderDetailsPage() {
                     Suggested: {suggestedBaker.name}
                   </button>
                 )}
+              </div>
+
+              {/* Delivery by: in-house rider (default) or Borzo */}
+              <div className="flex flex-col gap-2 pt-2 border-t border-brand-brown/5">
+                <label className="text-xs font-bold text-brand-brown/60">Delivery By</label>
+                <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-label="Delivery by">
+                  {([["in_house", `${riderName} (in-house)`], ["borzo", "Borzo"]] as const).map(([value, label]) => {
+                    const on = (order.delivery_partner || "in_house") === value;
+                    return (
+                      <button
+                        key={value}
+                        role="radio"
+                        aria-checked={on}
+                        onClick={() => setDeliveryPartner(value)}
+                        disabled={savingPartner || isCancelled || order.delivery_status === "delivered"}
+                        className={`py-2.5 rounded-2xl text-xs font-black uppercase tracking-wide border transition-all cursor-pointer disabled:opacity-50 ${
+                          on ? "bg-brand-brown text-white border-brand-brown" : "bg-white text-brand-brown border-brand-brown/15 hover:border-brand-brown/40"
+                        }`}
+                      >
+                        {savingPartner && !on ? <Loader2 className="w-3.5 h-3.5 animate-spin mx-auto" /> : label}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-xs text-brand-brown/60">
+                  {order.delivery_person
+                    ? `Out with ${order.delivery_person}.`
+                    : (order.delivery_partner || "in_house") === "borzo"
+                      ? "Borzo is booked when the order goes out for delivery."
+                      : `${riderName} delivers this order. Switch to Borzo if needed.`}
+                </p>
+                {partnerNote && <p className="text-xs font-bold text-brand-orange">{partnerNote}</p>}
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs font-bold">
+                  {riderToken && (
+                    <a href={`/rider/${riderToken}`} target="_blank" rel="noopener noreferrer" className="text-brand-orange underline">
+                      {riderName}&apos;s deliveries page
+                    </a>
+                  )}
+                  {order.tracking_token && (
+                    <a href={`/track/${order.tracking_token}`} target="_blank" rel="noopener noreferrer" className="text-brand-orange underline">
+                      Customer tracking page
+                    </a>
+                  )}
+                </div>
               </div>
 
               {/* Delivery date picker */}

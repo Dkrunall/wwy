@@ -7,7 +7,7 @@ import { BUSINESS, businessValue } from "@/lib/business";
 import { scheduleWindows, deliveryDaysLong, cutoffRuleText } from "@/lib/schedule";
 
 export const metadata: Metadata = {
-  title: "Delivery Information & Ordering | Wild Wild Yeast Mumbai",
+  title: { absolute: "Delivery Information & Ordering | Wild Wild Yeast Mumbai" },
   description:
     "Find out how to order Wild Wild Yeast sourdough and bakes online, including delivery coverage, order timelines and twice-weekly baking schedules.",
   alternates: { canonical: "/delivery" },

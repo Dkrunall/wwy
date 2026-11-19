@@ -59,6 +59,13 @@ function StarRating({ value, onChange }: { value: number; onChange: (v: number) 
   );
 }
 
+// Whose orders to show: the logged-in customer's id, or their flat if the id is missing.
+// Flat numbers are not unique across buildings, so the id is preferred.
+function orderOwner(flat: string): [string, string] {
+  const id = typeof window !== "undefined" ? localStorage.getItem("wwy_customer_id") : null;
+  return id ? ["customer_id", id] : ["flat_number", flat];
+}
+
 export default function HistoryPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
@@ -99,7 +106,7 @@ export default function HistoryPage() {
       supabase
         .from("orders")
         .select("*, order_items(*)")
-        .eq("flat_number", storedFlat)
+        .eq(...orderOwner(storedFlat))
         .order("created_at", { ascending: false })
         .then(({ data }) => { setOrders(data || []); setLoading(false); });
 

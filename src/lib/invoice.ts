@@ -75,7 +75,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     doc.font("Times-Bold").fontSize(26).text("Wild Wild Yeast", 50, 50);
     
     doc.fillColor("#E89936");
-    doc.font("Helvetica-Bold").fontSize(8.5).text("NATURAL SODAS & SOURDOUGH · BAKED WITH WILD FERMENTATION", 50, 80);
+    doc.font("Helvetica-Bold").fontSize(8.5).text("ARTISAN SOURDOUGH · BAKED WITH WILD FERMENTATION", 50, 80);
     
     doc.fillColor("#8C7665");
     doc.font("Helvetica").fontSize(9.5).text("Handcrafted Daily · Sourced from Local Sourdough Cultures", 50, 94);
@@ -369,7 +369,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     
     doc.fillColor("#923D26");
     doc.font("Helvetica-Bold").fontSize(7.5).text(
-      `WILD WILD YEAST · SOURDOUGH & NATURAL FERMENTS · GSTIN ${GSTIN}`,
+      `WILD WILD YEAST · ARTISAN SOURDOUGH · GSTIN ${GSTIN}`,
       50,
       footerY + 16,
       { align: "center", width: 495 }

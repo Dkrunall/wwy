@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { STANDARD_SHIPPING_FEE_PAISE } from "@/lib/shipping";
+import { FREE_DELIVERY_MIN_PAISE, STANDARD_SHIPPING_FEE_PAISE } from "@/lib/shipping";
 
 type State = "idle" | "checking" | "free" | "paid" | "blocked" | "error";
 
@@ -30,7 +30,7 @@ export default function PincodeCheck({ tone = "light" }: { tone?: "light" | "dar
   const message: Record<State, string> = {
     idle: "",
     checking: "Checking...",
-    free: "Good news, we deliver to your pincode, and delivery is free.",
+    free: `Good news, we deliver to your pincode. Delivery is free on orders of ₹${FREE_DELIVERY_MIN_PAISE / 100} or more.`,
     paid: `Good news, we deliver to your pincode. A ₹${STANDARD_SHIPPING_FEE_PAISE / 100} delivery charge applies.`,
     blocked: "Sorry, we deliver within Mumbai only.",
     error: "Enter a valid 6-digit pincode.",

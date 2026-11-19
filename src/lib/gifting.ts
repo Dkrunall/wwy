@@ -36,5 +36,3 @@ export const GIFT_TIERS: GiftTier[] = [
   },
 ];
 
-export const GIFTING_MIN_ORDER = "Minimum 5 hampers for corporate orders";
-export const GIFTING_LEAD_TIME = "Order at least 5 days before your delivery date. Larger orders need more notice.";

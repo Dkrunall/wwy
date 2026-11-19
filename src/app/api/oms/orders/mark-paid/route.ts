@@ -5,6 +5,8 @@ import { generateInvoicePDF, withTaxInfo } from "@/lib/invoice";
 import { deriveLoyaltyDiscount } from "@/lib/coupons";
 import { sendPaymentConfirmedToCustomer, sendOwnerNotification } from "@/lib/email";
 import { OMS_COOKIE, verifyOmsToken } from "@/lib/omsAuth";
+import { customerOfOrder } from "@/lib/customerOfOrder";
+import { redeemCouponByCode } from "@/lib/couponResolve";
 
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
@@ -33,8 +35,9 @@ export async function POST(req: NextRequest) {
       updated_at: new Date().toISOString(),
     }).eq("id", orderId);
 
-    const { data: customer } = await supabase
-      .from("customers").select("*").eq("flat_number", order.flat_number).single();
+    if (order.coupon_code) await redeemCouponByCode(supabase, order.coupon_code).catch(console.error);
+
+    const customer = await customerOfOrder(supabase, order);
 
     // Baker assignment now happens from OMS after payment — see admin bulk-assign flow.
 

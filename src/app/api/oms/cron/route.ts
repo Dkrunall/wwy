@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { sendDeliveryUpdateToCustomer } from "@/lib/email";
-import { createBorzoDelivery } from "@/lib/borzo";
+import { customerTrackingUrl, dispatchFields } from "@/lib/delivery";
 import { OMS_COOKIE, verifyOmsToken } from "@/lib/omsAuth";
 
 // Called manually from OMS or via Vercel Cron (add to vercel.json)
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
 
   const { data: orders } = await supabase
     .from("orders")
-    .select("*, customers(email, address, phone, pincode), bakers(id, name, phone, address)")
+    .select("*, customers(email, address, phone, pincode), bakers(id, name, phone, address, lat, lng)")
     .eq("delivery_date", todayISO)
     .eq("payment_status", "paid");
 
@@ -66,32 +66,11 @@ export async function POST(req: NextRequest) {
       updated_at: new Date().toISOString(),
     };
 
-    // Dispatch Borzo when transitioning to out_for_delivery
+    // Out for delivery: our in-house rider by default, or Borzo if this order is set to Borzo.
     if (transition.to === "out_for_delivery") {
-      const baker = order.bakers as { name: string; phone: string; address: string | null } | null;
-      const customer = order.customers as { email?: string; address?: string; phone?: string; pincode?: string } | null;
-
-      if (baker?.address) {
-        const dropoffAddress =
-          customer?.address ||
-          `Flat ${order.flat_number}${customer?.pincode ? ", " + customer.pincode : ""}`;
-
-        const borzoResult = await createBorzoDelivery({
-          pickupAddress: baker.address,
-          pickupContactName: baker.name,
-          pickupContactPhone: baker.phone,
-          dropoffAddress,
-          dropoffContactName: order.customer_name,
-          dropoffContactPhone: customer?.phone || "",
-          dropoffNote: `Flat ${order.flat_number} · WWY ${order.order_number || order.id.slice(0, 8).toUpperCase()}`,
-          clientOrderId: order.id,
-        }).catch((e) => { console.error("[Cron Borzo] error:", e); return { borzoOrderId: null, trackingUrl: null }; });
-
-        if (borzoResult.borzoOrderId) updatePayload.borzo_order_id = borzoResult.borzoOrderId;
-        if (borzoResult.trackingUrl) updatePayload.borzo_tracking_url = borzoResult.trackingUrl;
-      } else {
-        console.warn(`[Cron Borzo] Baker has no address for order ${order.id} — skipping dispatch`);
-      }
+      const baker = order.bakers as { name: string; phone: string; address: string | null; lat?: number | null; lng?: number | null } | null;
+      const customer = order.customers as { address?: string; phone?: string; pincode?: string } | null;
+      Object.assign(updatePayload, await dispatchFields(supabase, order, baker, customer));
     }
 
     await supabase
@@ -101,7 +80,7 @@ export async function POST(req: NextRequest) {
 
     const email = (order.customers as { email?: string } | null)?.email;
     if (email) {
-      await sendDeliveryUpdateToCustomer(email, order.customer_name, order.order_number, transition.to).catch(console.error);
+      await sendDeliveryUpdateToCustomer(email, order.customer_name, order.order_number, transition.to, customerTrackingUrl(order, updatePayload)).catch(console.error);
     }
     processed++;
   }
