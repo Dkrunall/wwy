@@ -1,4 +1,6 @@
 import { DELIVERY_CHARGE_TEXT } from "@/lib/shipping";
+import { CART_TIERS, EXPIRY_BAKE_CYCLES, MAX_CREDIT_SHARE, SUB_CREDIT_PERCENT } from "@/lib/crumbPoints";
+import { MAX_SKIPS_PER_PERIOD, STREAK_BAKES, SUB_LOAVES_PER_WEEK, SUB_PERIOD_WEEKS } from "@/lib/subscriptions";
 import type { Metadata } from "next";
 import Link from "next/link";
 import PolicyPage from "@/components/PolicyPage";
@@ -45,6 +47,25 @@ export default function TermsPage() {
         Our products are fresh, perishable food. Please check each product page for ingredients, allergens, storage and best-before information.
         If you have an allergy, contact us before ordering. Our kitchen and partner kitchens handle gluten, dairy, nuts and sesame.
       </p>
+
+      <h2>Crumb Points</h2>
+      <ul>
+        <li>Crumb Points are promotional credit. You earn them on qualifying orders ({CART_TIERS.slice().reverse().map((t) => `${t.percent}% back on orders of ₹${t.minPaise / 100} or more`).join(", ")}), added once the order is delivered and paid.</li>
+        <li>Points come off your next order automatically, up to {MAX_CREDIT_SHARE * 100}% of the order value. One rupee of points is worth one rupee off.</li>
+        <li>Points cannot be bought, topped up, transferred or exchanged for cash. They can only be used on Wild Wild Yeast orders.</li>
+        <li>If an order is cancelled or refunded, the points it earned are taken back and the points it used are returned.</li>
+        <li>Points expire if you place no order for {EXPIRY_BAKE_CYCLES} bake days in a row.</li>
+      </ul>
+
+      <h2>Standing Order</h2>
+      <ul>
+        <li>A Standing Order is {SUB_LOAVES_PER_WEEK} flavoured sourdough loaves a week on the days you choose, paid in advance for {SUB_PERIOD_WEEKS} weeks at a time. Your payment is an advance for those loaves, not stored value.</li>
+        <li>You can pick a flavour for each bake or leave it to the baker, and skip up to {MAX_SKIPS_PER_PERIOD} bakes a month before the order cutoff. Skipped loaves come off your next payment.</li>
+        <li>We email a payment link before each paid month ends. If it isn&apos;t paid by the next order cutoff, deliveries pause with no penalty and restart from the first open bake after you pay.</li>
+        <li>Each Standing Order bake earns {SUB_CREDIT_PERCENT}% of its value in Crumb Points once delivered. When your balance reaches the price of a loaf, it becomes a free loaf on your next bake.</li>
+        <li>{STREAK_BAKES} bakes in a row without a skip earns two free Baker&apos;s Choice loaves, one sweet and one savoury, on your next bake.</li>
+        <li>You can stop renewing at any time. Bakes already paid for are still delivered.</li>
+      </ul>
 
       <h2>Cancellations and refunds</h2>
       <p>See our <Link href="/refund">Refund and Cancellation Policy</Link>.</p>

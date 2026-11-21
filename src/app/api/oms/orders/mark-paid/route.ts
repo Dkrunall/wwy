@@ -7,6 +7,7 @@ import { sendPaymentConfirmedToCustomer, sendOwnerNotification } from "@/lib/ema
 import { OMS_COOKIE, verifyOmsToken } from "@/lib/omsAuth";
 import { customerOfOrder } from "@/lib/customerOfOrder";
 import { redeemCouponByCode } from "@/lib/couponResolve";
+import { creditBalance, redeemOrderCredit } from "@/lib/crumbPoints";
 
 export async function POST(req: NextRequest) {
   const cookieStore = await cookies();
@@ -36,6 +37,7 @@ export async function POST(req: NextRequest) {
     }).eq("id", orderId);
 
     if (order.coupon_code) await redeemCouponByCode(supabase, order.coupon_code).catch(console.error);
+    await redeemOrderCredit(supabase, order).catch(console.error);
 
     const customer = await customerOfOrder(supabase, order);
 
@@ -46,7 +48,7 @@ export async function POST(req: NextRequest) {
     );
     const shippingFeePaise = order.shipping_fee_paise || 0;
     const couponDiscountPaise = order.coupon_discount_paise || 0;
-    const { discountPercent } = deriveLoyaltyDiscount(itemsSubtotal, order.total_paise, shippingFeePaise, couponDiscountPaise);
+    const { discountPercent } = deriveLoyaltyDiscount(itemsSubtotal, order.total_paise, shippingFeePaise, couponDiscountPaise, order.credit_used_paise || 0);
 
     let invoiceUrl: string | undefined;
     try {
@@ -62,6 +64,7 @@ export async function POST(req: NextRequest) {
         coupon_code: order.coupon_code,
         coupon_discount_paise: couponDiscountPaise,
         discount_percent: discountPercent,
+        credit_used_paise: order.credit_used_paise || 0,
         delivery_date: order.delivery_date,
         created_at: order.created_at,
       });
@@ -73,7 +76,8 @@ export async function POST(req: NextRequest) {
     } catch (e) { console.error("Invoice gen failed:", e); }
 
     if (customer?.email) {
-      await sendPaymentConfirmedToCustomer(customer.email, order.customer_name, order.order_number, invoiceUrl).catch(console.error);
+      const creditPaise = order.customer_id ? await creditBalance(supabase, order.customer_id).catch(() => null) : null;
+      await sendPaymentConfirmedToCustomer(customer.email, order.customer_name, order.order_number, invoiceUrl, creditPaise).catch(console.error);
     }
     await sendOwnerNotification({
       order_number: order.order_number, customer_name: order.customer_name,

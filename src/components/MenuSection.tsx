@@ -282,7 +282,7 @@ export default function MenuSection() {
         {/* View Full Menu CTA */}
         <div className="flex justify-center mt-10 sm:mt-14">
           <Link
-            href="/order"
+            href="/shop"
             className="inline-flex items-center gap-2 bg-brand-brown text-white hover:bg-brand-terracotta px-8 py-4 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 active:scale-95 shadow-md"
           >
             View Full Menu <ArrowRight className="w-3.5 h-3.5" />
@@ -337,6 +337,7 @@ function ProductCard({
       <div>
         <ProductHead
           name={product.name}
+          image={product.image_url}
           label={bakeDays ? "This week" : undefined}
           ingredients={product.ingredients}
           allergens={product.allergens}

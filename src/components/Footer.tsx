@@ -9,7 +9,7 @@ const COLUMNS: { title: string; links: [string, string][] }[] = [
     title: "Shop",
     links: [
       ["/shop", "Shop all"],
-      ["/order", "Order"],
+      ["/subscribe", "Standing Order"],
       ["/gifting", "Gifting"],
       ["/flavour-lab", "Flavour Lab"],
     ],

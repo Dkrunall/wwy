@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { getRazorpay } from "@/lib/razorpay";
-import { applyDiscounts } from "@/lib/discounts";
+import { creditBalance, hasFreeDelivery, maxCreditFor, reservedCredit } from "@/lib/crumbPoints";
 import { calculateShippingFee } from "@/lib/shipping";
 import { resolveCoupon } from "@/lib/couponResolve";
 import { calculateDeliveryDate, deliveryDateISO, formatDeliveryDate, isValidDeliveryDate, parseDeliveryDays } from "@/lib/dateUtils";
@@ -93,18 +93,25 @@ export async function POST(req: NextRequest) {
     if (limitError) return NextResponse.json({ error: limitError }, { status: 400 });
 
     const baseTotalPaise = pricedCart.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
-    const { finalTotal: loyaltyFinalPaise, discountPercent } = await applyDiscounts(resolvedCustomerId, baseTotalPaise);
-    const loyaltyDiscountPaise = baseTotalPaise - loyaltyFinalPaise;
-
     const { coupon, discountPaise: couponDiscountPaise, error: couponError } =
       await resolveCoupon(supabase, resolvedCustomerId, baseTotalPaise, couponCode, skipAutoCoupon);
     if (couponCode && couponCode.trim() && couponError) {
       return NextResponse.json({ error: couponError }, { status: 400 });
     }
 
-    const totalDiscountPaise = Math.min(baseTotalPaise, loyaltyDiscountPaise + couponDiscountPaise);
-    const finalGoodsPaise = baseTotalPaise - totalDiscountPaise;
-    const shippingFeePaise = calculateShippingFee(customer.pincode, baseTotalPaise);
+    const goodsAfterCouponPaise = baseTotalPaise - Math.min(baseTotalPaise, couponDiscountPaise);
+
+    // Crumb Points apply automatically, up to half the goods. Credit held by the customer's
+    // other open checkouts is set aside; the ledger entry is written when payment is confirmed.
+    const [balancePaise, reservedPaise, freeDelivery] = await Promise.all([
+      creditBalance(supabase, resolvedCustomerId),
+      reservedCredit(supabase, resolvedCustomerId),
+      hasFreeDelivery(supabase, customer.phone),
+    ]);
+    const creditUsedPaise = maxCreditFor(goodsAfterCouponPaise, balancePaise - reservedPaise);
+
+    const finalGoodsPaise = goodsAfterCouponPaise - creditUsedPaise;
+    const shippingFeePaise = calculateShippingFee(baseTotalPaise, freeDelivery);
     const finalTotal = finalGoodsPaise + shippingFeePaise;
 
     const deliveryDate = (chosenDate && isValidDeliveryDate(chosenDate, deliveryDays, cutoffHour))
@@ -144,6 +151,8 @@ export async function POST(req: NextRequest) {
         shipping_fee_paise: shippingFeePaise,
         coupon_code: coupon?.code ?? null,
         coupon_discount_paise: couponDiscountPaise,
+        // Only sent when used, so checkout keeps working before supabase-crumb-points.sql is run.
+        ...(creditUsedPaise > 0 ? { credit_used_paise: creditUsedPaise } : {}),
         notes: notes?.trim() || null,
         status: "pending",
         payment_status: "pending",
@@ -180,7 +189,7 @@ export async function POST(req: NextRequest) {
       razorpayOrderId: rzpOrder.id,
       amount: finalTotal,
       keyId: process.env.RAZORPAY_KEY_ID,
-      discountPercent,
+      creditUsedPaise,
       shippingFeePaise,
       couponCode: coupon?.code ?? null,
       couponDiscountPaise,

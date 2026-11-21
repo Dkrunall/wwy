@@ -7,6 +7,8 @@ import { deriveLoyaltyDiscount } from "@/lib/coupons";
 import { generateInvoicePDF, withTaxInfo } from "@/lib/invoice";
 import { customerOfOrder } from "@/lib/customerOfOrder";
 import { redeemCouponByCode } from "@/lib/couponResolve";
+import { confirmPeriodPayment, sendSubscriptionConfirmation } from "@/lib/subscriptions";
+import { creditBalance, redeemOrderCredit } from "@/lib/crumbPoints";
 
 export async function POST(req: NextRequest) {
   const rawBody = await req.text();
@@ -33,7 +35,13 @@ export async function POST(req: NextRequest) {
     .eq("razorpay_order_id", razorpayOrderId)
     .single();
 
-  if (!order || order.payment_status === "paid") {
+  if (!order) {
+    // Not a shop order: it may be a Standing Order payment whose browser never came back.
+    const paid = await confirmPeriodPayment(supabase, razorpayOrderId, payment.id);
+    if (paid) await sendSubscriptionConfirmation(supabase, paid.id);
+    return NextResponse.json({ ok: true });
+  }
+  if (order.payment_status === "paid") {
     return NextResponse.json({ ok: true });
   }
 
@@ -48,6 +56,7 @@ export async function POST(req: NextRequest) {
     .eq("id", order.id);
 
   if (order.coupon_code) await redeemCouponByCode(supabase, order.coupon_code).catch(console.error);
+    await redeemOrderCredit(supabase, order).catch(console.error);
 
   const customer = await customerOfOrder(supabase, order);
 
@@ -88,7 +97,7 @@ export async function POST(req: NextRequest) {
   );
   const shippingFeePaise = order.shipping_fee_paise || 0;
   const couponDiscountPaise = order.coupon_discount_paise || 0;
-  const { discountPercent } = deriveLoyaltyDiscount(itemsSubtotal, order.total_paise, shippingFeePaise, couponDiscountPaise);
+  const { discountPercent } = deriveLoyaltyDiscount(itemsSubtotal, order.total_paise, shippingFeePaise, couponDiscountPaise, order.credit_used_paise || 0);
 
   let invoiceUrl: string | undefined;
   try {
@@ -104,6 +113,7 @@ export async function POST(req: NextRequest) {
       coupon_code: order.coupon_code,
       coupon_discount_paise: couponDiscountPaise,
       discount_percent: discountPercent,
+        credit_used_paise: order.credit_used_paise || 0,
       delivery_date: order.delivery_date,
       created_at: order.created_at,
     });
@@ -120,7 +130,8 @@ export async function POST(req: NextRequest) {
   }
 
   if (customer?.email) {
-    await sendPaymentConfirmedToCustomer(customer.email, order.customer_name, order.order_number, invoiceUrl).catch(console.error);
+    const creditPaise = order.customer_id ? await creditBalance(supabase, order.customer_id).catch(() => null) : null;
+      await sendPaymentConfirmedToCustomer(customer.email, order.customer_name, order.order_number, invoiceUrl, creditPaise).catch(console.error);
   }
 
   await sendOwnerNotification({

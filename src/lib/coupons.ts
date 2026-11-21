@@ -36,10 +36,11 @@ export function deriveLoyaltyDiscount(
   itemsSubtotalPaise: number,
   totalPaise: number,
   shippingFeePaise: number,
-  couponDiscountPaise: number
+  couponDiscountPaise: number,
+  creditUsedPaise = 0
 ): { discountPercent: number; loyaltyDiscountPaise: number } {
   const goodsTotal = totalPaise - shippingFeePaise;
-  const loyaltyDiscountPaise = Math.max(0, itemsSubtotalPaise - goodsTotal - couponDiscountPaise);
+  const loyaltyDiscountPaise = Math.max(0, itemsSubtotalPaise - goodsTotal - couponDiscountPaise - creditUsedPaise);
   const discountPercent = itemsSubtotalPaise > 0 && loyaltyDiscountPaise > 0
     ? Math.round((loyaltyDiscountPaise / itemsSubtotalPaise) * 100)
     : 0;

@@ -66,7 +66,7 @@ export default function Navbar() {
     setSearchValue("");
     setSearchOpen(false);
     setMobileMenuOpen(false);
-    router.push(query ? `/order?q=${encodeURIComponent(query)}` : "/order");
+    router.push(query ? `/shop?q=${encodeURIComponent(query)}` : "/shop");
   };
 
   const handleLogout = async () => {

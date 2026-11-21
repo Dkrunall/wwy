@@ -94,7 +94,7 @@ export default function HistoryPage() {
       unit_price_paise: priceMap[item.product_id] ?? item.unit_price_paise,
     }));
     localStorage.setItem("wwy_cart", JSON.stringify(cartItems));
-    router.push("/order");
+    router.push("/shop");
   };
 
   useEffect(() => {
@@ -169,7 +169,7 @@ export default function HistoryPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-8 xl:px-16 h-14 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <button
-              onClick={() => router.push("/order")}
+              onClick={() => router.push("/shop")}
               className="w-8 h-8 rounded-xl bg-brand-oat hover:bg-brand-brown/10 flex items-center justify-center transition-colors shrink-0"
             >
               <span className="font-black text-brand-brown text-base leading-none">←</span>
@@ -209,7 +209,7 @@ export default function HistoryPage() {
           <div className="flex flex-col items-center gap-6 py-16">
             <p className="font-black text-brand-charcoal/55 text-2xl tracking-tight">No orders yet.</p>
             <button
-              onClick={() => router.push("/order")}
+              onClick={() => router.push("/shop")}
               className="bg-brand-brown text-white font-black text-xs tracking-wider uppercase px-6 py-3 rounded-xl hover:bg-brand-orange transition-colors"
             >
               Start ordering →

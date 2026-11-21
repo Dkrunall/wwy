@@ -89,12 +89,12 @@ export default function Hero() {
 
           <div className="hero-text flex flex-col sm:flex-row gap-3 sm:gap-4 w-full sm:w-auto">
             <Link
-              href="/order"
+              href="/shop"
               className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-brand-brown text-brand-oat hover:bg-brand-orange hover:text-white px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-xl active:scale-95"
             >
               Shop all
             </Link>
-            <Link href="/flavour-lab" className="w-full sm:w-auto inline-flex items-center justify-center bg-white text-brand-brown hover:bg-brand-oat px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-sm border border-brand-brown/5 active:scale-95">
+            <Link href="/shop" className="w-full sm:w-auto inline-flex items-center justify-center bg-white text-brand-brown hover:bg-brand-oat px-8 sm:px-10 py-4 sm:py-5 rounded-full text-xs font-black tracking-[0.2em] uppercase transition-all duration-300 shadow-sm border border-brand-brown/5 active:scale-95">
               Explore this week&apos;s bakes
             </Link>
           </div>

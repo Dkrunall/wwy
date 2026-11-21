@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import AnnouncementBar from "@/components/AnnouncementBar";
+import CrumbPointsCard from "@/components/CrumbPointsCard";
 
 interface OrderWithItems {
   id: string;
@@ -65,7 +66,7 @@ function ConfirmContent() {
             My Orders
           </button>
           <button
-            onClick={() => router.push("/order")}
+            onClick={() => router.push("/shop")}
             className="w-full text-brand-charcoal/60 hover:text-brand-terracotta font-black text-xs tracking-wider uppercase py-2 transition-colors"
           >
             ← Back to Shop
@@ -154,6 +155,8 @@ function ConfirmContent() {
           </a>
         )}
 
+        <CrumbPointsCard className="w-full" />
+
         {!isPaid && (
           <div className="w-full bg-amber-50 rounded-2xl px-5 py-4 border border-amber-200 text-center">
             <p className="text-xs font-black text-amber-800">Payment pending</p>
@@ -172,7 +175,7 @@ function ConfirmContent() {
             Track My Order
           </button>
           <button
-            onClick={() => router.push("/order")}
+            onClick={() => router.push("/shop")}
             className="w-full text-brand-charcoal/60 hover:text-brand-terracotta font-black text-xs tracking-wider uppercase transition-colors py-2"
           >
             Order more →

@@ -52,6 +52,7 @@ interface InvoiceData {
   coupon_code?: string | null;
   coupon_discount_paise?: number;
   discount_percent?: number;
+  credit_used_paise?: number;
   delivery_date?: string | null;
   created_at: string;
 }
@@ -213,10 +214,11 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     const subtotal = data.items.reduce((s, i) => s + i.quantity * i.unit_price_paise, 0);
     const hasLoyaltyDiscount = !!data.discount_percent && data.discount_percent > 0;
     const hasCoupon = couponDiscountPaise > 0;
-    const loyaltyDiscountPaise = Math.max(0, subtotal - goodsTotal - couponDiscountPaise);
+    const creditUsedPaise = data.credit_used_paise || 0;
+    const loyaltyDiscountPaise = Math.max(0, subtotal - goodsTotal - couponDiscountPaise - creditUsedPaise);
     const sectionTop = y;
 
-    if (hasLoyaltyDiscount || hasCoupon) {
+    if (hasLoyaltyDiscount || hasCoupon || creditUsedPaise > 0) {
       doc.fillColor("#5C4A3C");
       doc.font("Helvetica").fontSize(9);
       doc.text(`Subtotal: Rs.${(subtotal / 100).toFixed(0)}`, totalsX, y, { width: totalsWidth, align: "right" });
@@ -245,6 +247,14 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
         );
         y += 16;
       }
+
+      // Promotional credit reduces the taxable value, so it sits with the discounts.
+      if (creditUsedPaise > 0) {
+        doc.fillColor("#E89936");
+        doc.font("Helvetica-Bold").fontSize(9);
+        doc.text(`Crumb Points credit: -Rs.${(creditUsedPaise / 100).toFixed(0)}`, totalsX, y, { width: totalsWidth, align: "right" });
+        y += 16;
+      }
     }
 
     doc.fillColor("#5C4A3C");
@@ -270,7 +280,7 @@ export async function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
     );
 
     // ─── GST SUMMARY (left column, beside totals) ────────────────────────────
-    // Prices are GST-inclusive. Spread loyalty + coupon discounts across lines pro rata,
+    // Prices are GST-inclusive. Spread loyalty, coupon and Crumb Points credit across lines pro rata,
     // tax shipping at the highest item rate (it's part of the same composite supply),
     // then back the tax out of each rate bucket.
     const totalDiscount = Math.max(0, subtotal - goodsTotal);

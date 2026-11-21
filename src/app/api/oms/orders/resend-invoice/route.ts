@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     );
     const shippingFeePaise = order.shipping_fee_paise || 0;
     const couponDiscountPaise = order.coupon_discount_paise || 0;
-    const { discountPercent } = deriveLoyaltyDiscount(itemsSubtotal, order.total_paise, shippingFeePaise, couponDiscountPaise);
+    const { discountPercent } = deriveLoyaltyDiscount(itemsSubtotal, order.total_paise, shippingFeePaise, couponDiscountPaise, order.credit_used_paise || 0);
 
     const pdfBuffer = await generateInvoicePDF({
       order_number: order.order_number,
@@ -44,6 +44,7 @@ export async function POST(req: NextRequest) {
       coupon_code: order.coupon_code,
       coupon_discount_paise: couponDiscountPaise,
       discount_percent: discountPercent,
+        credit_used_paise: order.credit_used_paise || 0,
       delivery_date: order.delivery_date,
       created_at: order.created_at,
     });

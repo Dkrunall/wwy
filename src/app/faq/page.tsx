@@ -69,7 +69,7 @@ const GROUPS: { title: string; items: Faq[] }[] = [
     items: [
       {
         q: "Where do you deliver?",
-        a: "We deliver within Mumbai only. Delivery is free from Colaba and Cuffe Parade to Kandivali on orders of ₹300 or more. Otherwise it is ₹65.",
+        a: "We deliver within Mumbai only. Delivery is free on orders of ₹300 or more. Otherwise it is ₹65.",
         link: { href: "/delivery", label: "Check your pincode" },
       },
       {

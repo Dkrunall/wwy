@@ -19,11 +19,13 @@ import {
   Tag,
   X,
   Loader2,
+  Wheat,
 } from "lucide-react";
 import { CartItem, supabase } from "@/lib/supabase";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { calculateShippingFee } from "@/lib/shipping";
+import { FREE_DELIVERY_MIN_PAISE, calculateShippingFee } from "@/lib/shipping";
+import { CART_TIERS, MAX_CREDIT_SHARE, cartRewardPercent, maxCreditFor } from "@/lib/crumbPoints";
 
 function fmt(paise: number) {
   return `₹${(paise / 100).toFixed(0)}`;
@@ -57,7 +59,7 @@ export default function CartPage() {
   const [customerId, setCustomerId] = useState("");
   const [error, setError] = useState("");
   const [discountInfo, setDiscountInfo] = useState<{
-    discountPercent: number;
+    creditUsedPaise: number;
     finalTotal: number;
     shippingFeePaise: number;
     couponCode: string | null;
@@ -66,7 +68,7 @@ export default function CartPage() {
   const [deliveryLabel, setDeliveryLabel] = useState<string>("");
   const [deliverySlots, setDeliverySlots] = useState<{ iso: string; label: string }[]>([]);
   const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<string>("");
-  const [pincode, setPincode] = useState("");
+  const [rewards, setRewards] = useState<{ availablePaise: number; freeDelivery: boolean } | null>(null);
 
   // Coupons — auto-applied (welcome / min-order) or manually entered
   const [appliedCoupon, setAppliedCoupon] = useState<{
@@ -91,8 +93,16 @@ export default function CartPage() {
     }
     setFlat(storedFlat);
     setCustomerId(localStorage.getItem("wwy_customer_id") || "");
-    setPincode(localStorage.getItem("wwy_pincode") || "");
     setCart(getCart());
+
+    // Crumb Points balance and the existing-customer delivery waiver.
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) return;
+      fetch("/api/rewards", { headers: { Authorization: `Bearer ${session.access_token}` } })
+        .then((r) => (r.ok ? r.json() : null))
+        .then((d) => d && setRewards({ availablePaise: d.availablePaise, freeDelivery: d.freeDelivery }))
+        .catch(() => {});
+    });
 
     fetch("/api/orders/delivery-slots")
       .then((r) => r.json())
@@ -184,16 +194,21 @@ export default function CartPage() {
     setAppliedCoupon(null);
     setCouponError("");
   };
-  const previewShippingFeePaise = calculateShippingFee(pincode, baseTotalPaise);
+  const previewShippingFeePaise = calculateShippingFee(baseTotalPaise, rewards?.freeDelivery);
   // Each delivery day has its own menu: offer only the days that bake everything in the cart.
   const cartNames = cart.map((i) => i.product_name);
   const bakeSlots = deliverySlots.filter((s) => bakeHasAll(s.iso, cartNames));
   const deliveryISO = bakeSlots.some((s) => s.iso === selectedDeliveryDate) ? selectedDeliveryDate : bakeSlots[0]?.iso ?? "";
   const shippingFeePaise = discountInfo ? discountInfo.shippingFeePaise : previewShippingFeePaise;
   const previewCouponDiscountPaise = appliedCoupon?.discountPaise ?? 0;
+  const previewGoodsPaise = Math.max(0, baseTotalPaise - previewCouponDiscountPaise);
+  const creditUsedPaise = discountInfo ? discountInfo.creditUsedPaise : maxCreditFor(previewGoodsPaise, rewards?.availablePaise ?? 0);
   const displayTotal = discountInfo
     ? discountInfo.finalTotal
-    : Math.max(0, baseTotalPaise - previewCouponDiscountPaise) + previewShippingFeePaise;
+    : previewGoodsPaise - creditUsedPaise + previewShippingFeePaise;
+  // Crumb Points this order earns once delivered, and the next tier up when it is within ₹500.
+  const earnPercent = cartRewardPercent(baseTotalPaise);
+  const nextTier = [...CART_TIERS].reverse().find((t) => baseTotalPaise < t.minPaise && t.minPaise - baseTotalPaise <= 50000);
   const itemCount = cart.reduce((s, i) => s + i.quantity, 0);
 
   const handlePay = async () => {
@@ -237,13 +252,13 @@ export default function CartPage() {
         razorpayOrderId,
         amount,
         keyId,
-        discountPercent,
+        creditUsedPaise: cu,
         shippingFeePaise: sf,
         couponCode: appliedCode,
         couponDiscountPaise: cdp,
         deliveryLabel: dl,
       } = await res.json();
-      setDiscountInfo({ discountPercent, finalTotal: amount, shippingFeePaise: sf, couponCode: appliedCode, couponDiscountPaise: cdp });
+      setDiscountInfo({ creditUsedPaise: cu ?? 0, finalTotal: amount, shippingFeePaise: sf, couponCode: appliedCode, couponDiscountPaise: cdp });
       setDeliveryLabel(dl);
 
       const razorpay = new window.Razorpay({
@@ -310,7 +325,7 @@ export default function CartPage() {
             </p>
           </div>
           <button
-            onClick={() => router.push("/order")}
+            onClick={() => router.push("/shop")}
             className="bg-brand-brown text-white font-black text-xs tracking-widest uppercase px-8 py-4 rounded-2xl hover:bg-brand-terracotta transition-colors shadow-md cursor-pointer"
           >
             ← Explore Menu &amp; Order
@@ -486,14 +501,6 @@ export default function CartPage() {
                     <span className="font-bold text-brand-brown">{fmt(baseTotalPaise)}</span>
                   </div>
 
-                  {discountInfo && discountInfo.discountPercent > 0 && (
-                    <div className="flex justify-between text-emerald-700 font-bold bg-emerald-50 p-3 rounded-2xl border border-emerald-200/60">
-                      <span>Loyalty Discount ({discountInfo.discountPercent}%)</span>
-                      <span>
-                        −{fmt(Math.max(0, baseTotalPaise - discountInfo.couponDiscountPaise - (discountInfo.finalTotal - discountInfo.shippingFeePaise)))}
-                      </span>
-                    </div>
-                  )}
 
                   {/* Coupon */}
                   {appliedCoupon ? (
@@ -543,6 +550,21 @@ export default function CartPage() {
                     </div>
                   )}
 
+                  {creditUsedPaise > 0 && (
+                    <div className="flex justify-between items-center text-emerald-700 font-bold bg-emerald-50 p-3 rounded-2xl border border-emerald-200/60">
+                      <span className="flex items-center gap-1.5">
+                        <Wheat className="w-3.5 h-3.5" /> Crumb Points
+                        <span className="text-[11px] font-black uppercase tracking-wider bg-emerald-100 px-1.5 py-0.5 rounded-md">Auto</span>
+                      </span>
+                      <span>−{fmt(creditUsedPaise)}</span>
+                    </div>
+                  )}
+                  {creditUsedPaise > 0 && (rewards?.availablePaise ?? 0) > creditUsedPaise && (
+                    <p className="-mt-2 text-[11px] font-bold text-brand-brown/55">
+                      Points cover up to {MAX_CREDIT_SHARE * 100}% of an order. {fmt((rewards?.availablePaise ?? 0) - creditUsedPaise)} stays in your balance.
+                    </p>
+                  )}
+
                   <div className="flex justify-between text-brand-brown/70 font-medium">
                     <span className="flex items-center gap-1.5">
                       <Truck className="w-3.5 h-3.5 text-emerald-600" /> Shipping
@@ -553,6 +575,10 @@ export default function CartPage() {
                       <span className="font-bold text-brand-brown">{fmt(shippingFeePaise)}</span>
                     )}
                   </div>
+
+                  {rewards?.freeDelivery && shippingFeePaise === 0 && baseTotalPaise < FREE_DELIVERY_MIN_PAISE && (
+                    <p className="-mt-2 text-[11px] font-bold text-emerald-700">Free delivery for our existing customers.</p>
+                  )}
 
                   {deliveryLabel && (
                     <div className="text-[11px] font-bold text-brand-brown/65 italic bg-brand-oat/40 p-2.5 rounded-xl border border-brand-brown/8">
@@ -582,6 +608,16 @@ export default function CartPage() {
                     <span>Pay {fmt(displayTotal)} →</span>
                   )}
                 </button>
+
+                {(earnPercent > 0 || nextTier) && (
+                  <div className="flex items-start gap-2 text-xs font-bold text-brand-brown/70 bg-brand-oat/50 p-3 rounded-2xl border border-brand-brown/10">
+                    <Wheat className="w-4 h-4 text-brand-terracotta shrink-0" />
+                    <span>
+                      {earnPercent > 0 && <>This order earns {fmt(Math.floor((baseTotalPaise * earnPercent) / 100))} in Crumb Points once delivered. </>}
+                      {nextTier && <>Add {fmt(nextTier.minPaise - baseTotalPaise)} more to earn {nextTier.percent}% back.</>}
+                    </span>
+                  </div>
+                )}
 
                 <div className="flex items-center justify-center gap-1.5 text-[11px] font-bold text-brand-brown/60 uppercase tracking-wider pt-1">
                   <Lock className="w-3 h-3 text-emerald-600" />

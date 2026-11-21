@@ -27,6 +27,11 @@ function cutoffInstant(deliveryDate: Date, cutoffHour: number): number {
   return deliveryDate.getTime() - CUTOFF_LEAD_DAYS * DAY_MS + cutoffHour * 60 * 60 * 1000 - IST_OFFSET_MS;
 }
 
+// True while orders for this delivery date (YYYY-MM-DD) are still open.
+export function isBeforeCutoff(isoDate: string, cutoffHour = DEFAULT_CUTOFF_HOUR_IST, now = new Date()): boolean {
+  return now.getTime() < cutoffInstant(new Date(isoDate + "T00:00:00Z"), cutoffHour);
+}
+
 // The next delivery day still open for orders, and when it closes.
 // Rule: orders close CUTOFF_LEAD_DAYS before the delivery day at `cutoffHour` IST
 // (default 9 PM Monday for Wednesday, 9 PM Thursday for Saturday).

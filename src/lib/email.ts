@@ -11,9 +11,13 @@ export async function sendPaymentConfirmedToCustomer(
   email: string,
   name: string,
   orderNumber: string,
-  invoiceUrl?: string
+  invoiceUrl?: string,
+  creditPaise?: number | null
 ): Promise<void> {
   if (!process.env.GMAIL_USER || !email) return;
+  const creditLine = typeof creditPaise === "number"
+    ? `<p style="background:#f5edd7;padding:10px 14px;border-radius:8px;font-size:14px">Your Crumb Points balance: <b>₹${(creditPaise / 100).toFixed(0)}</b>. It comes off your next order automatically.</p>`
+    : "";
   const html = `
     <div style="font-family:sans-serif;max-width:520px;margin:0 auto;color:#2c1a0e">
       <h2 style="color:#c9a96e;margin-bottom:4px">Payment Confirmed ✅</h2>
@@ -22,6 +26,7 @@ export async function sendPaymentConfirmedToCustomer(
       <p style="font-size:20px;font-weight:900;color:#2c1a0e">Order ${orderNumber}</p>
       <p>Your bread is confirmed and baking will begin soon. 🍞<br/>We'll send you another email when your order is out for delivery.</p>
       ${invoiceUrl ? `<p><a href="${invoiceUrl}" style="background:#2c1a0e;color:white;padding:10px 20px;text-decoration:none;border-radius:8px;font-weight:bold;display:inline-block;margin-top:8px">Download Invoice →</a></p>` : ""}
+      ${creditLine}
       <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
       <p style="font-size:12px;color:#aaa">Wild Wild Yeast · Handcrafted with love 🌾</p>
     </div>`;
@@ -262,6 +267,61 @@ export async function sendOwnerNotification(order: OrderEmailData): Promise<void
     from: process.env.GMAIL_USER,
     to: process.env.OWNER_EMAIL,
     subject: `New Order ${order.order_number}: ₹${total}: ${order.customer_name}`,
+    html,
+  });
+}
+
+const inr = (paise: number) => `₹${(paise / 100).toFixed(0)}`;
+const fmtBake = (iso: string) =>
+  new Date(iso + "T00:00:00Z").toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", timeZone: "UTC" });
+
+// Standing Order: payment received, here are the bakes it covers.
+export async function sendSubscriptionConfirmed(
+  email: string,
+  name: string,
+  data: { amountPaise: number; daysLabel: string; bakeDates: string[]; manageUrl: string }
+): Promise<void> {
+  if (!process.env.GMAIL_USER || !email) return;
+  const html = `
+    <div style="font-family:sans-serif;max-width:520px;margin:0 auto;color:#2c1a0e">
+      <h2 style="color:#c9a96e;margin-bottom:4px">Standing Order confirmed</h2>
+      <p style="margin-top:0;color:#888;font-size:13px">Wild Wild Yeast</p>
+      <p>Hi <b>${name}</b>, we've received ${inr(data.amountPaise)} for your next four weeks of bread on ${data.daysLabel}.</p>
+      <p><b>Your bakes:</b><br/>${data.bakeDates.map(fmtBake).join("<br/>")}</p>
+      <p>You can pick flavours or skip up to two bakes a month before each order cutoff.</p>
+      <p><a href="${data.manageUrl}" style="background:#2c1a0e;color:white;padding:10px 20px;text-decoration:none;border-radius:8px;font-weight:bold;display:inline-block">Manage Standing Order →</a></p>
+      <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
+      <p style="font-size:12px;color:#aaa">Wild Wild Yeast · Handcrafted with love 🌾</p>
+    </div>`;
+  await createTransporter().sendMail({
+    from: `Wild Wild Yeast <${process.env.GMAIL_USER}>`,
+    to: email,
+    subject: "Your Standing Order is confirmed",
+    html,
+  });
+}
+
+// Standing Order: the paid month is ending; pay for the next four weeks.
+export async function sendSubscriptionRenewal(
+  email: string,
+  name: string,
+  data: { amountPaise: number; lastBake: string; payUrl: string }
+): Promise<void> {
+  if (!process.env.GMAIL_USER || !email) return;
+  const html = `
+    <div style="font-family:sans-serif;max-width:520px;margin:0 auto;color:#2c1a0e">
+      <h2 style="color:#c9a96e;margin-bottom:4px">Time to renew your Standing Order</h2>
+      <p style="margin-top:0;color:#888;font-size:13px">Wild Wild Yeast</p>
+      <p>Hi <b>${name}</b>, your last paid bake is on <b>${fmtBake(data.lastBake)}</b>.</p>
+      <p>Pay ${inr(data.amountPaise)} for the next four weeks to keep your loaves coming. If you pay after the next order cutoff, we simply start from the following bake.</p>
+      <p><a href="${data.payUrl}" style="background:#2c1a0e;color:white;padding:10px 20px;text-decoration:none;border-radius:8px;font-weight:bold;display:inline-block">Pay ${inr(data.amountPaise)} →</a></p>
+      <hr style="border:none;border-top:1px solid #eee;margin:24px 0"/>
+      <p style="font-size:12px;color:#aaa">Wild Wild Yeast · Handcrafted with love 🌾</p>
+    </div>`;
+  await createTransporter().sendMail({
+    from: `Wild Wild Yeast <${process.env.GMAIL_USER}>`,
+    to: email,
+    subject: "Renew your Standing Order",
     html,
   });
 }

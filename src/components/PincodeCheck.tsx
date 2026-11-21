@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { FREE_DELIVERY_MIN_PAISE, STANDARD_SHIPPING_FEE_PAISE } from "@/lib/shipping";
 
-type State = "idle" | "checking" | "free" | "paid" | "blocked" | "error";
+type State = "idle" | "checking" | "ok" | "blocked" | "error";
 
 // Early pincode check (P3-4): tells visitors whether we deliver to them before they browse and add to cart.
 export default function PincodeCheck({ tone = "light" }: { tone?: "light" | "dark" }) {
@@ -20,7 +20,7 @@ export default function PincodeCheck({ tone = "light" }: { tone?: "light" | "dar
     try {
       const res = await fetch(`/api/pincode/serviceable?code=${pincode}`);
       const d = await res.json();
-      setState(d.serviceable ? (d.free ? "free" : "paid") : "blocked");
+      setState(d.serviceable ? "ok" : "blocked");
     } catch {
       setState("error");
     }
@@ -30,8 +30,7 @@ export default function PincodeCheck({ tone = "light" }: { tone?: "light" | "dar
   const message: Record<State, string> = {
     idle: "",
     checking: "Checking...",
-    free: `Good news, we deliver to your pincode. Delivery is free on orders of ₹${FREE_DELIVERY_MIN_PAISE / 100} or more.`,
-    paid: `Good news, we deliver to your pincode. A ₹${STANDARD_SHIPPING_FEE_PAISE / 100} delivery charge applies.`,
+    ok: `Good news, we deliver to your pincode. Delivery is free on orders of ₹${FREE_DELIVERY_MIN_PAISE / 100} or more, otherwise ₹${STANDARD_SHIPPING_FEE_PAISE / 100}.`,
     blocked: "Sorry, we deliver within Mumbai only.",
     error: "Enter a valid 6-digit pincode.",
   };
@@ -61,7 +60,7 @@ export default function PincodeCheck({ tone = "light" }: { tone?: "light" | "dar
           Check
         </button>
       </div>
-      <p role="status" className={`text-xs font-bold min-h-4 ${state === "blocked" || state === "error" ? "text-rose-600" : state === "free" || state === "paid" ? "text-emerald-600" : text}`}>
+      <p role="status" className={`text-xs font-bold min-h-4 ${state === "blocked" || state === "error" ? "text-rose-600" : state === "ok" ? "text-emerald-600" : text}`}>
         {message[state]}
       </p>
     </form>

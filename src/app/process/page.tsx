@@ -47,7 +47,7 @@ export default function ProcessPage() {
 
       <h2>Curious about the results?</h2>
       <p>
-        Explore our <Link href="/order?category=Crafted%20Bakes">Crafted Bakes</Link> and discover what fermentation and flavour can bring to your
+        Explore our <Link href="/shop">menu</Link> and discover what fermentation and flavour can bring to your
         table. We bake twice a week, bringing fresh batches to your doorstep according to our baking and delivery schedule.
       </p>
     </PolicyPage>

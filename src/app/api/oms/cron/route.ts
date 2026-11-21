@@ -4,6 +4,7 @@ import { createServerSupabase } from "@/lib/supabase-server";
 import { sendDeliveryUpdateToCustomer } from "@/lib/email";
 import { customerTrackingUrl, dispatchFields } from "@/lib/delivery";
 import { OMS_COOKIE, verifyOmsToken } from "@/lib/omsAuth";
+import { createDueSubscriptionOrders, sendRenewalReminders } from "@/lib/subscriptions";
 
 // Called manually from OMS or via Vercel Cron (add to vercel.json)
 // Processes delivery status transitions for today's orders.
@@ -32,6 +33,11 @@ export async function POST(req: NextRequest) {
   const supabase = createServerSupabase();
   const todayISO = new Date().toISOString().slice(0, 10);
 
+  // Standing Orders: bakes past their order cutoff become orders, and renewal links go out.
+  // Failures here (e.g. supabase-subscriptions.sql not run yet) must not stop the status updates below.
+  const subscriptionOrders = await createDueSubscriptionOrders(supabase).catch((e) => { console.error("[Cron] subscription orders:", e); return 0; });
+  const renewalEmails = await sendRenewalReminders(supabase).catch((e) => { console.error("[Cron] renewal reminders:", e); return 0; });
+
   const { data: orders } = await supabase
     .from("orders")
     .select("*, customers(email, address, phone, pincode), bakers(id, name, phone, address, lat, lng)")
@@ -39,7 +45,7 @@ export async function POST(req: NextRequest) {
     .eq("payment_status", "paid");
 
   if (!orders || orders.length === 0) {
-    return NextResponse.json({ ok: true, processed: 0 });
+    return NextResponse.json({ ok: true, processed: 0, subscriptionOrders, renewalEmails });
   }
 
   const nowUTC = new Date();
@@ -54,7 +60,7 @@ export async function POST(req: NextRequest) {
 
   const transition = transitions[String(istHour)];
   if (!transition) {
-    return NextResponse.json({ ok: true, processed: 0, message: "No transition for this hour" });
+    return NextResponse.json({ ok: true, processed: 0, message: "No transition for this hour", subscriptionOrders, renewalEmails });
   }
 
   let processed = 0;
@@ -85,5 +91,5 @@ export async function POST(req: NextRequest) {
     processed++;
   }
 
-  return NextResponse.json({ ok: true, processed });
+  return NextResponse.json({ ok: true, processed, subscriptionOrders, renewalEmails });
 }

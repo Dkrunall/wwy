@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { supabase, Order } from "@/lib/supabase";
 import AnnouncementBar from "@/components/AnnouncementBar";
+import CrumbPointsCard from "@/components/CrumbPointsCard";
 
 function fmt(paise: number) { return `₹${(paise / 100).toFixed(0)}`; }
 function fmtDate(iso: string) {
@@ -149,7 +150,7 @@ export default function AccountPage() {
       unit_price_paise: priceMap[item.product_id] ?? item.unit_price_paise,
     }));
     localStorage.setItem("wwy_cart", JSON.stringify(cartItems));
-    router.push("/order");
+    router.push("/shop");
   };
 
   const savePhone = async () => {
@@ -200,7 +201,7 @@ export default function AccountPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-8 xl:px-16 h-14 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <button
-              onClick={() => router.push("/order")}
+              onClick={() => router.push("/shop")}
               className="flex items-center gap-2 text-xs font-black tracking-wider uppercase text-gray-400 hover:text-brand-brown transition-colors"
             >
               <Home className="w-4 h-4" /> Shop
@@ -266,9 +267,22 @@ export default function AccountPage() {
             </nav>
           </div>
 
+          <CrumbPointsCard detailed />
+
+          <button
+            onClick={() => router.push("/subscribe")}
+            className="bg-white border border-gray-200 hover:border-brand-terracotta/40 rounded-2xl px-5 py-4 flex items-center justify-between transition-all shadow-sm"
+          >
+            <div className="text-left">
+              <p className="font-black text-sm text-brand-brown leading-none">Standing Order</p>
+              <p className="text-gray-400 text-[11px] font-bold mt-0.5">2 flavoured loaves a week, paid monthly</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-gray-300" />
+          </button>
+
           {/* Quick shop */}
           <button
-            onClick={() => router.push("/order")}
+            onClick={() => router.push("/shop")}
             className="bg-brand-brown hover:bg-brand-orange text-white rounded-2xl px-5 py-4 flex items-center justify-between transition-all active:scale-[0.98] shadow-sm"
           >
             <div className="flex items-center gap-3">
@@ -386,7 +400,7 @@ export default function AccountPage() {
                     <ShoppingBag className="w-10 h-10 text-gray-200" />
                     <p className="font-black text-gray-300 text-sm">No orders yet</p>
                     <button
-                      onClick={() => router.push("/order")}
+                      onClick={() => router.push("/shop")}
                       className="bg-brand-brown text-white font-black text-xs tracking-wider uppercase px-6 py-3 rounded-xl hover:bg-brand-orange transition-colors"
                     >
                       Browse Menu →

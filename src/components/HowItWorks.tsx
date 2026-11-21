@@ -93,7 +93,7 @@ export default function HowItWorks() {
           {[
             { label: `Delivery: ${deliveryDaysShort()} only` },
             { label: "Order online, pay by card / UPI / netbanking" },
-            { label: "Free delivery Colaba to Kandivali over ₹300" },
+            { label: "Free delivery over ₹300" },
             { label: "Baked to order, no advance stock" },
           ].map(({ label }) => (
             <span key={label} className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-full bg-white border border-brand-brown/8 text-[11px] sm:text-xs md:text-sm font-black tracking-[0.12em] uppercase text-brand-brown/60 shadow-sm">

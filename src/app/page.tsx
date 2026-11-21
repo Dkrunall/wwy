@@ -8,7 +8,6 @@ import Hero from "@/components/Hero";
 import ProcessStory from "@/components/ProcessStory";
 import StorySection from "@/components/StorySection";
 import MenuSection from "@/components/MenuSection";
-import SocialGallery from "@/components/SocialGallery";
 import Newsletter from "@/components/Newsletter";
 import Footer from "@/components/Footer";
 import { FlavourFreshnessSection } from "@/components/HomeSections";
@@ -34,7 +33,6 @@ export default function Home() {
       <StorySection />
       <ProcessStory />
       <FlavourFreshnessSection />
-      <SocialGallery />
       <Newsletter />
       <Footer />
       <CartDrawer />

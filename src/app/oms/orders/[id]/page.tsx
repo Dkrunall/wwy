@@ -16,7 +16,7 @@ import {
 interface OrderItem { id: string; product_name: string; quantity: number; unit_price_paise: number; }
 interface OrderDetail {
   id: string; order_number: string | null; flat_number: string; customer_name: string;
-  total_paise: number; shipping_fee_paise: number | null; coupon_code: string | null; coupon_discount_paise: number | null; status: string; payment_status: string | null;
+  total_paise: number; shipping_fee_paise: number | null; coupon_code: string | null; coupon_discount_paise: number | null; credit_used_paise?: number | null; status: string; payment_status: string | null;
   delivery_status: string | null; delivery_date: string | null; invoice_url: string | null;
   baker_id: string | null; notes: string | null; admin_notes: string | null;
   borzo_tracking_url: string | null; source: string | null; created_at: string;
@@ -365,6 +365,12 @@ export default function OrderDetailsPage() {
                     <span>−{fmt(order.coupon_discount_paise)}</span>
                   </div>
                 )}
+                {!!order.credit_used_paise && (
+                  <div className="flex justify-between items-center text-xs font-bold text-emerald-700">
+                    <span>Crumb Points</span>
+                    <span>−{fmt(order.credit_used_paise)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between items-center text-xs font-bold text-brand-brown/50">
                   <span>Shipping</span>
                   <span>{order.shipping_fee_paise ? fmt(order.shipping_fee_paise) : "FREE"}</span>
@@ -570,7 +576,7 @@ export default function OrderDetailsPage() {
             <div className="bg-rose-50 border border-rose-200/50 rounded-2xl p-4">
               <p className="text-sm font-black text-rose-800">{order.order_number || `#${order.id.slice(0, 8).toUpperCase()}`}</p>
               <p className="text-xs font-bold text-rose-700/70 mt-1">{order.customer_name} · Flat {order.flat_number} · {fmt(order.total_paise)}</p>
-              {order.payment_status === "paid" && <p className="text-xs font-bold text-rose-600 mt-2 bg-rose-100 rounded-xl px-3 py-2">⚠ Order is paid — arrange a manual refund if needed.</p>}
+              {order.payment_status === "paid" && <p className="text-xs font-bold text-rose-600 mt-2 bg-rose-100 rounded-xl px-3 py-2">⚠ Order is paid — arrange a manual refund if needed. Crumb Points it used go back to the customer automatically.</p>}
             </div>
             <div className="flex gap-3">
               <button onClick={() => setConfirmingCancel(false)} className="flex-1 py-3 rounded-2xl border border-brand-brown/15 text-xs font-black uppercase tracking-wider text-brand-brown/60 hover:bg-brand-brown/5 cursor-pointer">Keep</button>

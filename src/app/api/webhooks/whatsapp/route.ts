@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase-server";
 import { calculateDeliveryDate, formatDeliveryDate, deliveryDateISO } from "@/lib/dateUtils";
-import { applyDiscounts } from "@/lib/discounts";
+import { hasFreeDelivery } from "@/lib/crumbPoints";
 import { calculateShippingFee } from "@/lib/shipping";
 import { resolveCoupon } from "@/lib/couponResolve";
 import { getRazorpay } from "@/lib/razorpay";
@@ -360,15 +360,11 @@ async function stepConfirmOrder(
   }
 
   const subtotal = cart.reduce((s, i) => s + i.qty * i.price, 0);
-  const { finalTotal: loyaltyFinalTotal, discountPercent } = await applyDiscounts(customer?.id || "", subtotal);
-  const loyaltyDiscountPaise = subtotal - loyaltyFinalTotal;
-
   // No manual coupon-code entry in the chat flow — auto-apply only (welcome / min-order coupons).
   const { coupon, discountPaise: couponDiscountPaise } = await resolveCoupon(supabase, customer?.id || null, subtotal);
 
-  const totalDiscountPaise = Math.min(subtotal, loyaltyDiscountPaise + couponDiscountPaise);
-  const finalGoodsTotal = subtotal - totalDiscountPaise;
-  const shippingFeePaise = calculateShippingFee(customer?.pincode, subtotal);
+  const finalGoodsTotal = subtotal - Math.min(subtotal, couponDiscountPaise);
+  const shippingFeePaise = calculateShippingFee(subtotal, await hasFreeDelivery(supabase, customer?.phone));
   const finalTotal = finalGoodsTotal + shippingFeePaise;
 
   // Use earliest delivery date across cart items
@@ -428,10 +424,9 @@ async function stepConfirmOrder(
   await updateSession(phone, { step: "identify", cart: [] }, supabase);
 
   let msg = `Order *${orderNumber}* is placed! 🎉\nTotal: ₹${(finalTotal / 100).toFixed(0)}`;
-  if (discountPercent > 0) msg += ` _(${discountPercent}% loyalty discount applied)_`;
   if (coupon) msg += `\nCoupon *${coupon.code}* applied: -₹${(couponDiscountPaise / 100).toFixed(0)}`;
   msg += shippingFeePaise > 0
-    ? `\nShipping: ₹${(shippingFeePaise / 100).toFixed(0)} (free over ₹599)`
+    ? `\nShipping: ₹${(shippingFeePaise / 100).toFixed(0)} (free over ₹300)`
     : `\nShipping: FREE`;
   msg += `\nDelivery: ${formatISODate(deliveryISO)}`;
   if (rzpLink) msg += `\n\nPay here: ${rzpLink}\n\n_Link expires in 15 minutes._`;

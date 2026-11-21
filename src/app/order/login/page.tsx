@@ -16,7 +16,7 @@ const OTP_LENGTH = Math.min(10, Math.max(6, parseInt(process.env.NEXT_PUBLIC_OTP
 // Where to go after login: only same-site /order paths, so ?next= cannot redirect off-site.
 function safeNext(raw: string | null): string {
   if (raw && /^\/order(\/[A-Za-z0-9\-_/]*)?$/.test(raw)) return raw;
-  return "/order";
+  return "/shop";
 }
 
 export default function OrderLoginPage() {

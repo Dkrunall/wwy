@@ -16,6 +16,9 @@ import {
   Download, Send, ChevronLeft, ChevronRight, Star, Bell, Zap,
 } from "lucide-react";
 import { Coupon, computeCouponDiscount } from "@/lib/coupons";
+import OmsCrumbPoints from "@/components/OmsCrumbPoints";
+import OmsFreeDeliveryList from "@/components/OmsFreeDeliveryList";
+import OmsSubscriptions from "@/components/OmsSubscriptions";
 
 interface OrderItem { id: string; product_name: string; quantity: number; unit_price_paise: number; }
 interface Order {
@@ -749,6 +752,7 @@ function OmsDashboardInner() {
                 <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Address</label><input className={inputCls} placeholder="Tower B, Apt 12..." value={customerForm.address} onChange={e=>setCustomerForm(f=>({...f,address:e.target.value}))}/></div>
                 <div className="flex flex-col gap-1.5"><label className="text-[10px] font-black uppercase tracking-widest text-brand-brown/50">Pincode</label><input className={inputCls} placeholder="400001" value={customerForm.pincode} onChange={e=>setCustomerForm(f=>({...f,pincode:e.target.value}))}/></div>
               </div>
+              <OmsCrumbPoints customerId={editingCustomer.id} />
               {formError && <p className="text-xs font-bold text-rose-600 -mt-2">{formError}</p>}
               <div className="flex gap-3"><button onClick={closeModal} className="flex-1 py-3 rounded-2xl border border-brand-brown/15 text-xs font-black uppercase tracking-wider text-brand-brown/60 hover:bg-brand-brown/5">Cancel</button><button onClick={saveCustomer} disabled={formSaving} className="flex-1 py-3 rounded-2xl bg-brand-brown hover:bg-brand-orange text-white text-xs font-black uppercase tracking-wider disabled:opacity-50 flex items-center justify-center gap-2">{formSaving&&<Loader2 className="w-3.5 h-3.5 animate-spin"/>}Save Changes</button></div>
             </div>
@@ -1629,6 +1633,10 @@ function OmsDashboardInner() {
               {defaultBakerMsg && <p className="text-xs font-bold text-emerald-700">{defaultBakerMsg}</p>}
             </div>
 
+            <OmsFreeDeliveryList />
+
+            <OmsSubscriptions />
+
             {/* Known settings */}
             <div className="bg-white rounded-[2rem] border border-brand-brown/10 p-6 shadow-sm flex flex-col gap-4">
               <p className="text-[9px] font-black uppercase tracking-widest text-brand-brown/40 mb-1">Store Settings</p>
@@ -1637,6 +1645,7 @@ function OmsDashboardInner() {
                 {key:"min_order_paise",label:"Min Order (paise)",desc:"e.g. 20000 = ₹200 minimum",placeholder:"20000"},
                 {key:"delivery_days",label:"Delivery Days",desc:"Comma-separated: wed,sat",placeholder:"wed,sat"},
                 {key:"cutoff_hour_ist",label:"Order Cutoff Hour (IST)",desc:"24h integer, e.g. 20 = 8 PM",placeholder:"20"},
+                {key:"sub_loaf_price_paise",label:"Standing Order Loaf Price (paise)",desc:"e.g. 37500 = ₹375 a loaf; 8 loaves per 4-week payment",placeholder:"37500"},
               ].map(({key,label,desc,placeholder})=>{
                 const current = settingValues[key]??"";
                 const edited = settingEdits[key];

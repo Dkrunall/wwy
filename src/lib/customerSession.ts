@@ -6,6 +6,7 @@ export type SessionCustomer = {
   name: string;
   flat_number: string;
   pincode: string | null;
+  phone: string | null;
 };
 
 // Identify the customer from the Supabase Auth session the browser sends as
@@ -22,7 +23,7 @@ export async function getSessionCustomer(req: NextRequest, admin: SupabaseClient
 
   const { data: customer } = await admin
     .from("customers")
-    .select("id, name, flat_number, pincode")
+    .select("id, name, flat_number, pincode, phone")
     .eq("email", email)
     .maybeSingle();
   return (customer as SessionCustomer | null) ?? null;
