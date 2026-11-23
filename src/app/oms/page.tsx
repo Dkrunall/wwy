@@ -19,6 +19,7 @@ import { Coupon, computeCouponDiscount } from "@/lib/coupons";
 import OmsCrumbPoints from "@/components/OmsCrumbPoints";
 import OmsFreeDeliveryList from "@/components/OmsFreeDeliveryList";
 import OmsSubscriptions from "@/components/OmsSubscriptions";
+import OmsBorzoTest from "@/components/OmsBorzoTest";
 
 interface OrderItem { id: string; product_name: string; quantity: number; unit_price_paise: number; }
 interface Order {
@@ -1636,6 +1637,8 @@ function OmsDashboardInner() {
             <OmsFreeDeliveryList />
 
             <OmsSubscriptions />
+
+            <OmsBorzoTest />
 
             {/* Known settings */}
             <div className="bg-white rounded-[2rem] border border-brand-brown/10 p-6 shadow-sm flex flex-col gap-4">

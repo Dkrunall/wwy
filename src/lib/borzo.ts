@@ -1,5 +1,6 @@
+// Live: robot-in.borzodelivery.com. Test: set BORZO_API_BASE to https://robotapitest-in.borzodelivery.com/api/business/1.6
 const BORZO_API_BASE =
-  process.env.BORZO_API_BASE || "https://api-in.borzodelivery.com/api/business/1.6";
+  process.env.BORZO_API_BASE || "https://robot-in.borzodelivery.com/api/business/1.6";
 
 export interface BorzoDeliveryInput {
   pickupAddress: string;
@@ -83,5 +84,36 @@ export async function createBorzoDelivery(
   } catch (err) {
     console.error("[Borzo] fetch error:", err);
     return { borzoOrderId: null, trackingUrl: null, error: "fetch_failed" };
+  }
+}
+
+// Price quote only (calculate-order): books nothing and costs nothing. Used by the OMS
+// "Test Borzo connection" button to check the key and API address.
+export async function quoteBorzoDelivery(pickupAddress: string, dropoffAddress: string): Promise<{
+  ok: boolean;
+  live: boolean;
+  amount?: string;
+  error?: string;
+}> {
+  const live = !BORZO_API_BASE.includes("robotapitest");
+  const token = process.env.BORZO_AUTH_TOKEN;
+  if (!token) return { ok: false, live, error: "BORZO_AUTH_TOKEN is not set in Vercel." };
+  try {
+    const res = await fetch(`${BORZO_API_BASE}/calculate-order`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-DV-Auth-Token": token },
+      body: JSON.stringify({
+        type: "standard",
+        matter: "Sourdough Bread",
+        total_weight_kg: "2",
+        points: [{ address: pickupAddress }, { address: dropoffAddress }],
+      }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.status === 401 || res.status === 403) return { ok: false, live, error: "Borzo rejected the key. Check BORZO_AUTH_TOKEN, and that it matches the live/test address." };
+    if (!data.is_successful) return { ok: false, live, error: JSON.stringify(data.errors || data.parameter_errors || data.warnings || `HTTP ${res.status}`) };
+    return { ok: true, live, amount: data.order?.payment_amount };
+  } catch {
+    return { ok: false, live, error: "Could not reach Borzo." };
   }
 }
